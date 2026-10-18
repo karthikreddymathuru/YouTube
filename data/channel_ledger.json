@@ -1,0 +1,25 @@
+{
+  "channel_name": "Pip & Leo Kids Science Shorts",
+  "episodes": [
+    {
+      "episode_number": 1,
+      "timestamp": "2026-10-17T23:41:27",
+      "date": "2026-10-17",
+      "niche": "animal_secrets",
+      "title": "3 Impossible Flamingo Superpowers That Are 100% REAL! \ud83e\udda9\ud83d\udd25 #shorts",
+      "package_dir": "data/ready_for_upload/package_20261017_234127",
+      "video_file": "data/ready_for_upload/package_20261017_234039.mp4",
+      "duration_sec": 47.3,
+      "av_drift_sec": 0.003,
+      "tournament_score": 100.0,
+      "winning_archetype": "curiosity_mystery",
+      "silent_comprehension_score": 97.0,
+      "character_face_consistency_score": 100.0,
+      "all_gates_passed": true,
+      "made_for_kids": true,
+      "upload_status": "staged_locally",
+      "youtube_video_id": null
+    }
+  ],
+  "last_updated": "2026-10-17T23:41:27"
+}

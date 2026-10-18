@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Secrets & Environment Variables (NEVER COMMIT)
+.env
+*.env
+client_secret*.json
+data/token.json
+token.json
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large Generated Media & Video Outputs
+data/output/
+data/ready_for_upload/
+*.mp4
+*.wav
+*.avi
+
+# Keep essential audio assets
+!data/music/*.wav
+!data/sound_effects/*.wav
+
+# Temporary test artifacts
+test_*.png
+tavily_test.*
+tavily_vertical_flamingo.png
+test_flux.png
+test_flamingo.png
+.agents/

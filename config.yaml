@@ -1,0 +1,71 @@
+# YouTube Shorts Automated Generator Configuration
+project_name: "KidsShortsAuto"
+version: "1.0.0"
+
+# Target Audience & Monetization Strategy
+monetization:
+  # Options: 'family_co_viewing' (recommended: higher RPM, comments active) or 'pure_kids'
+  audience_strategy: "family_co_viewing"
+  default_made_for_kids: false
+  target_rpm_niche: "curiosity_and_edutainment"
+  enforce_uniqueness: true
+  min_semantic_distance: 0.35
+
+# Content Niches & Rotation
+niches:
+  active:
+    - "animal_secrets"
+    - "interactive_riddles"
+    - "dinosaur_and_nature"
+    - "science_curiosities"
+  rotation_policy: "round_robin"
+
+# Voice & Audio Settings
+audio:
+  # Edge-TTS voices: 'en-US-AnaNeural' (child-friendly, energetic), 'en-US-JennyNeural' (storyteller)
+  primary_voice: "en-US-AnaNeural"
+  backup_voice: "en-US-JennyNeural"
+  speech_rate: "+5%"
+  speech_pitch: "+3Hz"
+  # Audio ducking: percentage of original music volume when speech is active
+  music_ducking_volume: 0.12
+  music_ambient_volume: 0.28
+  sfx_volume: 0.70
+
+# Video Visual & Typography Standards
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  aspect_ratio: "9:16"
+  target_duration_seconds: 40  # Ideal 35-45s for kids retention
+  ken_burns:
+    enabled: true
+    zoom_ratio: 1.15
+  # Caption Safe Zones (avoids YouTube Shorts top title and bottom channel icon/description)
+  subtitles:
+    font_size: 64
+    font_color: "#FFE500"      # High-retention bright yellow
+    highlight_color: "#00FF66" # Neon green for active word
+    stroke_color: "#000000"
+    stroke_width: 5
+    safe_zone_vertical_pct: 0.52 # Centered at 52% of vertical height
+
+# Publishing & Output Settings
+paths:
+  data_dir: "data"
+  playbook_file: "data/viral_playbook.json"
+  output_dir: "data/output"
+  sound_effects_dir: "data/sound_effects"
+  music_dir: "data/music"
+
+publishing:
+  default_privacy: "unlisted"  # 'unlisted', 'private', or 'public'
+  category_id: "27"            # 27 = Education, 24 = Entertainment
+  default_tags:
+    - "shorts"
+    - "kidsshorts"
+    - "funfacts"
+    - "curiosity"
+    - "didyouknow"
+    - "learning"
