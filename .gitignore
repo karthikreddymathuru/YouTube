@@ -14,6 +14,8 @@ ENV/
 *.env
 client_secret*.json
 credentials*.json
+!credentials.example.json
+!client_secret.example.json
 data/token.json
 token.json
 
