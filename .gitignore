@@ -13,6 +13,7 @@ ENV/
 .env
 *.env
 client_secret*.json
+credentials*.json
 data/token.json
 token.json
 
