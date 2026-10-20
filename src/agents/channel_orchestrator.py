@@ -529,7 +529,7 @@ class ChannelOrchestrator:
                 f"A/V Drift: {quality_res['av_drift_sec']}s"
             )
 
-            if quality_res["all_gates_passed"] or attempt > max_retries:
+            if quality_res["all_gates_passed"]:
                 # Agent 6: Publishing & Analytics Feedback Manager
                 pub_res = self.publishing_agent.publish_and_record(
                     mp4_path=prod_res["final_mp4"],
@@ -558,7 +558,19 @@ class ChannelOrchestrator:
                     "publishing": pub_res,
                     "workspace_bridges": self.bridge.get_status_summary(),
                 }
+            else:
+                logger.warning(
+                    f"⚠️ Quality Gate failed on attempt {attempt}: "
+                    f"species_conflict={quality_res.get('visual_audit', {}).get('species_conflict_error')}, "
+                    f"all_passed={quality_res['all_gates_passed']}. Autonomous retry..."
+                )
 
-            logger.warning(f"⚠️ Quality Gate failed on attempt {attempt}; triggering autonomous self-healing retry...")
-
-        return {}
+        quarantine_dir = os.path.join("data/output", "quarantine", f"failed_{run_id}")
+        os.makedirs(quarantine_dir, exist_ok=True)
+        logger.error(f"❌ PUBLISH STRICTLY BLOCKED: Quality gates failed. Video quarantined at {quarantine_dir}.")
+        return {
+            "run_id": run_id,
+            "status": "BLOCKED_BY_QUALITY_GATES",
+            "quality_gates": quality_res,
+            "quarantine_dir": quarantine_dir
+        }

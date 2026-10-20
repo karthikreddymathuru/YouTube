@@ -281,19 +281,99 @@ class VisualEngine:
         self._draw_scene_environment(img, draw, visual_prop, scene_id)
 
         # 2. Render the specific visual story action & consistent characters
-        if visual_prop == "boiling_geyser":
-            # Scene 1: Pip sipping steaming boiling geyser water + 100°C thermometer + shocked Leo
+        low_narr = (narration or "").lower()
+        is_octopus = "octopus" in visual_prop.lower() or "octopus" in low_narr
+
+        # --- OCTOPUS & OCEAN EPISODES ---
+        if is_octopus:
+            if scene_id == 8 or visual_prop in ("octopus_superpower_choice", "choice_card"):
+                # Scene 8: Choice Card / Loop Finale with Octopus and Leo waving together
+                self._draw_octopus_character(
+                    draw, cx=360, cy=1020, scale=0.98, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("octopus_three_hearts", "three_hearts_xray"):
+                # Scene 1: Octopus transparent body with 3 glowing hearts pumping + Leo reaction
+                self._draw_octopus_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="coral",
+                    expression="happy", hearts_visible=True, anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="LEO: 3 HEARTS?!")
+
+            elif scene_id == 2 or visual_prop in ("octopus_blue_blood", "blue_blood_tube"):
+                # Scene 2: Octopus in cold ocean with neon-blue copper blood circulation + test tube
+                self._draw_octopus_character(
+                    draw, cx=440, cy=980, scale=1.1, color_state="coral",
+                    expression="happy", blue_blood=True, anim_phase=anim_phase
+                )
+                self._draw_blue_blood_tube_prop(draw, cx=760, cy=740, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="BLUE BLOOD!")
+
+            elif scene_id == 3 or visual_prop in ("octopus_rice_eggs",):
+                # Scene 3: Translucent ocean seaweed cradle with tiny rice-sized baby octopuses hatching!
+                self._draw_octopus_rice_eggs_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="RICE-SIZED!")
+
+            elif scene_id == 4 or visual_prop in ("octopus_catching_shrimp",):
+                # Scene 4: Octopus using tentacles to scoop up glowing deep-sea shrimp!
+                self._draw_octopus_character(
+                    draw, cx=420, cy=980, scale=1.05, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_glowing_shrimp_school(draw, cx=780, cy=980, anim_phase=anim_phase)
+                self._draw_pigment_arrows(draw, start_xy=(730, 960), end_xy=(510, 960))
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="SHRIMP FEAST!")
+
+            elif scene_id == 5 or visual_prop in ("octopus_03s_camouflage",):
+                # Scene 5: Instant 0.3s color transformation from coral orange to neon tiger camouflage!
+                self._draw_transformation_aura(draw, cx=540, cy=940)
+                self._draw_octopus_character(
+                    draw, cx=540, cy=960, scale=1.15, color_state="camouflage",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="0.3s SHIFT!")
+
+            elif scene_id == 6 or visual_prop in ("octopus_coral_sleep",):
+                # Scene 6: Octopus curled up fast asleep in glowing coral reef dreaming in neon colors!
+                self._draw_coral_reef_bed(draw, cy=1320)
+                self._draw_octopus_character(
+                    draw, cx=540, cy=980, scale=1.1, color_state="sleep_blue",
+                    expression="sleeping", anim_phase=anim_phase
+                )
+                self._draw_zzz_bubbles(draw, start_x=680, start_y=640, anim_phase=anim_phase)
+                self._draw_color_dream_thought_bubble(draw, cx=740, cy=460)
+
+            elif scene_id == 7 or visual_prop in ("octopus_nine_brains",):
+                # Scene 7: Full Octopus showing 1 Central Brain + 8 Tentacle Mini-Brains!
+                self._draw_octopus_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="coral",
+                    expression="happy", nine_brains=True, anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="9 BRAINS SYNC!")
+
+            else:
+                self._draw_octopus_character(
+                    draw, cx=540, cy=960, scale=1.15, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+
+        # --- FLAMINGO EPISODES ---
+        elif visual_prop == "boiling_geyser":
             self._draw_boiling_geyser_prop(draw, cx=330, cy=1220, anim_phase=anim_phase)
             self._draw_pip_character(
                 draw, cx=660, cy=980, scale=1.05,
                 color_state="pink", expression="shocked", one_leg=False, anim_phase=anim_phase
             )
             self._draw_thermometer_prop(draw, x=150, y=520, temp_text="100°C / 212°F")
-            # Leo in lower-left reaction badge
             self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="LEO: BOILING?!")
 
         elif visual_prop == "beak_shield":
-            # Scene 2: Pip close-up with golden hexagonal heat-shield barrier around beak deflecting steam
             self._draw_pip_character(
                 draw, cx=540, cy=1020, scale=1.28,
                 color_state="pink", expression="happy_proud", one_leg=False, anim_phase=anim_phase
@@ -302,23 +382,15 @@ class VisualEngine:
             self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="ARMOR BEAK!")
 
         elif visual_prop == "hatching_egg":
-            # Scene 3: Baby Pip / Ocean Hatching from cracked white egg with consistent face & teal eyes!
             self._draw_nest_and_egg_bottom(draw, cx=540, cy=1220)
             self._draw_pip_character(
                 draw, cx=540, cy=980, scale=0.88,
                 color_state="gray_chick", expression="baby_curious", one_leg=False, is_chick=True, anim_phase=anim_phase
             )
             self._draw_cracked_eggshell_top(draw, cx=540, cy=640)
-            low_n = (narration or "").lower()
-            if "octopus" in low_n or "rice" in low_n:
-                self._draw_comparison_callout(draw, x=830, y=560, title="RICE-SIZED!", subtitle="TINY OCEAN EGGS", color=(0, 225, 255))
-            elif "cloud" in low_n or "droplet" in low_n:
-                self._draw_comparison_callout(draw, x=830, y=560, title="MICRO DROPS!", subtitle="FLOATING IN AIR", color=(0, 225, 255))
-            else:
-                self._draw_comparison_callout(draw, x=830, y=560, title="NOT PINK!", subtitle="100% GRAY CHICK", color=(180, 195, 210))
+            self._draw_comparison_callout(draw, x=830, y=560, title="NOT PINK!", subtitle="100% GRAY CHICK", color=(180, 195, 210))
 
         elif visual_prop == "glowing_shrimp":
-            # Scene 4: Gray Pip scooping glowing neon-pink brine shrimp from blue water + arrows to feathers
             self._draw_pip_character(
                 draw, cx=420, cy=980, scale=1.0,
                 color_state="gray_chick", expression="eating_excited", one_leg=False, anim_phase=anim_phase
@@ -327,7 +399,6 @@ class VisualEngine:
             self._draw_pigment_arrows(draw, start_xy=(720, 960), end_xy=(480, 960))
 
         elif visual_prop == "color_transformation":
-            # Scene 5: Magical transformation / 0.3s Color Shift with Color Meter
             self._draw_transformation_aura(draw, cx=540, cy=960)
             self._draw_pip_character(
                 draw, cx=540, cy=980, scale=1.12,
@@ -336,7 +407,6 @@ class VisualEngine:
             self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
 
         elif visual_prop == "one_leg_ice":
-            # Scene 6: Pink Pip fast asleep in icy starry lagoon with Zzz bubbles
             self._draw_ice_floes(draw, cy=1340)
             self._draw_pip_character(
                 draw, cx=540, cy=980, scale=1.08,
@@ -346,33 +416,14 @@ class VisualEngine:
             self._draw_one_leg_pointer(draw, target_x=520, target_y=1240, narration=narration)
 
         elif visual_prop == "knee_gear_lock":
-            # Scene 7: Pip on one leg + Giant X-Ray Magnifying Glass showing Golden Mechanical Lock / 9 Brains Gears
             self._draw_pip_character(
                 draw, cx=340, cy=980, scale=1.0,
                 color_state="pink", expression="xray_focused", one_leg=True, anim_phase=anim_phase
             )
             self._draw_xray_gear_lock_diagram(draw, target_leg_xy=(330, 1210), zoom_center_xy=(740, 960), narration=narration)
 
-        elif visual_prop == "three_hearts_xray":
-            # Octopus & Ocean Episode: Pip and Leo inspecting a glowing 3-Hearts X-Ray Octopus scanner
-            self._draw_pip_character(
-                draw, cx=310, cy=1020, scale=0.95,
-                color_state="pink", expression="shocked", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_three_hearts_xray_prop(draw, cx=735, cy=940, anim_phase=anim_phase)
-            self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="3 HEARTS?!")
-
-        elif visual_prop == "blue_blood_tube":
-            # Octopus & Ocean Episode: Glowing Neon-Blue Copper Blood Tube + Deep Sea Thermometer
-            self._draw_pip_character(
-                draw, cx=330, cy=1010, scale=0.98,
-                color_state="pink", expression="happy_proud", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_blue_blood_tube_prop(draw, cx=740, cy=950, anim_phase=anim_phase)
-            self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="BLUE BLOOD!")
-
         else:
-            # Scene 8: Choice Card / Loop Finale with BOTH Pip and Leo waving together
+            # Universal Choice Card / Finale
             self._draw_pip_character(
                 draw, cx=330, cy=1020, scale=0.95,
                 color_state="pink", expression="waving_cheerful", one_leg=True, anim_phase=anim_phase
@@ -401,6 +452,14 @@ class VisualEngine:
             "three_hearts_xray": ((8, 32, 78), (0, 145, 215), (10, 52, 115)),
             "blue_blood_tube": ((10, 25, 68), (0, 175, 245), (12, 60, 128)),
             "choice_card": ((35, 25, 95), (255, 120, 90), (30, 80, 140)),
+            "octopus_three_hearts": ((6, 22, 60), (0, 110, 195), (4, 45, 95)),
+            "octopus_blue_blood": ((8, 25, 75), (0, 155, 235), (6, 50, 105)),
+            "octopus_rice_eggs": ((12, 35, 70), (0, 140, 180), (10, 65, 100)),
+            "octopus_catching_shrimp": ((10, 30, 80), (0, 160, 210), (8, 55, 110)),
+            "octopus_03s_camouflage": ((25, 15, 65), (0, 185, 200), (20, 30, 80)),
+            "octopus_coral_sleep": ((5, 12, 45), (15, 45, 110), (8, 25, 75)),
+            "octopus_nine_brains": ((10, 20, 65), (0, 140, 210), (8, 45, 100)),
+            "octopus_superpower_choice": ((15, 25, 75), (0, 165, 230), (12, 50, 110)),
         }
         sky_top, sky_bot, ground_col = palettes.get(visual_prop, ((20, 60, 120), (0, 180, 220), (0, 120, 170)))
 
@@ -656,6 +715,136 @@ class VisualEngine:
                 draw.line([(ex - er + 4, brow_y + 4), (ex + er - 4, brow_y - 4)], fill=(60, 25, 45, 255), width=5)
             else:
                 draw.arc([ex - er, brow_y - 6, ex + er, brow_y + 10], start=200, end=340, fill=(60, 25, 45, 255), width=4)
+
+    def _draw_octopus_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        color_state: str = "coral",
+        expression: str = "happy",
+        hearts_visible: bool = False,
+        blue_blood: bool = False,
+        nine_brains: bool = False,
+        anim_phase: float = 0.0
+    ):
+        """
+        Draws a vibrant, cute 3D-shaded Pixar-style Octopus hero with 8 animated wavy tentacles,
+        big glossy eyes, suction cups, and optional anatomical layers (3 glowing hearts, blue blood,
+        or 9 synapsing brain nodes).
+        """
+        bob_y = int(math.sin(anim_phase * 2 * math.pi) * 12 * scale)
+        cy = cy + bob_y
+
+        if color_state == "camouflage":
+            body_col = (0, 225, 205, 255)
+            shadow_col = (0, 145, 135, 255)
+            highlight_col = (255, 235, 90, 255)
+            sucker_col = (255, 245, 140, 255)
+        elif color_state == "sleep_blue":
+            body_col = (95, 115, 205, 255)
+            shadow_col = (55, 75, 145, 255)
+            highlight_col = (155, 175, 245, 255)
+            sucker_col = (185, 205, 255, 255)
+        else:
+            body_col = (255, 110, 80, 255)
+            shadow_col = (205, 65, 45, 255)
+            highlight_col = (255, 170, 135, 255)
+            sucker_col = (255, 220, 190, 255)
+
+        tentacle_configs = [
+            (-320, 260, -0.4), (-220, 310, -0.2), (-120, 335, -0.05), (-35, 345, 0.05),
+            (35, 345, -0.05), (120, 335, 0.05), (220, 310, 0.2), (320, 260, 0.4)
+        ]
+        tentacle_base_y = cy + int(75 * scale)
+
+        for i, (tx_off, ty_off, curve) in enumerate(tentacle_configs):
+            wave = math.sin((anim_phase + i * 0.12) * 2 * math.pi) * 20 * scale
+            base_x = cx + int(tx_off * 0.28 * scale)
+            end_x = cx + int((tx_off + wave) * scale)
+            end_y = cy + int(ty_off * scale)
+            mid_x = (base_x + end_x) // 2 + int(curve * 140 * scale)
+            mid_y = (tentacle_base_y + end_y) // 2
+
+            w = max(int(26 * scale), 8)
+            draw.line([(base_x, tentacle_base_y), (mid_x, mid_y)], fill=shadow_col, width=w + 4)
+            draw.line([(mid_x, mid_y), (end_x, end_y)], fill=shadow_col, width=w + 4)
+            draw.line([(base_x, tentacle_base_y), (mid_x, mid_y)], fill=body_col, width=w)
+            draw.line([(mid_x, mid_y), (end_x, end_y)], fill=body_col, width=w)
+
+            for frac in (0.35, 0.65, 0.9):
+                sx = int(base_x * (1 - frac) + end_x * frac + curve * 25 * scale)
+                sy = int(tentacle_base_y * (1 - frac) + end_y * frac)
+                sr = int(8 * scale)
+                draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=sucker_col, outline=shadow_col, width=2)
+
+            if nine_brains:
+                draw.ellipse([mid_x - 14, mid_y - 14, mid_x + 14, mid_y + 14], fill=(0, 255, 220, 255), outline=(255, 255, 255, 255), width=3)
+                draw.line([(mid_x, mid_y), (cx, cy - int(40 * scale))], fill=(255, 215, 0, 220), width=4)
+
+        hw = int(145 * scale)
+        hh = int(170 * scale)
+        draw.ellipse([cx - hw - 6, cy - hh - 6, cx + hw + 6, cy + int(90 * scale)], fill=shadow_col)
+        draw.ellipse([cx - hw, cy - hh, cx + hw, cy + int(85 * scale)], fill=body_col)
+        draw.ellipse([cx - int(hw * 0.7), cy - hh + int(12 * scale), cx + int(hw * 0.7), cy - int(hh * 0.3)], fill=highlight_col)
+
+        if color_state == "camouflage":
+            for sy_off in (-100, -50, 0, 50):
+                py = cy + int(sy_off * scale)
+                draw.arc([cx - hw + 15, py - 20, cx + hw - 15, py + 20], start=10, end=170, fill=(255, 230, 80, 230), width=int(12 * scale))
+
+        if hearts_visible:
+            draw.rounded_rectangle([cx - int(105 * scale), cy - int(155 * scale), cx + int(105 * scale), cy - int(45 * scale)], radius=int(25 * scale), fill=(10, 25, 65, 210), outline=(0, 240, 255, 255), width=4)
+            pulse = int(math.sin(anim_phase * 4 * math.pi) * 6 * scale)
+            for hx_off in (-50, 50):
+                hx = cx + int(hx_off * scale)
+                hy = cy - int(95 * scale)
+                hr = int(20 * scale) + pulse
+                draw.ellipse([hx - hr - 4, hy - hr - 4, hx + hr + 4, hy + hr + 4], fill=(255, 40, 100, 110))
+                draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=(255, 45, 105, 255), outline=(255, 255, 255, 255), width=3)
+            cx_h = cx
+            cy_h = cy - int(120 * scale)
+            chr = int(24 * scale) + pulse
+            draw.ellipse([cx_h - chr - 5, cy_h - chr - 5, cx_h + chr + 5, cy_h + chr + 5], fill=(255, 200, 0, 120))
+            draw.ellipse([cx_h - chr, cy_h - chr, cx_h + chr, cy_h + chr], fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=3)
+            hfont = self._get_font(18)
+            draw.text((cx, cy - int(60 * scale)), "3 HEARTS", fill=(255, 255, 255), font=hfont, anchor="mm")
+
+        if blue_blood:
+            for bx_off in (-65, 0, 65):
+                bx = cx + int(bx_off * scale)
+                draw.line([(bx, cy - int(110 * scale)), (bx + int(bx_off * 0.4), cy + int(70 * scale))], fill=(0, 235, 255, 240), width=int(10 * scale))
+                for bub_y in (-80, -30, 20):
+                    draw.ellipse([bx - 6, cy + int(bub_y * scale) - 6, bx + 6, cy + int(bub_y * scale) + 6], fill=(220, 250, 255, 255))
+
+        if nine_brains:
+            cb_y = cy - int(85 * scale)
+            draw.ellipse([cx - int(38 * scale), cb_y - int(38 * scale), cx + int(38 * scale), cb_y + int(38 * scale)], fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=4)
+            bfont = self._get_font(22)
+            draw.text((cx, cb_y), "MAIN BRAIN", fill=(20, 30, 60), font=bfont, anchor="mm")
+
+        eye_y = cy - int(10 * scale)
+        for ex_off in (-52, 52):
+            ex = cx + int(ex_off * scale)
+            er = int(32 * scale)
+
+            if expression == "sleeping":
+                draw.arc([ex - er, eye_y - er // 2, ex + er, eye_y + er // 2], start=190, end=350, fill=(35, 25, 45, 255), width=int(6 * scale))
+            else:
+                draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=shadow_col, width=4)
+                ir = int(er * 0.72)
+                draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=(0, 165, 195, 255))
+                pw = int(ir * 0.75)
+                ph = int(ir * 0.38)
+                draw.ellipse([ex - pw, eye_y - ph, ex + pw, eye_y + ph], fill=(15, 20, 35, 255))
+                draw.ellipse([ex - int(er * 0.4), eye_y - int(er * 0.45), ex - int(er * 0.4) + int(10 * scale), eye_y - int(er * 0.45) + int(10 * scale)], fill=(255, 255, 255, 255))
+
+        for ch_off in (-78, 78):
+            draw.ellipse([cx + int(ch_off * scale) - 18, cy + int(18 * scale) - 12, cx + int(ch_off * scale) + 18, cy + int(18 * scale) + 12], fill=(255, 90, 120, 140))
+
+        if expression != "sleeping":
+            draw.arc([cx - int(24 * scale), cy + int(16 * scale), cx + int(24 * scale), cy + int(42 * scale)], start=20, end=160, fill=(45, 20, 30, 255), width=int(5 * scale))
 
     def _draw_leo_character(
         self,
@@ -944,6 +1133,58 @@ class VisualEngine:
         font = self._get_font(28)
         draw.rounded_rectangle([cx - 205, cy + zr - 25, cx + 205, cy + zr + 42], radius=16, fill=(0, 175, 255, 255), outline=(255, 255, 255, 255), width=3)
         draw.text((cx, cy + zr + 8), "COPPER = BLUE BLOOD!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_octopus_rice_eggs_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing underwater seaweed cluster with clusters of tiny translucent rice-grain sized eggs hatching baby octopuses."""
+        for kx_off, kcol in [(-220, (18, 95, 65, 220)), (-140, (28, 135, 85, 230)), (140, (28, 135, 85, 230)), (220, (18, 95, 65, 220))]:
+            draw.line([(cx + kx_off, cy + 320), (cx + kx_off + int(math.sin(anim_phase * 2 * math.pi) * 30), cy - 220)], fill=kcol, width=32)
+
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(12, 38, 78, 245), outline=(0, 245, 255, 255), width=8)
+
+        draw.line([(cx, cy - zr + 40), (cx, cy + 40)], fill=(180, 225, 210, 220), width=8)
+        egg_offsets = [
+            (-95, -80), (-45, -110), (0, -70), (55, -100), (95, -75),
+            (-75, -20), (-25, -35), (35, -25), (75, -15),
+            (-50, 45), (0, 30), (50, 40)
+        ]
+        for ex, ey in egg_offsets:
+            draw.ellipse([cx + ex - 18, cy + ey - 32, cx + ex + 18, cy + ey + 32], fill=(235, 248, 255, 240), outline=(0, 215, 255, 255), width=3)
+            draw.ellipse([cx + ex - 8, cy + ey - 4, cx + ex - 2, cy + ey + 4], fill=(20, 35, 55, 255))
+            draw.ellipse([cx + ex + 2, cy + ey - 4, cx + ex + 8, cy + ey + 4], fill=(20, 35, 55, 255))
+
+        bx, by = cx + 85, cy + 120
+        draw.ellipse([bx - 32, by - 36, bx + 32, by + 16], fill=(255, 115, 85, 255), outline=(255, 220, 150, 255), width=3)
+        draw.ellipse([bx - 14, by - 16, bx - 2, by - 2], fill=(255, 255, 255, 255))
+        draw.ellipse([bx + 2, by - 16, bx + 14, by - 2], fill=(255, 255, 255, 255))
+        draw.ellipse([bx - 10, by - 12, bx - 4, by - 6], fill=(10, 25, 45, 255))
+        draw.ellipse([bx + 4, by - 12, bx + 10, by - 6], fill=(10, 25, 45, 255))
+        for i in (-18, -6, 6, 18):
+            draw.line([(bx + i, by + 14), (bx + i * 2, by + 42)], fill=(255, 115, 85, 255), width=6)
+
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(0, 225, 185, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "TINY RICE-SIZED EGGS!", fill=(12, 30, 50), font=font, anchor="mm")
+
+    def _draw_coral_reef_bed(self, draw: ImageDraw.ImageDraw, cy: int):
+        """Draws colorful glowing deep-sea coral reef at bottom of screen."""
+        coral_colors = [(255, 85, 125, 255), (145, 75, 225, 255), (0, 215, 205, 255), (255, 195, 55, 255)]
+        for idx, (cx_off, cr, col) in enumerate([(-380, 160, coral_colors[0]), (-180, 190, coral_colors[1]), (60, 175, coral_colors[2]), (320, 210, coral_colors[3])]):
+            bx = 540 + cx_off
+            draw.pieslice([bx - cr, cy - cr, bx + cr, cy + cr], start=180, end=360, fill=col, outline=(255, 255, 255, 180), width=4)
+            for py in range(cy - cr + 40, cy, 35):
+                draw.ellipse([bx - 12, py - 8, bx + 12, py + 8], fill=(255, 255, 255, 160))
+
+    def _draw_color_dream_thought_bubble(self, draw: ImageDraw.ImageDraw, cx: int, cy: int):
+        """Draws a dreamy cloud bubble showing the sleeping octopus dreaming in shifting rainbow neon colors."""
+        draw.ellipse([cx - 180, cy - 110, cx + 180, cy + 110], fill=(25, 15, 60, 240), outline=(255, 120, 240, 255), width=5)
+        draw.ellipse([cx - 140, cy + 130, cx - 115, cy + 155], fill=(255, 120, 240, 230))
+        draw.ellipse([cx - 175, cy + 175, cx - 160, cy + 190], fill=(255, 120, 240, 200))
+        for r, col in [(85, (255, 65, 115, 255)), (65, (255, 205, 55, 255)), (45, (0, 240, 220, 255))]:
+            draw.arc([cx - r, cy - r, cx + r, cy + r], start=0, end=360, fill=col, width=10)
+        font = self._get_font(26)
+        draw.text((cx, cy), "COLOR DREAMS!", fill=(255, 255, 255), font=font, anchor="mm")
+
 
     def _draw_superpower_vs_cards(self, draw: ImageDraw.ImageDraw, y: int, narration: str = ""):
         """Draws two visual superpower choice cards above Pip and Leo in Scene 8."""
