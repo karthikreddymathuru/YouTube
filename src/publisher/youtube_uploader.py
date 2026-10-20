@@ -99,7 +99,7 @@ class YouTubeUploader:
             )
 
         flow = InstalledAppFlow.from_client_secrets_file(creds_file, self.SCOPES)
-        creds = flow.run_local_server(port=0)
+        creds = flow.run_local_server(port=8080)
         os.makedirs(os.path.dirname(token_path), exist_ok=True)
         with open(token_path, "w") as tf:
             tf.write(creds.to_json())
@@ -119,25 +119,8 @@ class YouTubeUploader:
         character_sheet_path: Optional[str] = None,
         visual_audit_report: Optional[Dict[str, Any]] = None
     ) -> UploadResult:
-        """Uploads video to YouTube via API v3 or stages it locally if credentials are pending."""
-        creds_file = self._find_credentials_file()
-        token_path = "data/token.json"
-
-        if creds_file or os.path.exists(token_path):
-            try:
-                return self._upload_via_api(
-                    video_path=video_path,
-                    title=title,
-                    description=description,
-                    tags=tags,
-                    privacy_status=privacy_status,
-                    made_for_kids=made_for_kids,
-                    category_id=category_id
-                )
-            except Exception as e:
-                logger.error(f"YouTube API upload error: {e}. Falling back to staging package.")
-
-        return self._stage_local_package(
+        """Stages the video package locally and uploads to YouTube via API v3 if authenticated."""
+        stage_res = self._stage_local_package(
             video_path=video_path,
             title=title,
             description=description,
@@ -148,6 +131,28 @@ class YouTubeUploader:
             character_sheet_path=character_sheet_path,
             visual_audit_report=visual_audit_report
         )
+
+        creds_file = self._find_credentials_file()
+        token_path = "data/token.json"
+
+        if os.path.exists(token_path) or creds_file:
+            try:
+                staged_video = os.path.join(stage_res.package_dir, os.path.basename(video_path))
+                api_res = self._upload_via_api(
+                    video_path=staged_video if os.path.exists(staged_video) else video_path,
+                    title=title,
+                    description=description,
+                    tags=tags,
+                    privacy_status=privacy_status,
+                    made_for_kids=made_for_kids,
+                    category_id=category_id
+                )
+                api_res.package_dir = stage_res.package_dir
+                return api_res
+            except Exception as e:
+                logger.error(f"YouTube API upload error: {e}. Video remains staged locally at {stage_res.package_dir}.")
+
+        return stage_res
 
     def _upload_via_api(
         self,
