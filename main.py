@@ -174,6 +174,23 @@ def cmd_verify(args):
             print(f"  - {err}")
 
 
+def cmd_auth(args):
+    """Authenticates with YouTube Data API v3 and generates data/token.json."""
+    from src.publisher.youtube_uploader import YouTubeUploader
+    uploader = YouTubeUploader()
+    try:
+        creds = uploader.authenticate(force=args.force)
+        print("\n" + "=" * 60)
+        print("🎉 YOUTUBE OAUTH AUTHENTICATION SUCCESSFUL!")
+        print("=" * 60)
+        print("  • Token saved to: data/token.json")
+        print("  • Valid: " + str(creds.valid))
+        print("  • Ready for automated daily uploads to your YouTube channel!\n")
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: {e}")
+        print("👉 Please save your Google Cloud OAuth client credentials as 'credentials.json' in the project root.\n")
+
+
 def cmd_serve(args):
     """Starts the Streamlit Studio Web UI."""
     import subprocess
@@ -214,6 +231,11 @@ def main():
     learn_parser.add_argument("--niche", type=str, default="animal_secrets", help="Content niche to scout")
     learn_parser.add_argument("--max-results", type=int, default=3, help="Number of items to analyze")
     learn_parser.set_defaults(func=cmd_learn)
+
+    # Subcommand: auth
+    auth_parser = subparsers.add_parser("auth", help="Authenticate with YouTube Data API v3 using credentials.json")
+    auth_parser.add_argument("--force", action="store_true", help="Force re-authentication even if data/token.json exists")
+    auth_parser.set_defaults(func=cmd_auth)
 
     # Subcommand: verify
     verify_parser = subparsers.add_parser("verify", help="Verify dependencies and pipeline integrity")

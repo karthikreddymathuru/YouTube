@@ -34,15 +34,77 @@ class UploadResult:
 class YouTubeUploader:
     """Manages YouTube Data API v3 uploads and staging export packages."""
 
+    SCOPES = [
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube.readonly"
+    ]
+
     def __init__(
         self,
-        client_secrets_path: str = "client_secret.json",
+        client_secrets_path: Optional[str] = None,
         staging_dir: str = "data/ready_for_upload"
     ):
-        self.client_secrets_path = client_secrets_path
+        self.client_secrets_path = client_secrets_path or self._find_credentials_file()
         self.staging_dir = staging_dir
         self.ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
         os.makedirs(self.staging_dir, exist_ok=True)
+
+    def _find_credentials_file(self) -> Optional[str]:
+        """Discovers credentials.json or client_secret.json in workspace root or data/."""
+        import glob
+        candidates = [
+            "credentials.json",
+            "client_secret.json",
+            "data/credentials.json",
+            "data/client_secret.json",
+        ]
+        candidates.extend(glob.glob("client_secret*.json"))
+        for p in candidates:
+            if os.path.exists(p):
+                return p
+        return None
+
+    def authenticate(self, force: bool = False):
+        """Authenticates with YouTube Data API v3 and saves/refreshes data/token.json."""
+        from google_auth_oauthlib.flow import InstalledAppFlow
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+
+        token_path = "data/token.json"
+        creds = None
+        if os.path.exists(token_path) and not force:
+            try:
+                creds = Credentials.from_authorized_user_file(token_path, self.SCOPES)
+            except Exception as e:
+                logger.debug(f"Could not load existing token: {e}")
+
+        if creds and creds.valid:
+            return creds
+
+        if creds and creds.expired and creds.refresh_token:
+            try:
+                creds.refresh(Request())
+                with open(token_path, "w") as tf:
+                    tf.write(creds.to_json())
+                logger.info(f"Refreshed YouTube OAuth token at {token_path}")
+                return creds
+            except Exception as e:
+                logger.warning(f"Token refresh failed ({e}); re-authenticating...")
+
+        creds_file = self._find_credentials_file()
+        if not creds_file:
+            raise FileNotFoundError(
+                "Neither 'credentials.json' nor 'client_secret.json' found. "
+                "Please place your OAuth client JSON file in the project root."
+            )
+
+        flow = InstalledAppFlow.from_client_secrets_file(creds_file, self.SCOPES)
+        creds = flow.run_local_server(port=0)
+        os.makedirs(os.path.dirname(token_path), exist_ok=True)
+        with open(token_path, "w") as tf:
+            tf.write(creds.to_json())
+        logger.info(f"Successfully generated YouTube OAuth token at {token_path}")
+        return creds
 
     def publish_short(
         self,
@@ -58,7 +120,10 @@ class YouTubeUploader:
         visual_audit_report: Optional[Dict[str, Any]] = None
     ) -> UploadResult:
         """Uploads video to YouTube via API v3 or stages it locally if credentials are pending."""
-        if os.path.exists(self.client_secrets_path):
+        creds_file = self._find_credentials_file()
+        token_path = "data/token.json"
+
+        if creds_file or os.path.exists(token_path):
             try:
                 return self._upload_via_api(
                     video_path=video_path,
@@ -97,15 +162,8 @@ class YouTubeUploader:
         """Executes authorized upload using googleapiclient."""
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
-        from google.oauth2.credentials import Credentials
 
-        token_path = "data/token.json"
-        if not os.path.exists(token_path):
-            raise FileNotFoundError(f"OAuth token not found at {token_path}. Run authentication once to generate token.")
-
-        with open(token_path, "r") as f:
-            token_data = json.load(f)
-        creds = Credentials.from_authorized_user_info(token_data)
+        creds = self.authenticate()
         youtube = build("youtube", "v3", credentials=creds)
 
         body = {
