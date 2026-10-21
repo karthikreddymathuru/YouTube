@@ -251,8 +251,8 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
         "blueprint": [
             {
                 "scene_id": 1,
-                "topic_beat": "How warm sun-heated lagoon water steams up at 100°C to form giant sky clouds",
-                "required_keywords": ["warm", "hot", "water", "steam", "cloud", "sky"],
+                "topic_beat": "How warm ocean water steams up into the sky to form giant clouds",
+                "required_keywords": ["warm", "water", "steam", "cloud", "sky", "rises"],
                 "character_expression": "shocked",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_steam_rise",
@@ -261,8 +261,8 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
             },
             {
                 "scene_id": 2,
-                "topic_beat": "Earth's atmosphere acting like a giant protective shield holding a million pounds of cloud droplets",
-                "required_keywords": ["shield", "air", "million", "float", "droplets", "safe"],
+                "topic_beat": "Rising warm updrafts holding a million pounds of floating cloud droplets",
+                "required_keywords": ["air", "million", "float", "droplets", "updraft", "weigh"],
                 "character_expression": "happy_proud",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_atmosphere_shield",
@@ -271,48 +271,48 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
             },
             {
                 "scene_id": 3,
-                "topic_beat": "Every cloud starts as tiny invisible water droplets hatching in the sky turning fluffy gray and white",
-                "required_keywords": ["tiny", "fluffy", "gray", "white", "cloud", "born"],
+                "topic_beat": "Every cloud starts as billions of tiny invisible water droplets clustering together",
+                "required_keywords": ["tiny", "fluffy", "droplets", "cloud", "billions", "air"],
                 "character_expression": "baby_curious",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_micro_droplets",
-                "visual_badge_text": "FLUFFY SKY DROPLETS!",
+                "visual_badge_text": "BILLIONS OF DROPLETS!",
                 "sfx_cue": "pop",
             },
             {
                 "scene_id": 4,
-                "topic_beat": "Sunlight and ocean minerals scattering through water droplets",
-                "required_keywords": ["sunlight", "pink", "glowing", "water", "lagoon", "scoop"],
+                "topic_beat": "Bright sunlight scattering through water droplets into dazzling white glow",
+                "required_keywords": ["sunlight", "scatter", "white", "water", "light", "droplets"],
                 "character_expression": "eating_excited",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_sunlight_scattering",
-                "visual_badge_text": "SUNLIGHT & WATER!",
+                "visual_badge_text": "SCATTERING SUNLIGHT!",
                 "sfx_cue": "pop",
             },
             {
                 "scene_id": 5,
-                "topic_beat": "Sunset light transforming gray clouds into glowing neon pink and gold across the sky",
-                "required_keywords": ["sunset", "transform", "gray", "neon", "pink", "sky"],
+                "topic_beat": "Sunset light bending across the sky transforming white clouds into glowing neon pink and gold",
+                "required_keywords": ["sunset", "transform", "neon", "pink", "gold", "sky"],
                 "character_expression": "transforming_amazed",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_sunset_neon",
-                "visual_badge_text": "GRAY TO NEON SUNSET!",
+                "visual_badge_text": "NEON SUNSET CLOUDS!",
                 "sfx_cue": "chime",
             },
             {
                 "scene_id": 6,
-                "topic_beat": "High up at night, cloud droplets freeze into sparkling ice crystals in freezing air",
-                "required_keywords": ["night", "freezing", "ice", "sleep", "leg", "cold"],
+                "topic_beat": "High up in freezing air, cloud droplets freeze into sparkling ice crystals",
+                "required_keywords": ["freezing", "ice", "crystals", "cold", "high", "droplets"],
                 "character_expression": "sleeping_peaceful",
                 "character_color_state": "sky",
                 "visual_prop": "cloud_ice_crystals",
-                "visual_badge_text": "FREEZING SKY ICE!",
+                "visual_badge_text": "FREEZING ICE CRYSTALS!",
                 "sfx_cue": "chime",
             },
             {
                 "scene_id": 7,
-                "topic_beat": "Bumping ice crystals locking electric charges like gears to spark glowing lightning",
-                "required_keywords": ["lock", "gear", "spark", "energy", "charge", "lightning"],
+                "topic_beat": "Bumping ice crystals generate static electricity like giant batteries to spark lightning",
+                "required_keywords": ["bump", "spark", "energy", "charge", "lightning", "electric"],
                 "character_expression": "xray_focused",
                 "character_color_state": "sky",
                 "visual_prop": "lightning_electrostatic_lock",
@@ -321,7 +321,7 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
             },
             {
                 "scene_id": 8,
-                "topic_beat": "Asking the viewer which superpower they would pick: 1 million pound cloud or lightning spark",
+                "topic_beat": "Asking the viewer which superpower they would choose: floating a 1 million pound cloud or sparking bright lightning",
                 "required_keywords": ["which", "pick", "choose", "superpower", "cloud", "lightning"],
                 "character_expression": "waving_cheerful",
                 "character_color_state": "sky",
@@ -334,17 +334,17 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
             {
                 "style_name": "Sky_Science_Wonder_Arc",
                 "title": "How Can A 1,000,000 Pound Cloud Float In The Sky? ☁️⚡ #shorts",
-                "description": "Pip and Leo explain how steaming water rises into million-pound clouds, turns neon pink at sunset, and sparks lightning! #shorts #kids #science #weather",
-                "tags": ["shorts", "kidsshorts", "scienceforkids", "clouds", "weather", "funfacts"],
+                "description": "Discover how steaming water rises to float 1,000,000-pound clouds, turns neon pink at sunset, and sparks electric lightning! #shorts #kids #science #weather",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "clouds", "weather", "lightning", "funfacts"],
                 "scene_narrations": [
-                    "Did you know steaming hot water rises into the sky to build giant clouds?",
-                    "Rising warm air acts like a giant shield that floats a million pounds of droplets!",
-                    "Every cloud starts out as tiny droplets that puff up into fluffy gray shapes!",
-                    "Down below, Pip scoops glowing pink shrimp while watching the clouds reflect the lagoon!",
-                    "At sunset, golden light transforms those gray clouds into glowing neon pink cotton candy!",
-                    "High up at night, the air is freezing cold while Pip sleeps on one leg!",
-                    "Inside the cloud, ice crystals lock electric energy like gears to spark bright lightning!",
-                    "Which superpower would you choose, floating on warm air or glowing neon pink?"
+                    "Did you know warm ocean water steams up into the sky to create giant fluffy clouds?",
+                    "A single fluffy cumulus cloud can weigh over one million pounds and still float!",
+                    "That is because rising warm updrafts of air hold up billions of microscopic water droplets!",
+                    "When bright sunlight hits those tiny water droplets, it scatters all colors into pure white!",
+                    "At sunset, long light waves transform those white clouds into glowing neon pink and gold cotton candy!",
+                    "High up where the air is freezing cold, water droplets turn into sparkling ice crystals!",
+                    "When billions of ice crystals bump into each other, they build electric charge and spark lightning!",
+                    "Which superpower would you choose, floating a million-pound cloud or sparking bright lightning?"
                 ]
             }
         ]
@@ -421,15 +421,21 @@ class ScriptEngine:
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
 
     def _select_episode_blueprint(self, topic: str, niche: str) -> Dict[str, Any]:
-        """Selects the best matching episode blueprint or rotates to an unpublished episode automatically."""
+        """Selects the best matching unpublished episode blueprint or rotates to an unpublished episode automatically."""
+        past_titles = self._get_published_titles()
         topic_lower = topic.lower()
-        if "octopus" in topic_lower or "jellyfish" in topic_lower or "ocean" in topic_lower:
-            return EPISODE_LIBRARY["octopus_and_ocean_secrets"]
+
         if "cloud" in topic_lower or "weather" in topic_lower or "lightning" in topic_lower:
-            return EPISODE_LIBRARY["cloud_and_lightning_science"]
+            ep = EPISODE_LIBRARY["cloud_and_lightning_science"]
+            if not any(c["title"] in past_titles for c in ep["candidates"]):
+                return ep
+
+        if "octopus" in topic_lower or "jellyfish" in topic_lower or "ocean" in topic_lower:
+            ep = EPISODE_LIBRARY["octopus_and_ocean_secrets"]
+            if not any(c["title"] in past_titles for c in ep["candidates"]):
+                return ep
 
         # Check published history: if an episode has already had any candidate published, rotate to the next completely fresh episode!
-        past_titles = self._get_published_titles()
         for ep_key, ep_data in EPISODE_LIBRARY.items():
             if not any(c["title"] in past_titles for c in ep_data["candidates"]):
                 logger.info(f"Auto-selecting fresh unpublished episode blueprint: '{ep_key}' ({ep_data['topic']})")
@@ -441,7 +447,7 @@ class ScriptEngine:
                 logger.info(f"Auto-rotating to episode blueprint with fresh candidate: '{ep_key}' ({ep_data['topic']})")
                 return ep_data
 
-        return EPISODE_LIBRARY["flamingo_superpowers"]
+        return EPISODE_LIBRARY["cloud_and_lightning_science"]
 
     def _get_published_titles(self) -> set:
         titles = set()

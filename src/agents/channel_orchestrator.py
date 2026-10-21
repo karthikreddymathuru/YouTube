@@ -515,7 +515,7 @@ class ChannelOrchestrator:
             quality_res = self.quality_gate_agent.run_five_gate_inspection(
                 script=script,
                 full_script_text=showrunner_res["full_script_text"],
-                intended_topic=research_res["today_topic"],
+                intended_topic=getattr(script, "topic", research_res.get("today_topic", "Cloud & Weather Superpowers")),
                 scene_images=prod_res["scene_images"],
                 word_timestamps=prod_res["word_timestamps"],
                 mp4_path=prod_res["final_mp4"],

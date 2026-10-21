@@ -69,7 +69,7 @@
       "id": "interactive_countdown",
       "formula": "Can you solve this in 5 seconds? Can You Spot The Imposter Puppy in 5s?!",
       "example": "Can you solve this in 5 seconds? Can You Spot The Imposter Puppy in 5s?!",
-      "engagement_score": 95,
+      "engagement_score": 94,
       "sfx_cue": "countdown_tick"
     },
     {
@@ -92,6 +92,13 @@
       "example": "Only 5% Can Solve These Riddles! Can You?",
       "engagement_score": 74,
       "sfx_cue": "timer_tick"
+    },
+    {
+      "id": "high_stakes_challenge",
+      "formula": "According to the FBI, if you solve this riddle, you're smart enough to become a special agent.",
+      "example": "According to the FBI, if you solve this riddle, you're smart enough to become a special agent.",
+      "engagement_score": 93,
+      "sfx_cue": "ticking_timer"
     }
   ],
   "pacing_rules": {

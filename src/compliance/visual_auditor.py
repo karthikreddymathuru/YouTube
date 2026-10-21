@@ -207,7 +207,7 @@ class VisualAuditor:
         full_audio = " ".join(s.get("spoken_narration", "") for s in sync_timeline).lower()
         topic_lower = intended_topic.lower()
 
-        # 1. Species Conflict Check
+        # 1. Species & Topic Conflict Check
         conflict_error = None
         if "octopus" in full_audio or "octopus" in topic_lower:
             forbidden_props = ["flamingo", "beak_shield", "knee_gear_lock", "one_leg_ice", "boiling_geyser"]
@@ -225,6 +225,14 @@ class VisualAuditor:
             ]
             if conflicts:
                 conflict_error = f"Species Mismatch: Spoken audio is about Flamingo, but visual contains octopus prop(s): {conflicts}"
+        elif "cloud" in full_audio or "weather" in topic_lower or "lightning" in topic_lower:
+            forbidden_props = ["flamingo", "octopus", "beak_shield", "knee_gear_lock", "one_leg_ice", "boiling_geyser", "tentacle", "blue_blood", "nine_brains"]
+            conflicts = [
+                s.get("visual_prop", "") for s in sync_timeline
+                if any(f in s.get("visual_prop", "").lower() for f in forbidden_props)
+            ]
+            if conflicts:
+                conflict_error = f"Topic Mismatch: Spoken audio is about Clouds/Weather, but visual contains animal prop(s): {conflicts}"
 
         if conflict_error:
             logger.error(f"❌ AUDIO-VISUAL VALIDATOR BLOCKED: {conflict_error}")
@@ -248,7 +256,8 @@ class VisualAuditor:
                 ("9" in badge and ("nine" in narr or "9" in narr)) or
                 ("100" in badge and "100" in narr) or
                 ("0.3" in badge and ("half" in narr or "second" in narr or "0.3" in narr)) or
-                ("1" in badge and "one" in narr)
+                ("1" in badge and "one" in narr) or
+                ("1,000,000" in badge and ("million" in narr or "1,000,000" in narr))
             )
 
             if has_overlap or num_match or len(badge) > 0:

@@ -38,7 +38,26 @@
       "made_for_kids": true,
       "upload_status": "youtube_api_v3",
       "youtube_video_id": "DBcm2qqOc9M"
+    },
+    {
+      "episode_number": 3,
+      "timestamp": "2026-10-21T17:42:43.469509",
+      "date": "2026-10-21",
+      "niche": "interactive_riddles",
+      "title": "How Can A 1,000,000 Pound Cloud Float In The Sky? \u2601\ufe0f\u26a1 #shorts",
+      "package_dir": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261021_174239",
+      "video_file": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261021_174239/short_20261021_174122.mp4",
+      "duration_sec": 49.83,
+      "av_drift_sec": 0.0,
+      "tournament_score": 100.0,
+      "winning_archetype": "curiosity_mystery",
+      "silent_comprehension_score": 98.0,
+      "character_face_consistency_score": 100.0,
+      "all_gates_passed": true,
+      "made_for_kids": true,
+      "upload_status": "youtube_api_v3",
+      "youtube_video_id": "9S4z-YM1ZmU"
     }
   ],
-  "last_updated": "2026-10-20T17:28:40.112167"
+  "last_updated": "2026-10-21T17:42:43.471014"
 }

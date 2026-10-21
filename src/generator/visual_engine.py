@@ -283,6 +283,7 @@ class VisualEngine:
         # 2. Render the specific visual story action & consistent characters
         low_narr = (narration or "").lower()
         is_octopus = "octopus" in visual_prop.lower() or "octopus" in low_narr
+        is_cloud = "cloud" in visual_prop.lower() or "lightning" in visual_prop.lower() or "weather" in low_narr or "cloud" in low_narr
 
         # --- OCTOPUS & OCEAN EPISODES ---
         if is_octopus:
@@ -361,6 +362,94 @@ class VisualEngine:
                 self._draw_octopus_character(
                     draw, cx=540, cy=960, scale=1.15, color_state="coral",
                     expression="happy", anim_phase=anim_phase
+                )
+
+        # --- CLOUD & WEATHER EPISODES ---
+        elif is_cloud:
+            if scene_id == 8 or visual_prop in ("cloud_superpower_choice", "choice_card"):
+                # Scene 8: Choice Card / Loop Finale with Fluffy Cloud and Leo waving together
+                self._draw_fluffy_cloud(
+                    draw, cx=320, cy=1020, scale=1.05,
+                    color=(255, 255, 255), expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=770, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("cloud_steam_rise",):
+                # Scene 1: Ocean water at bottom, steaming updraft particles rising into the sky to build cloud
+                self._draw_steam_rise_prop(draw, cx=540, cy=1220, anim_phase=anim_phase)
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=740, scale=1.1,
+                    color=(255, 255, 255), expression="shocked", anim_phase=anim_phase
+                )
+                self._draw_thermometer_prop(draw, x=150, y=520, temp_text="100°C STEAM")
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="STEAM RISES!")
+
+            elif scene_id == 2 or visual_prop in ("cloud_atmosphere_shield",):
+                # Scene 2: Atmosphere aerodynamic shield holding up 1,000,000 lbs of water droplets
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=860, scale=1.35,
+                    color=(255, 255, 255), expression="happy", anim_phase=anim_phase
+                )
+                self._draw_atmosphere_shield_prop(draw, cx=540, cy=860, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="1,000,000 LBS!")
+
+            elif scene_id == 3 or visual_prop in ("cloud_micro_droplets",):
+                # Scene 3: Cute fluffy cloud with magnifying bubble showing billions of micro water droplets
+                self._draw_fluffy_cloud(
+                    draw, cx=360, cy=880, scale=1.0,
+                    color=(255, 255, 255), expression="happy", anim_phase=anim_phase
+                )
+                self._draw_cloud_micro_droplets_prop(draw, cx=740, cy=880, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="TINY DROPLETS!")
+
+            elif scene_id == 4 or visual_prop in ("cloud_sunlight_scattering",):
+                # Scene 4: Golden radiant sun scattering prism light waves through droplets into pure white glow
+                self._draw_cloud_sunlight_scattering_prop(draw, cx=260, cy=600, anim_phase=anim_phase)
+                self._draw_fluffy_cloud(
+                    draw, cx=580, cy=960, scale=1.15,
+                    color=(255, 255, 255), expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="PRISM LIGHT!")
+
+            elif scene_id == 5 or visual_prop in ("cloud_sunset_neon",):
+                # Scene 5: Sunset turning cloud into glowing neon pink and golden cotton candy!
+                self._draw_cloud_sunset_neon_prop(draw, cx=540, cy=900, anim_phase=anim_phase)
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=900, scale=1.25,
+                    color=(255, 110, 180), outline=(255, 220, 120),
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="NEON SUNSET!")
+
+            elif scene_id == 6 or visual_prop in ("cloud_ice_crystals",):
+                # Scene 6: Freezing cold air turning droplets into sparkling geometric ice crystals
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=880, scale=1.15,
+                    color=(215, 238, 255), outline=(130, 185, 245),
+                    expression="sleeping", anim_phase=anim_phase
+                )
+                self._draw_cloud_ice_crystals_prop(draw, cx=540, cy=880, anim_phase=anim_phase)
+                self._draw_thermometer_prop(draw, x=150, y=520, temp_text="-40°C FREEZE")
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="ICE CRYSTALS!")
+
+            elif scene_id == 7 or visual_prop in ("lightning_electrostatic_lock",):
+                # Scene 7: Stormy thundercloud bumping ice crystals with static charges sparking electric lightning!
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=780, scale=1.25,
+                    color=(68, 72, 98), outline=(145, 155, 200),
+                    expression="shocked", anim_phase=anim_phase
+                )
+                self._draw_lightning_bolt_prop(draw, cx=540, cy=980, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="LIGHTNING SPARK!")
+
+            else:
+                self._draw_fluffy_cloud(
+                    draw, cx=540, cy=920, scale=1.2,
+                    color=(255, 255, 255), expression="happy", anim_phase=anim_phase
                 )
 
         # --- FLAMINGO EPISODES ---
@@ -460,6 +549,14 @@ class VisualEngine:
             "octopus_coral_sleep": ((5, 12, 45), (15, 45, 110), (8, 25, 75)),
             "octopus_nine_brains": ((10, 20, 65), (0, 140, 210), (8, 45, 100)),
             "octopus_superpower_choice": ((15, 25, 75), (0, 165, 230), (12, 50, 110)),
+            "cloud_steam_rise": ((18, 45, 95), (0, 180, 225), (10, 85, 150)),
+            "cloud_atmosphere_shield": ((20, 70, 140), (70, 190, 255), (20, 120, 180)),
+            "cloud_micro_droplets": ((18, 60, 125), (50, 175, 245), (15, 100, 165)),
+            "cloud_sunlight_scattering": ((30, 80, 160), (120, 210, 255), (40, 140, 190)),
+            "cloud_sunset_neon": ((55, 18, 90), (255, 110, 130), (70, 30, 95)),
+            "cloud_ice_crystals": ((8, 20, 60), (45, 95, 165), (15, 45, 95)),
+            "lightning_electrostatic_lock": ((12, 12, 38), (35, 30, 75), (18, 18, 48)),
+            "cloud_superpower_choice": ((20, 50, 115), (0, 175, 235), (20, 110, 175)),
         }
         sky_top, sky_bot, ground_col = palettes.get(visual_prop, ((20, 60, 120), (0, 180, 220), (0, 120, 170)))
 
@@ -1030,6 +1127,8 @@ class VisualEngine:
         low = (narration or "").lower()
         if "skin" in low or "second" in low or "camouflage" in low:
             left_txt, right_txt = "NORMAL SKIN", "0.3s CAMOUFLAGE!"
+        elif "sunset" in low or "cotton candy" in low or "pink" in low or "neon" in low:
+            left_txt, right_txt = "WHITE CLOUD", "NEON SUNSET!"
         elif "lightning" in low or "sun" in low:
             left_txt, right_txt = "COOL CLOUD", "5X SUN HEAT!"
         else:
@@ -1230,3 +1329,264 @@ class VisualEngine:
         )
         badge_font = self._get_font(46)
         draw.text((self.width // 2, 185), badge_text.upper(), fill=(255, 235, 85), font=badge_font, anchor="mm")
+
+    def _draw_fluffy_cloud(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        color: Tuple[int, int, int] = (255, 255, 255),
+        outline: Tuple[int, int, int] = (190, 215, 245),
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws a cute 3D-shaded cumulus cloud character ('Nimbus') with big Pixar eyes and smile."""
+        puffs = [
+            (-140, 20, 95),
+            (-80, -35, 115),
+            (10, -60, 130),
+            (95, -30, 110),
+            (145, 25, 90),
+            (-50, 45, 100),
+            (55, 45, 95)
+        ]
+        # 1. Drop shadow / bottom shading for 3D depth
+        shadow_col = (max(0, color[0] - 40), max(0, color[1] - 35), max(0, color[2] - 25), 255)
+        for dx, dy, r in puffs:
+            px = cx + int(dx * scale)
+            py = cy + int((dy + 14) * scale)
+            pr = int(r * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=shadow_col)
+
+        # 2. Outer stroke / outline
+        for dx, dy, r in puffs:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int((r + 4) * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=outline)
+
+        # 3. Main cloud body puffs
+        fill_col = (color[0], color[1], color[2], 255)
+        for dx, dy, r in puffs:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int(r * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=fill_col)
+
+        # 4. Top highlight puffs for fluffy 3D sunlight sheen
+        highlight_col = (min(255, color[0] + 30), min(255, color[1] + 30), min(255, color[2] + 30), 180)
+        for dx, dy, r in [(-60, -45, 80), (15, -70, 95), (85, -40, 75)]:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int(r * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=highlight_col)
+
+        # 5. Cute Face (in center of cloud)
+        face_y = cy + int(10 * scale)
+        eye_y = face_y - int(10 * scale)
+
+        # Rosy cheeks
+        blush_col = (255, 120, 160, 160) if color[0] > 100 else (255, 160, 180, 140)
+        draw.ellipse([cx - int(70 * scale), face_y, cx - int(35 * scale), face_y + int(24 * scale)], fill=blush_col)
+        draw.ellipse([cx + int(35 * scale), face_y, cx + int(70 * scale), face_y + int(24 * scale)], fill=blush_col)
+
+        # Big Pixar Eyes
+        for ex_off in (-40, 40):
+            ex = cx + int(ex_off * scale)
+            er = int(22 * scale)
+            if expression == "sleeping":
+                draw.arc([ex - er, eye_y - er // 2, ex + er, eye_y + er // 2], start=0, end=180, fill=(35, 45, 65, 255), width=int(5 * scale))
+            else:
+                draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=(35, 45, 65, 255), width=3)
+                ir = int(er * (0.65 if expression != "shocked" else 0.52))
+                iris_col = (30, 80, 140, 255) if color[0] > 100 else (100, 180, 255, 255)
+                draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=iris_col)
+                pr = int(ir * 0.55)
+                draw.ellipse([ex - pr, eye_y - pr, ex + pr, eye_y + pr], fill=(15, 20, 30, 255))
+                # Sparkle catchlight
+                draw.ellipse([ex - int(er * 0.35), eye_y - int(er * 0.4), ex - int(er * 0.1), eye_y - int(er * 0.15)], fill=(255, 255, 255, 255))
+
+        # Mouth
+        if expression == "sleeping":
+            draw.arc([cx - int(12 * scale), face_y + int(12 * scale), cx + int(12 * scale), face_y + int(24 * scale)], start=0, end=180, fill=(35, 45, 65, 255), width=3)
+        elif expression == "shocked":
+            draw.ellipse([cx - int(16 * scale), face_y + int(12 * scale), cx + int(16 * scale), face_y + int(36 * scale)], fill=(210, 60, 80, 255), outline=(35, 45, 65, 255), width=3)
+        else:
+            draw.pieslice([cx - int(24 * scale), face_y + int(8 * scale), cx + int(24 * scale), face_y + int(36 * scale)], start=0, end=180, fill=(230, 65, 95, 255), outline=(35, 45, 65, 255), width=3)
+
+    def _draw_steam_rise_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws warm wavy steam ribbons and rising vapor bubbles floating from lagoon water into sky."""
+        for off_x in (-160, -80, 0, 80, 160):
+            pts = []
+            for i in range(12):
+                y = cy - i * 45
+                x = cx + off_x + int(math.sin((i * 0.8) + (off_x * 0.05) + anim_phase * 6.28) * 22)
+                pts.append((x, y))
+            for i in range(len(pts) - 1):
+                alpha = int(180 * (1.0 - (i / len(pts))))
+                draw.line([pts[i], pts[i + 1]], fill=(255, 255, 255, alpha), width=6)
+
+        rng = random.Random(42)
+        for _ in range(25):
+            bx = cx + rng.randint(-220, 220)
+            by = cy - rng.randint(40, 520)
+            br = rng.randint(8, 22)
+            draw.ellipse([bx - br, by - br, bx + br, by + br], fill=(255, 255, 255, 120), outline=(200, 230, 255, 200), width=2)
+
+        draw.polygon([(cx - 25, cy - 320), (cx + 25, cy - 320), (cx + 25, cy - 250), (cx - 25, cy - 250)], fill=(0, 245, 160, 220))
+        draw.polygon([(cx - 50, cy - 320), (cx + 50, cy - 320), (cx, cy - 380)], fill=(0, 245, 160, 220))
+
+    def _draw_atmosphere_shield_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws protective glowing atmosphere shield dome and 1,000,000 LB weight callout."""
+        for r_off in (30, 45, 60):
+            draw.arc([cx - 360 - r_off, cy - 220 - r_off, cx + 360 + r_off, cy + 220 + r_off], start=160, end=380, fill=(0, 225, 255, 140), width=6)
+
+        for ax in (cx - 220, cx, cx + 220):
+            draw.polygon([(ax - 20, cy + 260), (ax + 20, cy + 260), (ax + 20, cy + 180), (ax - 20, cy + 180)], fill=(0, 255, 175, 230))
+            draw.polygon([(ax - 40, cy + 180), (ax + 40, cy + 180), (ax, cy + 130)], fill=(0, 255, 175, 230))
+
+        draw.rounded_rectangle([cx - 220, cy + 300, cx + 220, cy + 410], radius=24, fill=(20, 32, 65, 245), outline=(255, 215, 0, 255), width=5)
+        font = self._get_font(34)
+        sub_font = self._get_font(24)
+        draw.text((cx, cy + 335), "1,000,000 LBS!", fill=(255, 225, 80), font=font, anchor="mm")
+        draw.text((cx, cy + 380), "HELD UP BY WARM AIR", fill=(255, 255, 255), font=sub_font, anchor="mm")
+
+    def _draw_cloud_micro_droplets_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws magnifying glass zoom bubble showing cute water droplets clustering together."""
+        r = 170
+        draw.line([(cx + int(r * 0.7), cy + int(r * 0.7)), (cx + r + 90, cy + r + 90)], fill=(120, 80, 50, 255), width=24)
+        draw.ellipse([cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8], fill=(255, 215, 0, 255))
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(18, 55, 110, 245))
+
+        droplet_coords = [
+            (-70, -60, 22), (0, -80, 26), (70, -50, 20),
+            (-80, 0, 24), (-20, -15, 28), (45, -5, 25), (90, 15, 20),
+            (-60, 60, 24), (5, 50, 28), (70, 65, 22), (0, 105, 18)
+        ]
+        for dx, dy, dr in droplet_coords:
+            px = cx + dx
+            py = cy + dy
+            draw.ellipse([px - dr, py - dr // 2, px + dr, py + dr], fill=(0, 210, 255, 255), outline=(255, 255, 255, 255), width=2)
+            draw.polygon([(px - dr + 2, py), (px + dr - 2, py), (px, py - dr - 6)], fill=(0, 210, 255, 255))
+            draw.ellipse([px - dr // 2, py - dr // 3, px - dr // 4, py], fill=(255, 255, 255, 220))
+            draw.ellipse([px - 4, py + 2, px - 1, py + 5], fill=(15, 25, 45, 255))
+            draw.ellipse([px + 1, py + 2, px + 4, py + 5], fill=(15, 25, 45, 255))
+
+        draw.rounded_rectangle([cx - 150, cy + r - 30, cx + 150, cy + r + 25], radius=16, fill=(255, 60, 110, 255), outline=(255, 255, 255, 255), width=3)
+        font = self._get_font(24)
+        draw.text((cx, cy + r - 2), "TINY DROPLETS!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_cloud_sunlight_scattering_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws radiant golden sun and prism light rays scattering into rainbow spectrum."""
+        sr = 90
+        draw.ellipse([cx - sr - 15, cy - sr - 15, cx + sr + 15, cy + sr + 15], fill=(255, 240, 120, 140))
+        draw.ellipse([cx - sr, cy - sr, cx + sr, cy + sr], fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=5)
+
+        for i in range(12):
+            ang = (i / 12.0) * 2 * math.pi
+            bx1 = cx + int(math.cos(ang) * (sr + 10))
+            by1 = cy + int(math.sin(ang) * (sr + 10))
+            bx2 = cx + int(math.cos(ang) * (sr + 65))
+            by2 = cy + int(math.sin(ang) * (sr + 65))
+            draw.line([(bx1, by1), (bx2, by2)], fill=(255, 235, 80, 220), width=6)
+
+        colors = [
+            (255, 60, 60),
+            (255, 160, 40),
+            (255, 230, 40),
+            (40, 220, 100),
+            (0, 205, 255),
+            (80, 110, 255),
+            (180, 70, 255)
+        ]
+        target_x = cx + 550
+        for idx, col in enumerate(colors):
+            y_off = (idx - 3) * 28
+            draw.line([(cx + sr, cy), (target_x, cy + 200 + y_off)], fill=(col[0], col[1], col[2], 180), width=8)
+
+        draw.line([(cx + sr, cy), (target_x, cy + 200)], fill=(255, 255, 255, 240), width=12)
+
+    def _draw_cloud_sunset_neon_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws sunset golden hour glow, neon pink cotton candy aura, and floating stars."""
+        draw.pieslice([cx - 240, 1150, cx + 240, 1550], start=180, end=360, fill=(255, 180, 40, 255), outline=(255, 230, 120, 255), width=5)
+
+        for r_off in (35, 65, 95):
+            draw.ellipse([cx - 320 - r_off, cy - 140 - r_off, cx + 320 + r_off, cy + 140 + r_off], fill=(255, 80, 160, 40))
+
+        rng = random.Random(88)
+        for _ in range(25):
+            sx = rng.randint(80, 1000)
+            sy = rng.randint(450, 1100)
+            sr = rng.randint(4, 9)
+            draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=(255, 240, 160, 220))
+
+    def _draw_cloud_ice_crystals_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws sparkling geometric hexagonal snowflakes and ice crystals inside freezing cloud."""
+        def draw_snowflake(scx: int, scy: int, radius: int):
+            for i in range(6):
+                ang = (i / 6.0) * math.pi
+                dx = int(math.cos(ang) * radius)
+                dy = int(math.sin(ang) * radius)
+                draw.line([(scx - dx, scy - dy), (scx + dx, scy + dy)], fill=(255, 255, 255, 240), width=3)
+                for frac in (0.4, 0.75):
+                    bx = scx + int(dx * frac)
+                    by = scy + int(dy * frac)
+                    bdx = int(math.cos(ang + 0.6) * (radius * 0.3))
+                    bdy = int(math.sin(ang + 0.6) * (radius * 0.3))
+                    draw.line([(bx, by), (bx + bdx, by + bdy)], fill=(200, 235, 255, 230), width=2)
+                    draw.line([(bx, by), (bx - bdx, by - bdy)], fill=(200, 235, 255, 230), width=2)
+            draw.ellipse([scx - 4, scy - 4, scx + 4, scy + 4], fill=(255, 255, 255, 255))
+
+        flake_locs = [
+            (cx - 180, cy - 60, 32),
+            (cx - 70, cy - 90, 38),
+            (cx + 80, cy - 70, 36),
+            (cx + 190, cy - 50, 30),
+            (cx - 120, cy + 70, 34),
+            (cx + 10, cy + 90, 42),
+            (cx + 140, cy + 60, 32),
+        ]
+        for fx, fy, fr in flake_locs:
+            draw_snowflake(fx, fy, fr)
+
+    def _draw_lightning_bolt_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws electrostatic positive/negative charges and bright jagged electric lightning bolt."""
+        charges = [
+            (cx - 180, cy - 120, "+", (255, 80, 80)),
+            (cx - 90, cy - 140, "+", (255, 80, 80)),
+            (cx + 40, cy - 130, "+", (255, 80, 80)),
+            (cx + 160, cy - 110, "+", (255, 80, 80)),
+            (cx - 150, cy + 120, "-", (60, 180, 255)),
+            (cx - 50, cy + 140, "-", (60, 180, 255)),
+            (cx + 80, cy + 130, "-", (60, 180, 255)),
+            (cx + 180, cy + 110, "-", (60, 180, 255)),
+        ]
+        font = self._get_font(28)
+        for ch_x, ch_y, ch_sym, ch_col in charges:
+            draw.ellipse([ch_x - 18, ch_y - 18, ch_x + 18, ch_y + 18], fill=ch_col, outline=(255, 255, 255, 255), width=2)
+            draw.text((ch_x, ch_y - 2), ch_sym, fill=(255, 255, 255), font=font, anchor="mm")
+
+        bolt_pts = [
+            (cx - 40, cy - 120),
+            (cx + 25, cy - 20),
+            (cx - 30, cy + 10),
+            (cx + 60, cy + 110),
+            (cx + 10, cy + 130),
+            (cx + 80, cy + 240),
+            (cx + 20, cy + 260),
+            (cx + 110, cy + 390)
+        ]
+        for i in range(len(bolt_pts) - 1):
+            draw.line([bolt_pts[i], bolt_pts[i + 1]], fill=(0, 235, 255, 180), width=28)
+        for i in range(len(bolt_pts) - 1):
+            draw.line([bolt_pts[i], bolt_pts[i + 1]], fill=(255, 245, 60, 245), width=14)
+        for i in range(len(bolt_pts) - 1):
+            draw.line([bolt_pts[i], bolt_pts[i + 1]], fill=(255, 255, 255, 255), width=6)
+
+        strike_x, strike_y = bolt_pts[-1]
+        for spk_ang in (0.3, 1.1, 2.2, 3.4, 4.5, 5.6):
+            sx2 = strike_x + int(math.cos(spk_ang) * 45)
+            sy2 = strike_y + int(math.sin(spk_ang) * 45)
+            draw.line([(strike_x, strike_y), (sx2, sy2)], fill=(255, 255, 120, 220), width=4)
+
