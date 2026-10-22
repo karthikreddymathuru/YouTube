@@ -348,6 +348,110 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
                 ]
             }
         ]
+    },
+    "chameleon_crystal_color_science": {
+        "niche": "animal_secrets",
+        "topic": "Chameleon Color Superpowers",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "Chameleons do NOT change color to blend in with trees like camouflage",
+                "required_keywords": ["chameleons", "color", "change", "not", "camouflage", "trees"],
+                "character_expression": "shocked",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_myth_busted",
+                "visual_badge_text": "NOT FOR CAMOUFLAGE!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "They actually change color based on their mood and temperature like mood rings",
+                "required_keywords": ["mood", "temperature", "color", "feel", "sunshine", "shift"],
+                "character_expression": "happy_proud",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_mood_ring_shift",
+                "visual_badge_text": "MOOD & TEMPERATURE!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "Under their skin are millions of microscopic photonic crystals like tiny mirrors",
+                "required_keywords": ["crystals", "skin", "mirrors", "microscopic", "tiny", "light"],
+                "character_expression": "baby_curious",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_nanocrystal_zoom",
+                "visual_badge_text": "MICROSCOPIC CRYSTALS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "When relaxed, the crystals cluster tight together to reflect cool blue and emerald green",
+                "required_keywords": ["relaxed", "crystals", "tight", "reflect", "green", "close"],
+                "character_expression": "eating_excited",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_relaxed_green",
+                "visual_badge_text": "TIGHT CRYSTALS: GREEN!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "When excited or angry, skin stretches the crystals apart reflecting yellow and fiery red",
+                "required_keywords": ["excited", "skin", "stretches", "crystals", "yellow", "red"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "fiery_red",
+                "visual_prop": "chameleon_excited_neon_red",
+                "visual_badge_text": "SPREAD CRYSTALS: RED!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "Their eyes are like 360-degree radar turrets looking in two different directions at once",
+                "required_keywords": ["eyes", "swivel", "two", "different", "directions", "once"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_radar_eyes",
+                "visual_badge_text": "360° DUAL RADAR EYES!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "Their spring-loaded tongue shoots out faster than a jet fighter at 60 miles per hour",
+                "required_keywords": ["spring", "tongue", "shoots", "60", "miles", "jet"],
+                "character_expression": "xray_focused",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_ballistic_tongue",
+                "visual_badge_text": "60 MPH ROCKET TONGUE!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking viewer which superpower they would choose: 360 degree dual eyes or 60 mph rocket tongue",
+                "required_keywords": ["which", "pick", "choose", "superpower", "eyes", "tongue"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "green",
+                "visual_prop": "chameleon_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Reptile_Superpower_Explorer",
+                "title": "Why Chameleons ACTUALLY Change Color! 🦎🌈 #shorts",
+                "description": "Discover why chameleons don't change color for camouflage, how nanocrystals bend light, and their 60 mph rocket tongue! #shorts #kids #animals #science",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "chameleon", "animals", "funfacts"],
+                "scene_narrations": [
+                    "Did you know chameleons do NOT change color to hide or camouflage in trees?",
+                    "They actually shift colors to express their mood and warm up in the sunshine!",
+                    "Under their skin are millions of tiny nanocrystals that act like microscopic mirrors!",
+                    "When the chameleon is relaxed, crystals squeeze close together to reflect bright green!",
+                    "When excited, its skin stretches the crystals apart to reflect fiery yellow and red!",
+                    "Even crazier, their eyes can swivel in two completely different directions at once!",
+                    "And their spring-loaded tongue shoots out at 60 miles per hour faster than a jet!",
+                    "Which superpower would you choose, 360-degree dual radar eyes or a 60-mile-per-hour tongue?"
+                ]
+            }
+        ]
     }
 }
 
@@ -425,6 +529,11 @@ class ScriptEngine:
         past_titles = self._get_published_titles()
         topic_lower = topic.lower()
 
+        if "chameleon" in topic_lower or "lizard" in topic_lower or "color" in topic_lower or "reptile" in topic_lower:
+            ep = EPISODE_LIBRARY["chameleon_crystal_color_science"]
+            if not any(c["title"] in past_titles for c in ep["candidates"]):
+                return ep
+
         if "cloud" in topic_lower or "weather" in topic_lower or "lightning" in topic_lower:
             ep = EPISODE_LIBRARY["cloud_and_lightning_science"]
             if not any(c["title"] in past_titles for c in ep["candidates"]):
@@ -447,7 +556,7 @@ class ScriptEngine:
                 logger.info(f"Auto-rotating to episode blueprint with fresh candidate: '{ep_key}' ({ep_data['topic']})")
                 return ep_data
 
-        return EPISODE_LIBRARY["cloud_and_lightning_science"]
+        return EPISODE_LIBRARY["chameleon_crystal_color_science"]
 
     def _get_published_titles(self) -> set:
         titles = set()
@@ -513,6 +622,35 @@ class ScriptEngine:
             f"(Score: {winner['total_score']}/100 across {len(scored_candidates)} candidates)"
         )
 
+        topic_low = winner["topic"].lower()
+        if "chameleon" in topic_low:
+            char_name = "Cam the Chameleon & Leo"
+            char_spec = CharacterSpec(
+                name="Cam the Chameleon",
+                species_or_role="chameleon",
+                face_traits="Large expressive 360 turret eyes, cute smiling snout, lime-green and ruby color-shifting scales, signature golden star badge",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "cloud" in topic_low or "weather" in topic_low:
+            char_name = "Cumulus the Cloud & Leo"
+            char_spec = CharacterSpec(
+                name="Cumulus the Cloud",
+                species_or_role="cloud",
+                face_traits="Fluffy soft white cheeks, friendly glowing eyes, golden sunshine halo",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "octopus" in topic_low:
+            char_name = "Inky the Octopus & Leo"
+            char_spec = CharacterSpec(
+                name="Inky the Octopus",
+                species_or_role="octopus",
+                face_traits="Cute coral-orange tentacles, large bright glossy eyes, golden explorer badge",
+                companion_name="Leo the Explorer Kid"
+            )
+        else:
+            char_name = "Pip the Flamingo & Leo"
+            char_spec = CharacterSpec()
+
         scenes = []
         for idx, bp in enumerate(winner_bp):
             narr = winner["scene_narrations"][idx]
@@ -521,7 +659,7 @@ class ScriptEngine:
                     scene_id=bp["scene_id"],
                     duration_sec=3.2,
                     narration=narr,
-                    visual_prompt=f"Vertical 9:16 3D Pixar animation of Pip the Flamingo: {bp['topic_beat']}",
+                    visual_prompt=f"Vertical 9:16 3D Pixar animation of {char_name}: {bp['topic_beat']}",
                     character_expression=bp["character_expression"],
                     character_color_state=bp["character_color_state"],
                     visual_prop=bp["visual_prop"],
@@ -553,7 +691,7 @@ class ScriptEngine:
             title=winner["title"],
             topic=winner["topic"],
             target_audience="family_co_viewing",
-            character_spec=CharacterSpec(),
+            character_spec=char_spec,
             description=winner["description"],
             tags=winner["tags"],
             hook_0_3s=scenes[0].narration,

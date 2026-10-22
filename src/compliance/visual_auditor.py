@@ -233,6 +233,14 @@ class VisualAuditor:
             ]
             if conflicts:
                 conflict_error = f"Topic Mismatch: Spoken audio is about Clouds/Weather, but visual contains animal prop(s): {conflicts}"
+        elif "chameleon" in full_audio or "chameleon" in topic_lower:
+            forbidden_props = ["flamingo", "octopus", "beak_shield", "knee_gear_lock", "one_leg_ice", "boiling_geyser", "tentacle", "blue_blood", "nine_brains", "cloud_steam", "lightning"]
+            conflicts = [
+                s.get("visual_prop", "") for s in sync_timeline
+                if any(f in s.get("visual_prop", "").lower() for f in forbidden_props)
+            ]
+            if conflicts:
+                conflict_error = f"Topic Mismatch: Spoken audio is about Chameleon, but visual contains conflicting prop(s): {conflicts}"
 
         if conflict_error:
             logger.error(f"❌ AUDIO-VISUAL VALIDATOR BLOCKED: {conflict_error}")
@@ -257,7 +265,9 @@ class VisualAuditor:
                 ("100" in badge and "100" in narr) or
                 ("0.3" in badge and ("half" in narr or "second" in narr or "0.3" in narr)) or
                 ("1" in badge and "one" in narr) or
-                ("1,000,000" in badge and ("million" in narr or "1,000,000" in narr))
+                ("1,000,000" in badge and ("million" in narr or "1,000,000" in narr)) or
+                ("60" in badge and "60" in narr) or
+                ("360" in badge and "360" in narr)
             )
 
             if has_overlap or num_match or len(badge) > 0:

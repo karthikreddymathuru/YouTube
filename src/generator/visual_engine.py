@@ -284,6 +284,7 @@ class VisualEngine:
         low_narr = (narration or "").lower()
         is_octopus = "octopus" in visual_prop.lower() or "octopus" in low_narr
         is_cloud = "cloud" in visual_prop.lower() or "lightning" in visual_prop.lower() or "weather" in low_narr or "cloud" in low_narr
+        is_chameleon = "chameleon" in visual_prop.lower() or "lizard" in visual_prop.lower() or "chameleon" in low_narr or "nanocrystal" in visual_prop.lower()
 
         # --- OCTOPUS & OCEAN EPISODES ---
         if is_octopus:
@@ -452,6 +453,91 @@ class VisualEngine:
                     color=(255, 255, 255), expression="happy", anim_phase=anim_phase
                 )
 
+        # --- CHAMELEON & COLOR EPISODES ---
+        elif is_chameleon:
+            if scene_id == 8 or visual_prop in ("chameleon_superpower_choice", "choice_card"):
+                # Scene 8: Choice Card / Loop Finale with Chameleon and Leo waving together
+                self._draw_tree_branch(draw, cy=1140)
+                self._draw_chameleon_character(
+                    draw, cx=360, cy=1020, scale=1.05, color_state="green", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("chameleon_myth_busted",):
+                # Scene 1: Chameleon on branch + big NOT CAMOUFLAGE badge
+                self._draw_tree_branch(draw, cy=1120)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="green", anim_phase=anim_phase
+                )
+                self._draw_comparison_callout(draw, x=540, y=540, title="NOT CAMOUFLAGE!", subtitle="THEY DON'T HIDE IN TREES", color=(255, 60, 90))
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="NOT CAMO?!")
+
+            elif scene_id == 2 or visual_prop in ("chameleon_mood_ring_shift",):
+                # Scene 2: Mood ring shift based on temperature and feelings
+                self._draw_tree_branch(draw, cy=1120)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="half_orange", anim_phase=anim_phase
+                )
+                self._draw_thermometer_prop(draw, x=150, y=520, temp_text="WARM SUN")
+                self._draw_comparison_callout(draw, x=750, y=540, title="MOOD & HEAT!", subtitle="SHIFTS LIKE A MOOD RING", color=(255, 180, 50))
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="MOOD SHIFT!")
+
+            elif scene_id == 3 or visual_prop in ("chameleon_nanocrystal_zoom",):
+                # Scene 3: Magnifying glass showing grid of photonic nanocrystals like tiny mirrors
+                self._draw_tree_branch(draw, cy=1160)
+                self._draw_chameleon_character(
+                    draw, cx=330, cy=1040, scale=0.98, color_state="green", anim_phase=anim_phase
+                )
+                self._draw_nanocrystals_zoom_prop(draw, cx=740, cy=920, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="NANOCRYSTALS!")
+
+            elif scene_id == 4 or visual_prop in ("chameleon_relaxed_green",):
+                # Scene 4: Relaxed green chameleon with tight crystal lattice
+                self._draw_tree_branch(draw, cy=1120)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="green", anim_phase=anim_phase
+                )
+                self._draw_crystal_spacing_diagram(draw, cx=540, y=540, state="tight", label="TIGHT CRYSTALS -> BLUE/GREEN")
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="TIGHT = GREEN!")
+
+            elif scene_id == 5 or visual_prop in ("chameleon_excited_neon_red",):
+                # Scene 5: Excited chameleon transformed into fiery yellow and red stripes!
+                self._draw_tree_branch(draw, cy=1120)
+                self._draw_transformation_aura(draw, cx=540, cy=960)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.2, color_state="fiery_red", anim_phase=anim_phase
+                )
+                self._draw_crystal_spacing_diagram(draw, cx=540, y=540, state="spread", label="SPREAD CRYSTALS -> RED/YELLOW")
+                self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="FIERY RED!")
+
+            elif scene_id == 6 or visual_prop in ("chameleon_radar_eyes",):
+                # Scene 6: Chameleon close up with 360 dual radar eyes
+                self._draw_tree_branch(draw, cy=1140)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.3, color_state="green", eye_mode="dual_radar", anim_phase=anim_phase
+                )
+                self._draw_radar_eye_arcs(draw, cx=540, cy=960)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="360° EYES!")
+
+            elif scene_id == 7 or visual_prop in ("chameleon_ballistic_tongue",):
+                # Scene 7: Ballistic spring tongue shooting at 60 mph!
+                self._draw_tree_branch(draw, cy=1140)
+                self._draw_chameleon_character(
+                    draw, cx=320, cy=1020, scale=1.05, color_state="green", tongue=True, anim_phase=anim_phase
+                )
+                self._draw_ballistic_tongue_prop(draw, start_xy=(535, 1015), end_xy=(880, 880), anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="60 MPH JET!")
+
+            else:
+                self._draw_tree_branch(draw, cy=1120)
+                self._draw_chameleon_character(
+                    draw, cx=540, cy=960, scale=1.15, color_state="green", anim_phase=anim_phase
+                )
+
         # --- FLAMINGO EPISODES ---
         elif visual_prop == "boiling_geyser":
             self._draw_boiling_geyser_prop(draw, cx=330, cy=1220, anim_phase=anim_phase)
@@ -557,6 +643,14 @@ class VisualEngine:
             "cloud_ice_crystals": ((8, 20, 60), (45, 95, 165), (15, 45, 95)),
             "lightning_electrostatic_lock": ((12, 12, 38), (35, 30, 75), (18, 18, 48)),
             "cloud_superpower_choice": ((20, 50, 115), (0, 175, 235), (20, 110, 175)),
+            "chameleon_myth_busted": ((15, 65, 45), (40, 180, 110), (25, 95, 55)),
+            "chameleon_mood_ring_shift": ((20, 60, 50), (255, 175, 40), (30, 90, 60)),
+            "chameleon_nanocrystal_zoom": ((10, 35, 75), (0, 195, 230), (12, 60, 100)),
+            "chameleon_relaxed_green": ((15, 70, 40), (50, 210, 115), (20, 100, 50)),
+            "chameleon_excited_neon_red": ((70, 20, 30), (255, 95, 50), (90, 30, 40)),
+            "chameleon_radar_eyes": ((18, 55, 45), (45, 175, 120), (22, 85, 55)),
+            "chameleon_ballistic_tongue": ((20, 45, 60), (255, 110, 130), (25, 75, 85)),
+            "chameleon_superpower_choice": ((15, 55, 50), (0, 180, 160), (20, 85, 75)),
         }
         sky_top, sky_bot, ground_col = palettes.get(visual_prop, ((20, 60, 120), (0, 180, 220), (0, 120, 170)))
 
@@ -1125,7 +1219,9 @@ class VisualEngine:
     def _draw_color_progress_meter(self, draw: ImageDraw.ImageDraw, cx: int, y: int, narration: str = ""):
         """Draws a visual color transformation / camouflage meter at the bottom of Scene 5."""
         low = (narration or "").lower()
-        if "skin" in low or "second" in low or "camouflage" in low:
+        if "chameleon" in low or "stretches" in low or "crystal" in low or "neon" in low and "red" in low:
+            left_txt, right_txt = "RELAXED: GREEN", "EXCITED: RED!"
+        elif "skin" in low or "second" in low or "camouflage" in low:
             left_txt, right_txt = "NORMAL SKIN", "0.3s CAMOUFLAGE!"
         elif "sunset" in low or "cotton candy" in low or "pink" in low or "neon" in low:
             left_txt, right_txt = "WHITE CLOUD", "NEON SUNSET!"
@@ -1289,7 +1385,10 @@ class VisualEngine:
         """Draws two visual superpower choice cards above Pip and Leo in Scene 8."""
         font = self._get_font(30)
         low = (narration or "").lower()
-        if "heart" in low or "brain" in low or "camouflage" in low or "blue" in low:
+        if "chameleon" in low or "eyes" in low or "tongue" in low or "360" in low or "radar" in low or "60" in low:
+            card1_text = "360° RADAR EYES"
+            card2_text = "60 MPH TONGUE"
+        elif "heart" in low or "brain" in low or "camouflage" in low or "blue" in low:
             card1_text = "3 GLOWING HEARTS"
             card2_text = "0.3s CAMOUFLAGE"
         elif "cloud" in low or "lightning" in low:
@@ -1589,4 +1688,276 @@ class VisualEngine:
             sx2 = strike_x + int(math.cos(spk_ang) * 45)
             sy2 = strike_y + int(math.sin(spk_ang) * 45)
             draw.line([(strike_x, strike_y), (sx2, sy2)], fill=(255, 255, 120, 220), width=4)
+
+    # =========================================================================
+    # CHAMELEON & COLOR SCIENCE RENDERING METHODS
+    # =========================================================================
+
+    def _draw_tree_branch(self, draw: ImageDraw.ImageDraw, cy: int):
+        """Draws a sturdy jungle tree branch with lush green leaves across the frame."""
+        # Main wooden branch
+        branch_pts = [
+            (0, cy + 20),
+            (260, cy + 5),
+            (540, cy - 10),
+            (820, cy + 8),
+            (self.width, cy - 15),
+            (self.width, cy + 75),
+            (820, cy + 95),
+            (540, cy + 80),
+            (260, cy + 90),
+            (0, cy + 105),
+        ]
+        draw.polygon(branch_pts, fill=(110, 72, 38, 255), outline=(75, 48, 22, 255))
+        # Bark texture ridges
+        for bx, by, bw in [(140, cy + 35, 120), (420, cy + 25, 140), (720, cy + 30, 160)]:
+            draw.arc([bx, by, bx + bw, by + 30], start=15, end=165, fill=(80, 52, 26, 200), width=5)
+
+        # Fresh jungle leaves sprouting along branch
+        leaf_clusters = [
+            (90, cy + 5, -25),
+            (220, cy - 20, 30),
+            (470, cy + 75, 40),
+            (760, cy - 15, -35),
+            (960, cy + 65, 25),
+        ]
+        for lx, ly, rot in leaf_clusters:
+            # Leaf pair
+            draw.ellipse([lx - 35, ly - 18, lx + 35, ly + 18], fill=(46, 204, 113, 240), outline=(230, 255, 230, 255), width=2)
+            draw.line([(lx - 30, ly), (lx + 30, ly)], fill=(30, 140, 75, 255), width=3)
+
+    def _draw_chameleon_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        color_state: str = "green",
+        eye_mode: str = "normal",
+        tongue: bool = False,
+        anim_phase: float = 0.0,
+    ):
+        """Draws the adorable hero chameleon perched on the branch with animated states and color shifts."""
+        s = scale
+        # Determine color palette based on state
+        if color_state == "fiery_red":
+            body_col = (245, 55, 55, 255)
+            belly_col = (255, 165, 30, 255)
+            stripe_col = (255, 230, 50, 255)
+            crest_col = (210, 25, 45, 255)
+        elif color_state == "half_orange":
+            body_col = (245, 135, 35, 255)
+            belly_col = (255, 205, 75, 255)
+            stripe_col = (46, 204, 113, 255)
+            crest_col = (220, 95, 20, 255)
+        else:  # "green"
+            body_col = (46, 204, 113, 255)
+            belly_col = (130, 235, 160, 255)
+            stripe_col = (26, 160, 110, 255)
+            crest_col = (22, 145, 90, 255)
+
+        # 1. Prehensile Spiral Curled Tail (left of body)
+        tail_cx = cx - int(150 * s)
+        tail_cy = cy + int(10 * s)
+        draw.arc([tail_cx - int(75 * s), tail_cy - int(75 * s), tail_cx + int(75 * s), tail_cy + int(75 * s)], start=90, end=360, fill=body_col, width=int(26 * s))
+        draw.arc([tail_cx - int(45 * s), tail_cy - int(45 * s), tail_cx + int(45 * s), tail_cy + int(45 * s)], start=0, end=270, fill=body_col, width=int(20 * s))
+        draw.ellipse([tail_cx - int(15 * s), tail_cy - int(15 * s), tail_cx + int(15 * s), tail_cy + int(15 * s)], fill=body_col)
+
+        # 2. Chameleon Legs gripping the branch (zygodactylous mitten feet)
+        # Back foot
+        bf_x, bf_y = cx - int(70 * s), cy + int(70 * s)
+        draw.line([(cx - int(60 * s), cy + int(20 * s)), (bf_x, bf_y)], fill=body_col, width=int(22 * s))
+        draw.ellipse([bf_x - int(24 * s), bf_y - int(12 * s), bf_x + int(24 * s), bf_y + int(12 * s)], fill=crest_col)
+        # Front foot
+        ff_x, ff_y = cx + int(70 * s), cy + int(70 * s)
+        draw.line([(cx + int(50 * s), cy + int(20 * s)), (ff_x, ff_y)], fill=body_col, width=int(22 * s))
+        draw.ellipse([ff_x - int(24 * s), ff_y - int(12 * s), ff_x + int(24 * s), ff_y + int(12 * s)], fill=crest_col)
+
+        # 3. Main Body (arched back)
+        bw, bh = int(145 * s), int(85 * s)
+        draw.ellipse([cx - bw, cy - bh, cx + bw, cy + bh], fill=body_col, outline=(255, 255, 255, 120), width=int(3 * s))
+        # Soft belly
+        draw.ellipse([cx - int(100 * s), cy - int(25 * s), cx + int(100 * s), cy + int(75 * s)], fill=belly_col)
+
+        # Decorative dorsal spines / crest ridges along back
+        for i in range(-4, 5):
+            sp_x = cx + int(i * 26 * s)
+            sp_y = cy - int(math.cos(i * 0.28) * 85 * s)
+            draw.polygon([(sp_x - int(8 * s), sp_y), (sp_x, sp_y - int(16 * s)), (sp_x + int(8 * s), sp_y)], fill=crest_col)
+
+        # Tiger / mood stripes across flank
+        for st_x in (-60, -20, 20, 60):
+            sx = cx + int(st_x * s)
+            draw.line([(sx, cy - int(55 * s)), (sx + int(15 * s), cy + int(35 * s))], fill=stripe_col, width=int(9 * s))
+
+        # 4. Chameleon Head and Casque (tall helmet crest behind head)
+        head_cx = cx + int(135 * s)
+        head_cy = cy - int(20 * s)
+        # Casque crest
+        casque_pts = [
+            (head_cx - int(45 * s), head_cy - int(30 * s)),
+            (head_cx - int(25 * s), head_cy - int(95 * s)),
+            (head_cx + int(15 * s), head_cy - int(55 * s)),
+        ]
+        draw.polygon(casque_pts, fill=crest_col)
+        # Head dome
+        draw.ellipse([head_cx - int(60 * s), head_cy - int(50 * s), head_cx + int(65 * s), head_cy + int(50 * s)], fill=body_col)
+
+        # Cute Snout & Mouth
+        snout_x = head_cx + int(75 * s)
+        snout_y = head_cy + int(15 * s)
+        draw.pieslice([snout_x - int(40 * s), snout_y - int(30 * s), snout_x + int(25 * s), snout_y + int(30 * s)], start=280, end=80, fill=body_col)
+
+        if tongue:
+            # Mouth opened wide for tongue shot!
+            draw.pieslice([head_cx + int(20 * s), head_cy, snout_x + int(25 * s), snout_y + int(30 * s)], start=340, end=80, fill=(180, 20, 50, 255))
+        else:
+            # Sweet friendly lizard smile
+            draw.arc([snout_x - int(30 * s), snout_y - int(10 * s), snout_x + int(15 * s), snout_y + int(20 * s)], start=20, end=150, fill=(20, 45, 25, 255), width=int(4 * s))
+
+        # 5. Turret Cone Eyes
+        if eye_mode == "dual_radar":
+            # Dual 360 radar eyes looking in completely opposite directions!
+            # Left Eye turret pointing UP and BACK
+            le_x, le_y = head_cx - int(15 * s), head_cy - int(35 * s)
+            draw.ellipse([le_x - int(28 * s), le_y - int(28 * s), le_x + int(28 * s), le_y + int(28 * s)], fill=body_col, outline=crest_col, width=int(4 * s))
+            draw.ellipse([le_x - int(14 * s), le_y - int(24 * s), le_x + int(4 * s), le_y - int(6 * s)], fill=(255, 255, 255, 255))
+            draw.ellipse([le_x - int(10 * s), le_y - int(20 * s), le_x, le_y - int(10 * s)], fill=(15, 25, 45, 255))
+
+            # Right Eye turret pointing FORWARD and DOWN
+            re_x, re_y = head_cx + int(25 * s), head_cy - int(10 * s)
+            draw.ellipse([re_x - int(28 * s), re_y - int(28 * s), re_x + int(28 * s), re_y + int(28 * s)], fill=body_col, outline=crest_col, width=int(4 * s))
+            draw.ellipse([re_x + int(4 * s), re_y + int(2 * s), re_x + int(22 * s), re_y + int(20 * s)], fill=(255, 255, 255, 255))
+            draw.ellipse([re_x + int(8 * s), re_y + int(6 * s), re_x + int(18 * s), re_y + int(16 * s)], fill=(15, 25, 45, 255))
+        else:
+            # Cute big cartoon turret eye
+            eye_cx = head_cx + int(10 * s)
+            eye_cy = head_cy - int(20 * s)
+            er = int(34 * s)
+            # Turret ring
+            draw.ellipse([eye_cx - er, eye_cy - er, eye_cx + er, eye_cy + er], fill=body_col, outline=crest_col, width=int(5 * s))
+            # Sclera
+            draw.ellipse([eye_cx - int(22 * s), eye_cy - int(22 * s), eye_cx + int(22 * s), eye_cy + int(22 * s)], fill=(255, 255, 255, 255))
+            # Big curious pupil
+            draw.ellipse([eye_cx - int(8 * s), eye_cy - int(14 * s), eye_cx + int(18 * s), eye_cy + int(12 * s)], fill=(15, 30, 45, 255))
+            # Catchlight
+            draw.ellipse([eye_cx + int(2 * s), eye_cy - int(10 * s), eye_cx + int(12 * s), eye_cy], fill=(255, 255, 255, 255))
+
+    def _draw_nanocrystals_zoom_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws magnifying glass zoom bubble showing a microscopic grid of photonic nanocrystals like tiny mirrors."""
+        r = 175
+        # Wooden handle
+        draw.line([(cx + int(r * 0.7), cy + int(r * 0.7)), (cx + r + 85, cy + r + 85)], fill=(130, 85, 45, 255), width=24)
+        # Gold brass frame
+        draw.ellipse([cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8], fill=(255, 215, 0, 255))
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(12, 28, 56, 245))
+
+        # Geometric lattice of sparkling diamond nanocrystals
+        grid_offsets = [
+            (-90, -70), (-30, -70), (30, -70), (90, -70),
+            (-60, -20), (0, -20), (60, -20),
+            (-90, 30), (-30, 30), (30, 30), (90, 30),
+            (-60, 80), (0, 80), (60, 80)
+        ]
+        pulse = int(math.sin(anim_phase * 2 * math.pi) * 3)
+        for gx, gy in grid_offsets:
+            px = cx + gx
+            py = cy + gy
+            cr = 16 + pulse
+            # Diamond crystal
+            diamond = [(px, py - cr), (px + cr, py), (px, py + cr), (px - cr, py)]
+            draw.polygon(diamond, fill=(0, 240, 255, 240), outline=(255, 255, 255, 255))
+            # Inner gleam
+            draw.ellipse([px - 4, py - 4, px + 4, py + 4], fill=(255, 255, 255, 255))
+
+        # Bouncing light beam reflection
+        draw.line([(cx - 120, cy - 120), (cx, cy - 20)], fill=(255, 240, 100, 220), width=6)
+        draw.line([(cx, cy - 20), (cx + 120, cy - 110)], fill=(0, 255, 180, 240), width=6)
+
+        # Label pill
+        draw.rounded_rectangle([cx - 165, cy + r - 30, cx + 165, cy + r + 25], radius=16, fill=(0, 205, 160, 255), outline=(255, 255, 255, 255), width=3)
+        font = self._get_font(23)
+        draw.text((cx, cy + r - 2), "NANOCRYSTAL MIRRORS!", fill=(10, 30, 45), font=font, anchor="mm")
+
+    def _draw_crystal_spacing_diagram(self, draw: ImageDraw.ImageDraw, cx: int, y: int, state: str = "tight", label: str = ""):
+        """Draws a comparison diagram illustrating tight crystal spacing (blue/green) vs spread crystal spacing (red/yellow)."""
+        w, h = 420, 52
+        draw.rounded_rectangle([cx - w, y - h, cx + w, y + h], radius=22, fill=(20, 32, 60, 245), outline=(255, 255, 255, 255), width=4)
+
+        # Draw lattice dots on left side
+        if state == "tight":
+            # Packed tight crystals
+            dot_col = (0, 240, 220, 255)
+            for i in range(7):
+                dx = cx - 360 + i * 22
+                draw.ellipse([dx - 8, y - 8, dx + 8, y + 8], fill=dot_col, outline=(255, 255, 255, 255), width=2)
+            # Arrow
+            draw.line([(cx - 200, y), (cx - 170, y)], fill=(255, 255, 255, 255), width=4)
+        else:
+            # Spread wide crystals
+            dot_col = (255, 75, 65, 255)
+            for i in range(4):
+                dx = cx - 360 + i * 46
+                draw.ellipse([dx - 12, y - 12, dx + 12, y + 12], fill=dot_col, outline=(255, 230, 100, 255), width=2)
+            # Stretched arrows between them
+            draw.line([(cx - 200, y), (cx - 160, y)], fill=(255, 215, 0, 255), width=4)
+
+        font = self._get_font(26)
+        draw.text((cx + 90, y), label or ("TIGHT = GREEN" if state == "tight" else "SPREAD = RED"), fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_radar_eye_arcs(self, draw: ImageDraw.ImageDraw, cx: int, cy: int):
+        """Draws 360-degree radar vision arcs illustrating independent turret eye movement."""
+        # Eye center points
+        re_x, re_y = cx + int(135 * 1.3), cy - int(20 * 1.3)
+        # Radar scan rings
+        for r_arc, col in [(90, (0, 245, 255, 180)), (140, (0, 245, 255, 120)), (190, (0, 245, 255, 70))]:
+            draw.arc([re_x - r_arc, re_y - r_arc, re_x + r_arc, re_y + r_arc], start=290, end=90, fill=col, width=4)
+        for r_arc, col in [(90, (255, 215, 0, 180)), (140, (255, 215, 0, 120)), (190, (255, 215, 0, 70))]:
+            draw.arc([re_x - r_arc, re_y - r_arc, re_x + r_arc, re_y + r_arc], start=120, end=260, fill=col, width=4)
+
+        # Radar callout badge
+        draw.rounded_rectangle([cx - 220, cy - 310, cx + 220, cy - 240], radius=18, fill=(0, 220, 200, 245), outline=(255, 255, 255, 255), width=3)
+        font = self._get_font(28)
+        draw.text((cx, cy - 275), "360° INDEPENDENT RADAR!", fill=(15, 30, 50), font=font, anchor="mm")
+
+    def _draw_ballistic_tongue_prop(
+        self,
+        draw: ImageDraw.ImageDraw,
+        start_xy: Tuple[int, int],
+        end_xy: Tuple[int, int],
+        anim_phase: float = 0.0,
+    ):
+        """Draws the lightning-fast 60 mph ballistic chameleon tongue shooting across the screen."""
+        sx, sy = start_xy
+        ex, ey = end_xy
+        # Accordion spring tongue shaft
+        num_coils = 8
+        pts = [(sx, sy)]
+        for i in range(1, num_coils):
+            frac = i / float(num_coils)
+            tx = sx + int((ex - sx) * frac)
+            ty = sy + int((ey - sy) * frac) + (22 if i % 2 == 1 else -22)
+            pts.append((tx, ty))
+        pts.append((ex, ey))
+
+        # Outer tongue
+        for i in range(len(pts) - 1):
+            draw.line([pts[i], pts[i + 1]], fill=(255, 60, 120, 240), width=18)
+        # Inner tongue highlight
+        for i in range(len(pts) - 1):
+            draw.line([pts[i], pts[i + 1]], fill=(255, 175, 200, 255), width=8)
+
+        # Bulbous sticky suction-cup tip
+        draw.ellipse([ex - 28, ey - 28, ex + 28, ey + 28], fill=(255, 30, 85, 255), outline=(255, 255, 255, 255), width=4)
+        # Impact starburst
+        for ang in (0.0, 0.78, 1.57, 2.35, 3.14, 3.92, 4.71, 5.49):
+            spx = ex + int(math.cos(ang) * 44)
+            spy = ey + int(math.sin(ang) * 44)
+            draw.line([(ex, ey), (spx, spy)], fill=(255, 235, 80, 240), width=5)
+
+        # Speed badge
+        draw.rounded_rectangle([cx if 'cx' in locals() else (sx + ex)//2 - 190, ey - 100, (sx + ex)//2 + 190, ey - 45], radius=16, fill=(255, 50, 75, 245), outline=(255, 255, 255, 255), width=3)
+        font = self._get_font(26)
+        draw.text(((sx + ex)//2, ey - 72), "60 MPH IN 0.01s!", fill=(255, 255, 255), font=font, anchor="mm")
+
 
