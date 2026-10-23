@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Change directory to YouTube workspace
-cd /Users/karthik/Desktop/Projects/YouTube
+# Change directory to YouTube workspace dynamically
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$SCRIPT_DIR"
 
 # Setup environment
-export PATH="/Users/karthik/Desktop/Projects/YouTube/.venv/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+export PATH="$SCRIPT_DIR/.venv/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 echo "========================================================================"
 echo "🎬 [$(date '+%Y-%m-%d %H:%M:%S')] STARTING SCHEDULED DAILY KIDS SHORTS PIPELINE"
