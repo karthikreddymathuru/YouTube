@@ -218,13 +218,13 @@ class VisualAuditor:
             if conflicts:
                 conflict_error = f"Species Mismatch: Spoken audio is about Octopus, but visual contains flamingo prop(s): {conflicts}"
         elif "flamingo" in full_audio or "flamingo" in topic_lower:
-            forbidden_props = ["octopus", "tentacle", "blue_blood", "nine_brains"]
+            forbidden_props = ["octopus", "tentacle", "blue_blood", "nine_brains", "chameleon", "nanocrystal", "radar_eyes", "ballistic_tongue"]
             conflicts = [
                 s.get("visual_prop", "") for s in sync_timeline
                 if any(f in s.get("visual_prop", "").lower() for f in forbidden_props)
             ]
             if conflicts:
-                conflict_error = f"Species Mismatch: Spoken audio is about Flamingo, but visual contains octopus prop(s): {conflicts}"
+                conflict_error = f"Species Mismatch: Spoken audio is about Flamingo, but visual contains conflicting prop(s): {conflicts}"
         elif "cloud" in full_audio or "weather" in topic_lower or "lightning" in topic_lower:
             forbidden_props = ["flamingo", "octopus", "beak_shield", "knee_gear_lock", "one_leg_ice", "boiling_geyser", "tentacle", "blue_blood", "nine_brains"]
             conflicts = [
