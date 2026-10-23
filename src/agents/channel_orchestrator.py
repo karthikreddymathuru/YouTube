@@ -398,6 +398,24 @@ class PublishingManagerAgent:
         with open(self.ledger_path, "w", encoding="utf-8") as f:
             json.dump(ledger, f, indent=2)
 
+        # Auto-register into lifetime zero-repetition registry
+        try:
+            from src.compliance.topic_registry import TopicRegistry
+            title = entry.get("title", "")
+            core_entity = "unknown"
+            for known in ["shrimp", "axolotl", "eel", "tardigrade", "beetle", "falcon", "frog", "gecko", "archerfish", "jellyfish", "flamingo", "octopus", "cloud", "chameleon"]:
+                if known in title.lower():
+                    core_entity = known
+                    break
+            TopicRegistry.register_episode(
+                episode_number=entry.get("episode_number", 1),
+                core_entity=core_entity,
+                topic=title,
+                title=title
+            )
+        except Exception as e:
+            logger.warning(f"Could not update TopicRegistry: {e}")
+
 
 class ChannelOrchestrator:
     """

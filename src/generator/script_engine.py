@@ -11,6 +11,7 @@ import urllib.request
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from src.compliance.topic_registry import TopicRegistry
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -103,6 +104,7 @@ CANONICAL_SCENE_BLUEPRINT = [
 # Multi-Episode Storyboard Library across all 4 YouTube Kids Niches
 EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
     "flamingo_superpowers": {
+        "core_entity": "flamingo",
         "niche": "animal_secrets",
         "topic": "Flamingo Superpowers",
         "blueprint": CANONICAL_SCENE_BLUEPRINT,
@@ -142,6 +144,7 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
         ]
     },
     "octopus_and_ocean_secrets": {
+        "core_entity": "octopus",
         "niche": "animal_secrets",
         "topic": "Octopus & Ocean Superpowers",
         "blueprint": [
@@ -246,6 +249,7 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
         ]
     },
     "cloud_and_lightning_science": {
+        "core_entity": "cloud",
         "niche": "science_curiosities",
         "topic": "Cloud & Weather Superpowers",
         "blueprint": [
@@ -350,6 +354,7 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
         ]
     },
     "chameleon_crystal_color_science": {
+        "core_entity": "chameleon",
         "niche": "animal_secrets",
         "topic": "Chameleon Color Superpowers",
         "blueprint": [
@@ -452,6 +457,426 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
                 ]
             }
         ]
+    },
+    "pistol_shrimp_plasma_blast": {
+        "core_entity": "shrimp",
+        "niche": "animal_secrets",
+        "topic": "Pistol Shrimp Sonic Blast",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "The pistol shrimp possesses a giant claw that snaps shut faster than the blink of an eye",
+                "required_keywords": ["pistol", "shrimp", "giant", "claw", "snaps", "blink"],
+                "character_expression": "shocked",
+                "character_color_state": "coral",
+                "visual_prop": "shrimp_snap_claw",
+                "visual_badge_text": "60 MPH SNAP CLAW!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "The snap shoots a high-speed jet of water creating a low-pressure cavitation bubble",
+                "required_keywords": ["water", "shoots", "jet", "bubble", "speed", "pressure"],
+                "character_expression": "happy_proud",
+                "character_color_state": "coral",
+                "visual_prop": "cavitation_plasma_bubble",
+                "visual_badge_text": "CAVITATION BUBBLE!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "When the bubble collapses, it unleashes temperatures hotter than four thousand degrees",
+                "required_keywords": ["collapses", "temperatures", "hot", "sun", "thousand", "heat"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "coral",
+                "visual_prop": "heat_hotter_than_sun",
+                "visual_badge_text": "4,700°C SUN HEAT!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "The collapse creates a tiny spark of light called sonoluminescence",
+                "required_keywords": ["spark", "light", "glow", "tiny", "flash", "bright"],
+                "character_expression": "eating_excited",
+                "character_color_state": "coral",
+                "visual_prop": "sonoluminescence_flash",
+                "visual_badge_text": "LIGHT FROM SOUND!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "The deafening sonic shockwave instantly stuns passing crabs and small fish",
+                "required_keywords": ["shockwave", "sonic", "stuns", "crabs", "fish", "instant"],
+                "character_expression": "shocked",
+                "character_color_state": "coral",
+                "visual_prop": "shockwave_stun_fish",
+                "visual_badge_text": "SONIC SHOCKWAVE!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "Colonies of pistol shrimp make so much noise they actually jam military submarine sonar",
+                "required_keywords": ["colonies", "noise", "jam", "submarine", "sonar", "ocean"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "coral",
+                "visual_prop": "submarine_sonar_jamming",
+                "visual_badge_text": "JAMS SUBMARINE SONAR!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "If it ever loses its giant blaster claw, its smaller claw transforms into the new big gun",
+                "required_keywords": ["loses", "claw", "transforms", "new", "grows", "magic"],
+                "character_expression": "xray_focused",
+                "character_color_state": "coral",
+                "visual_prop": "claw_regeneration_swap",
+                "visual_badge_text": "MAGIC CLAW SWAP!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the viewer which superpower they would choose: sun-hot plasma blast or sonar-jamming claw",
+                "required_keywords": ["which", "pick", "choose", "superpower", "plasma", "claw"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "coral",
+                "visual_prop": "shrimp_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Plasma_Shockwave_Arc",
+                "title": "The Shrimp That Shoots SUN-HOT Plasma! 🦐💥 #shorts",
+                "description": "Discover how the tiny pistol shrimp snaps its claw to create plasma hotter than the sun! #shorts #animals #scienceforkids",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "pistolshrimp", "animals", "funfacts"],
+                "scene_narrations": [
+                    "Did you know a tiny shrimp in the ocean has a superpower stronger than a superhero?",
+                    "Its giant claw snaps shut so fast it shoots a high-speed jet of water!",
+                    "That snap creates a bubble that collapses with heat hotter than the sun!",
+                    "The collapse even creates a flash of light making light out of sound!",
+                    "The sonic shockwave travels through the water and stuns crabs instantly!",
+                    "Pistol shrimp make so much crackling noise they actually jam submarine sonars!",
+                    "And if it loses its snap claw, its other small claw transforms into the big one!",
+                    "Which superpower would you choose, the sun-hot plasma blast or the sonic boom claw?"
+                ]
+            }
+        ]
+    },
+    "axolotl_infinite_regeneration": {
+        "core_entity": "axolotl",
+        "niche": "science_curiosities",
+        "topic": "Axolotl Infinite Regeneration",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "The axolotl is an adorable smiling creature known as the Mexican walking fish",
+                "required_keywords": ["axolotl", "smiling", "walking", "fish", "mexico", "cute"],
+                "character_expression": "happy_proud",
+                "character_color_state": "pink",
+                "visual_prop": "axolotl_smile_gills",
+                "visual_badge_text": "SMILING WALKING FISH!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "If it loses an arm or leg, it can completely regrow the entire limb with zero scars",
+                "required_keywords": ["loses", "limb", "regrow", "scars", "perfect", "weeks"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "pink",
+                "visual_prop": "regrow_lost_limbs",
+                "visual_badge_text": "REGROWS FULL LIMBS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "Even more incredible, it can regrow damaged parts of its heart and spinal cord",
+                "required_keywords": ["heart", "spine", "spinal", "cord", "heals", "alive"],
+                "character_expression": "shocked",
+                "character_color_state": "pink",
+                "visual_prop": "regrow_heart_spine",
+                "visual_badge_text": "HEALS HEART & SPINE!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "Scientists discovered the axolotl can even regrow parts of its own brain",
+                "required_keywords": ["brain", "regrows", "smart", "scientists", "miracle", "cells"],
+                "character_expression": "eating_excited",
+                "character_color_state": "pink",
+                "visual_prop": "brain_regeneration_scan",
+                "visual_badge_text": "REGROWS BRAIN CELLS!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "Its feathery pink external gills work like natural underwater oxygen filters",
+                "required_keywords": ["feathery", "gills", "pink", "oxygen", "breathe", "water"],
+                "character_expression": "happy_proud",
+                "character_color_state": "pink",
+                "visual_prop": "feathery_oxygen_gills",
+                "visual_badge_text": "FEATHERY OXYGEN GILLS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "It stays in its adorable baby form forever through a superpower called neoteny",
+                "required_keywords": ["baby", "forever", "neoteny", "grows", "never", "young"],
+                "character_expression": "baby_curious",
+                "character_color_state": "pink",
+                "visual_prop": "eternal_baby_neoteny",
+                "visual_badge_text": "ETERNAL BABY FORM!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "Their immune system accepts tissue and organ transplants with zero rejection",
+                "required_keywords": ["immune", "system", "accepts", "organs", "zero", "rejection"],
+                "character_expression": "xray_focused",
+                "character_color_state": "pink",
+                "visual_prop": "organ_swap_zero_rejection",
+                "visual_badge_text": "ZERO ORGAN REJECTION!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the viewer which superpower they would choose: regrowing lost limbs or staying forever young",
+                "required_keywords": ["which", "pick", "choose", "superpower", "limbs", "young"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "pink",
+                "visual_prop": "axolotl_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Regeneration_Superpower_Arc",
+                "title": "The Animal That Can Regrow Its Entire Brain! 🦎✨ #shorts",
+                "description": "Meet the axolotl, the real-life superhero that can regrow limbs, heart, and brain tissue! #shorts #animals #scienceforkids",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "axolotl", "animals", "funfacts"],
+                "scene_narrations": [
+                    "Meet the axolotl, the cute smiling creature with the greatest healing power on Earth!",
+                    "If an axolotl loses a leg, it can completely regrow the entire limb with zero scars!",
+                    "Even crazier, it can regenerate damaged parts of its heart and spinal cord!",
+                    "Scientists found that axolotls can even regrow parts of their own brain!",
+                    "Those pretty pink crown feathers on its head are actually gills that breathe underwater!",
+                    "And unlike other salamanders, it stays in its cute baby form forever and never grows up!",
+                    "Its immune system is so gentle it can accept organ transplants with zero rejection!",
+                    "Which superpower would you pick, regrowing your limbs or staying forever young?"
+                ]
+            }
+        ]
+    },
+    "electric_eel_bio_battery": {
+        "core_entity": "eel",
+        "niche": "animal_secrets",
+        "topic": "Electric Eel 860V Shock Science",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "Electric eels are not actually eels at all—they are giant South American knifefish",
+                "required_keywords": ["electric", "eel", "not", "knifefish", "river", "amazon"],
+                "character_expression": "shocked",
+                "character_color_state": "yellow",
+                "visual_prop": "not_an_eel_knifefish",
+                "visual_badge_text": "NOT A REAL EEL!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "Over eighty percent of its long body is packed with thousands of bio-battery cells",
+                "required_keywords": ["body", "cells", "electrocytes", "batteries", "inside", "thousand"],
+                "character_expression": "happy_proud",
+                "character_color_state": "yellow",
+                "visual_prop": "electrocyte_battery_cells",
+                "visual_badge_text": "6,000 LIVING BATTERIES!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "It can unleash eight hundred and sixty volts of power—enough to run ten lightbulbs",
+                "required_keywords": ["volts", "860", "power", "shock", "bulbs", "zap"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "yellow",
+                "visual_prop": "voltage_860v_meter",
+                "visual_badge_text": "860 VOLTS OF POWER!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "It uses low voltage electrical pulses like radar to navigate dark muddy river water",
+                "required_keywords": ["radar", "radar", "muddy", "pulses", "navigate", "see"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "yellow",
+                "visual_prop": "electric_radar_navigation",
+                "visual_badge_text": "ELECTRIC RADAR VISION!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "When hunting, it curls its body around prey to double the electrical circuit shock",
+                "required_keywords": ["curls", "body", "circuit", "double", "hunting", "shock"],
+                "character_expression": "eating_excited",
+                "character_color_state": "yellow",
+                "visual_prop": "curling_voltage_booster",
+                "visual_badge_text": "DOUBLE CIRCUIT CURL!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "Its vital organs and thick skin are specially insulated so it never shocks itself",
+                "required_keywords": ["insulated", "skin", "never", "safe", "organs", "shield"],
+                "character_expression": "xray_focused",
+                "character_color_state": "yellow",
+                "visual_prop": "self_insulation_armor",
+                "visual_badge_text": "BUILT-IN INSULATION!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "A mother electric eel can light up the entire water to chase off giant hungry caimans",
+                "required_keywords": ["mother", "lights", "water", "caiman", "scare", "zap"],
+                "character_expression": "shocked",
+                "character_color_state": "yellow",
+                "visual_prop": "shock_predators_away",
+                "visual_badge_text": "SCARES GIANT CAIMANS!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the viewer which superpower they would choose: 860-volt lightning burst or electric radar vision",
+                "required_keywords": ["which", "pick", "choose", "superpower", "volts", "radar"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "yellow",
+                "visual_prop": "eel_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Electric_Shock_Arc",
+                "title": "Why Electric Eels Are LIVING Batteries! ⚡🔋 #shorts",
+                "description": "Discover how electric eels pack 6,000 biological batteries to blast 860 volts of electricity! #shorts #animals #scienceforkids",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "electriceel", "animals", "funfacts"],
+                "scene_narrations": [
+                    "Did you know an electric eel isn't actually an eel at all? It is a giant knifefish!",
+                    "Over eighty percent of its body is filled with six thousand living battery cells!",
+                    "When it discharges, it releases eight hundred and sixty volts—enough to power ten lightbulbs!",
+                    "In dark muddy water, it sends out gentle electrical radar clicks to see everything around it!",
+                    "To hunt, it curls its long body into a circle to double the electrical voltage!",
+                    "And thanks to its thick rubbery skin, it is fully insulated and never shocks itself!",
+                    "One big electric zap can even startle and chase away an entire giant hungry crocodile!",
+                    "Which superpower would you choose, the 860-volt shock or the electric radar vision?"
+                ]
+            }
+        ]
+    },
+    "tardigrade_water_bear": {
+        "core_entity": "tardigrade",
+        "niche": "science_curiosities",
+        "topic": "Tardigrade Indestructible Astronauts",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "Tardigrades or water bears are microscopic eight-legged creatures that look like gummy bears",
+                "required_keywords": ["tardigrade", "water", "bear", "microscopic", "gummy", "cute"],
+                "character_expression": "baby_curious",
+                "character_color_state": "blue",
+                "visual_prop": "water_bear_microscope",
+                "visual_badge_text": "INDESCRUCTIBLE GUMMY BEAR!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "They can survive freezing at near absolute zero minus two hundred and seventy-two degrees",
+                "required_keywords": ["freezing", "absolute", "zero", "cold", "degrees", "survive"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "blue",
+                "visual_prop": "absolute_zero_freeze",
+                "visual_badge_text": "-272°C ABSOLUTE ZERO!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "They can also survive boiling inside volcanic hot springs up to one hundred and fifty degrees",
+                "required_keywords": ["boiling", "volcanic", "hot", "springs", "heat", "survive"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "blue",
+                "visual_prop": "volcano_heat_resist",
+                "visual_badge_text": "150°C BOILING HEAT!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "Scientists sent water bears into outer space and they survived the freezing vacuum and radiation",
+                "required_keywords": ["space", "outer", "astronaut", "vacuum", "radiation", "survived"],
+                "character_expression": "shocked",
+                "character_color_state": "blue",
+                "visual_prop": "outer_space_vacuum_survive",
+                "visual_badge_text": "SURVIVES OUTER SPACE!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "To survive extreme danger, they turn their body into pure bioglass through cryptobiosis",
+                "required_keywords": ["bioglass", "cryptobiosis", "proteins", "protect", "glass", "sleep"],
+                "character_expression": "happy_proud",
+                "character_color_state": "blue",
+                "visual_prop": "cryptobiosis_glass_proteins",
+                "visual_badge_text": "TURNS INTO BIOGLASS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "They can sleep in this dry glass state for over thirty years without eating or drinking",
+                "required_keywords": ["sleep", "thirty", "years", "food", "water", "survive"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "blue",
+                "visual_prop": "thirty_year_sleep",
+                "visual_badge_text": "30-YEAR SLEEP LOCK!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "Add just a single drop of water and the little water bear wakes up alive and crawls away",
+                "required_keywords": ["drop", "water", "wakes", "alive", "crawls", "magic"],
+                "character_expression": "eating_excited",
+                "character_color_state": "blue",
+                "visual_prop": "drop_of_water_revive",
+                "visual_badge_text": "REVIVES WITH 1 DROP!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the viewer which superpower they would choose: surviving outer space or the 30-year sleep lock",
+                "required_keywords": ["which", "pick", "choose", "superpower", "space", "sleep"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "blue",
+                "visual_prop": "tardigrade_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Cosmic_Microscope_Arc",
+                "title": "The Immortal Animal That Survives OUTER SPACE! 🔬🚀 #shorts",
+                "description": "Meet the tardigrade or water bear, the tiny microscopic beast that can survive outer space and volcanoes! #shorts #animals #science",
+                "tags": ["shorts", "kidsshorts", "scienceforkids", "tardigrade", "animals", "funfacts"],
+                "scene_narrations": [
+                    "Under a microscope lives the toughest creature in the universe: the eight-legged water bear!",
+                    "It can survive freezing at near absolute zero colder than the coldest ice on Earth!",
+                    "It can even survive boiling in volcanic hot springs at three hundred degrees!",
+                    "Scientists sent tardigrades into outer space, and they survived the airless vacuum and radiation!",
+                    "When conditions get harsh, they turn their body into liquid glass through a trick called cryptobiosis!",
+                    "They can stay asleep in this indestructible glass state for over thirty whole years!",
+                    "Add just a single drop of water, and the tiny creature wakes up and crawls away completely fine!",
+                    "Which superpower would you choose, surviving the vacuum of outer space or the 30-year sleep lock?"
+                ]
+            }
+        ]
     }
 }
 
@@ -525,38 +950,83 @@ class ScriptEngine:
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
 
     def _select_episode_blueprint(self, topic: str, niche: str) -> Dict[str, Any]:
-        """Selects the best matching unpublished episode blueprint or rotates to an unpublished episode automatically."""
-        past_titles = self._get_published_titles()
-        topic_lower = topic.lower()
+        """
+        Selects a 100% brand-new, never-before-covered episode blueprint.
+        Strictly enforces indefinite zero-repetition across entities, topics, and titles.
+        """
+        used_entities = TopicRegistry.load_used_entities()
+        used_titles = TopicRegistry.load_used_titles()
+        topic_lower = (topic or "").lower()
 
-        if "chameleon" in topic_lower or "lizard" in topic_lower or "color" in topic_lower or "reptile" in topic_lower:
-            ep = EPISODE_LIBRARY["chameleon_crystal_color_science"]
-            if not any(c["title"] in past_titles for c in ep["candidates"]):
-                return ep
+        logger.info(f"Enforcing Zero-Repetition Lifetime Registry: {len(used_entities)} entities permanently locked out: {sorted(list(used_entities))}")
 
-        if "cloud" in topic_lower or "weather" in topic_lower or "lightning" in topic_lower:
-            ep = EPISODE_LIBRARY["cloud_and_lightning_science"]
-            if not any(c["title"] in past_titles for c in ep["candidates"]):
-                return ep
+        # If a specific topic was requested, verify it is NOT in used entities or past titles
+        if topic_lower:
+            for ep_key, ep_data in EPISODE_LIBRARY.items():
+                ent = ep_data.get("core_entity", ep_key).lower()
+                if ent in topic_lower or ep_key in topic_lower or ep_data["topic"].lower() in topic_lower:
+                    if not TopicRegistry.is_forbidden(ent, ep_data["topic"]):
+                        if not any(c["title"] in used_titles for c in ep_data["candidates"]):
+                            logger.info(f"Selected requested fresh episode blueprint: '{ep_key}' ({ep_data['topic']})")
+                            return ep_data
+                    else:
+                        logger.warning(f"Requested topic '{topic}' contains previously used entity '{ent}'. Bypassing to enforce zero repetition!")
 
-        if "octopus" in topic_lower or "jellyfish" in topic_lower or "ocean" in topic_lower:
-            ep = EPISODE_LIBRARY["octopus_and_ocean_secrets"]
-            if not any(c["title"] in past_titles for c in ep["candidates"]):
-                return ep
-
-        # Check published history: if an episode has already had any candidate published, rotate to the next completely fresh episode!
+        # Find all blueprints in EPISODE_LIBRARY whose core entity and topic have NEVER been used
+        fresh_blueprints = []
         for ep_key, ep_data in EPISODE_LIBRARY.items():
-            if not any(c["title"] in past_titles for c in ep_data["candidates"]):
-                logger.info(f"Auto-selecting fresh unpublished episode blueprint: '{ep_key}' ({ep_data['topic']})")
-                return ep_data
+            ent = ep_data.get("core_entity", ep_key).lower()
+            if TopicRegistry.is_forbidden(ent, ep_data["topic"]):
+                continue
+            if any(c["title"] in used_titles for c in ep_data["candidates"]):
+                continue
+            fresh_blueprints.append((ep_key, ep_data))
 
-        # Second pass: find any episode that still has at least one unpublished candidate variation
-        for ep_key, ep_data in EPISODE_LIBRARY.items():
-            if any(c["title"] not in past_titles for c in ep_data["candidates"]):
-                logger.info(f"Auto-rotating to episode blueprint with fresh candidate: '{ep_key}' ({ep_data['topic']})")
-                return ep_data
+        if fresh_blueprints:
+            # Match niche if possible, otherwise take next fresh blueprint
+            niche_matches = [b for b in fresh_blueprints if b[1].get("niche") == niche]
+            selected_key, selected_ep = niche_matches[0] if niche_matches else fresh_blueprints[0]
+            logger.info(f"Auto-selected fresh non-repeating blueprint: '{selected_key}' ({selected_ep['topic']})")
+            return selected_ep
 
-        return EPISODE_LIBRARY["chameleon_crystal_color_science"]
+        # If static library is exhausted, dynamically generate a novel blueprint with AI Studio / Gemini!
+        logger.info("All static library blueprints exhausted. Dynamically generating novel blueprint via AI Studio...")
+        novel_ep = self._generate_novel_blueprint_with_ai(niche, used_entities)
+        if novel_ep:
+            return novel_ep
+
+        raise RuntimeError(f"FATAL ZERO-REPETITION LOCK: All {len(used_entities)} topics in library have been used. No fresh blueprint available.")
+
+    def _generate_novel_blueprint_with_ai(self, niche: str, used_entities: set) -> Optional[Dict[str, Any]]:
+        """Dynamically synthesizes a brand-new, never-before-covered 8-scene blueprint using Gemini."""
+        if not self.api_key:
+            return None
+        forbidden_str = ", ".join(sorted(list(used_entities)))
+        prompt = (
+            f"You are the Lead Curriculum Showrunner for KuriousKids YouTube Channel.\n"
+            f"Task: Generate a completely new, kid-friendly 8-scene scientific Short blueprint for niche '{niche}'.\n"
+            f"CRITICAL MANDATE: The following entities and topics have ALREADY been produced and are STRICTLY FORBIDDEN from repeating: {forbidden_str}.\n"
+            f"You MUST select a completely different, unmentioned animal superpower or natural phenomenon.\n"
+            f"Return JSON with keys: core_entity, topic, niche, candidates (list of dict with title, description, tags, scene_narrations), "
+            f"blueprint (8 scenes with scene_id, topic_beat, required_keywords, character_expression, visual_prop, visual_badge_text, sfx_cue)."
+        )
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
+        payload = json.dumps({
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"}
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+                novel_data = json.loads(text)
+                if novel_data.get("blueprint") and len(novel_data["blueprint"]) == 8:
+                    logger.info(f"AI Studio synthesized brand-new blueprint: {novel_data.get('topic')}")
+                    return novel_data
+        except Exception as e:
+            logger.warning(f"Failed to generate dynamic blueprint via AI Studio: {e}")
+        return None
 
     def _get_published_titles(self) -> set:
         titles = set()
@@ -623,7 +1093,39 @@ class ScriptEngine:
         )
 
         topic_low = winner["topic"].lower()
-        if "chameleon" in topic_low:
+        if "shrimp" in topic_low:
+            char_name = "Perry the Pistol Shrimp & Leo"
+            char_spec = CharacterSpec(
+                name="Perry the Pistol Shrimp",
+                species_or_role="shrimp",
+                face_traits="Cute coral shell, bright inquisitive eyes, signature giant glowing blast claw, golden explorer star badge",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "axolotl" in topic_low:
+            char_name = "Axel the Axolotl & Leo"
+            char_spec = CharacterSpec(
+                name="Axel the Axolotl",
+                species_or_role="axolotl",
+                face_traits="Smiling pink baby face, feathery crown gills, sparkly eyes, golden explorer badge",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "eel" in topic_low:
+            char_name = "Volt the Electric Eel & Leo"
+            char_spec = CharacterSpec(
+                name="Volt the Electric Eel",
+                species_or_role="eel",
+                face_traits="Sleek golden knifefish body, friendly smiling jaw, sparkling electric aura, golden explorer badge",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "tardigrade" in topic_low or "water bear" in topic_low:
+            char_name = "Barnaby the Water Bear & Leo"
+            char_spec = CharacterSpec(
+                name="Barnaby the Water Bear",
+                species_or_role="tardigrade",
+                face_traits="Chubby 8-legged microscopic gummy bear body, shiny space helmet, golden explorer star",
+                companion_name="Leo the Explorer Kid"
+            )
+        elif "chameleon" in topic_low:
             char_name = "Cam the Chameleon & Leo"
             char_spec = CharacterSpec(
                 name="Cam the Chameleon",
@@ -647,9 +1149,17 @@ class ScriptEngine:
                 face_traits="Cute coral-orange tentacles, large bright glossy eyes, golden explorer badge",
                 companion_name="Leo the Explorer Kid"
             )
-        else:
+        elif "flamingo" in topic_low:
             char_name = "Pip the Flamingo & Leo"
             char_spec = CharacterSpec()
+        else:
+            char_name = "Leo the Explorer Kid"
+            char_spec = CharacterSpec(
+                name="Leo the Explorer Kid",
+                species_or_role="explorer",
+                face_traits="Warm smile, yellow explorer hat, golden star badge",
+                companion_name="Curious Squad"
+            )
 
         scenes = []
         for idx, bp in enumerate(winner_bp):

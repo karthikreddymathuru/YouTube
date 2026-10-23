@@ -1,0 +1,52 @@
+{
+  "policy": "STRICT_ZERO_REPETITION_LIFETIME",
+  "description": "Permanent ledger of all species, science phenomena, and topics ever covered on KuriousKids. Any entity or concept present in this registry is permanently locked out from ever being generated or repeated indefinitely.",
+  "used_entities": [
+    "flamingo",
+    "octopus",
+    "cloud",
+    "chameleon"
+  ],
+  "history": [
+    {
+      "episode_number": 1,
+      "date": "2026-10-17",
+      "core_entity": "flamingo",
+      "topic": "Flamingo Superpowers",
+      "title": "3 Impossible Flamingo Superpowers That Are 100% REAL! \ud83e\udda9\ud83d\udd25 #shorts",
+      "key_facts": ["boiling_beak", "pink_shrimp_diet", "one_leg_gear_lock"]
+    },
+    {
+      "episode_number": 2,
+      "date": "2026-10-20",
+      "core_entity": "octopus",
+      "topic": "Octopus & Ocean Superpowers",
+      "title": "Why Octopuses Have 3 Hearts & 9 Brains! \ud83d\udc19\ud83d\udc99 #shorts",
+      "key_facts": ["three_hearts", "nine_brains", "blue_copper_blood", "color_dreams"]
+    },
+    {
+      "episode_number": 3,
+      "date": "2026-10-21",
+      "core_entity": "cloud",
+      "topic": "Cloud & Weather Superpowers",
+      "title": "How Can A 1,000,000 Pound Cloud Float In The Sky? \u2601\ufe0f\u26a1 #shorts",
+      "key_facts": ["million_pound_weight", "updraft_wind_lock", "ice_crystals", "lightning_sun_heat"]
+    },
+    {
+      "episode_number": 4,
+      "date": "2026-10-22",
+      "core_entity": "chameleon",
+      "topic": "Chameleon Color Superpowers",
+      "title": "Why Chameleons ACTUALLY Change Color! \ud83e\udd8e\ud83c\udf08 #shorts",
+      "key_facts": ["not_camouflage", "mood_temperature", "photonic_nanocrystals", "radar_eyes", "60mph_tongue"]
+    },
+    {
+      "episode_number": 5,
+      "date": "2026-10-23",
+      "core_entity": "flamingo",
+      "topic": "Flamingo Superpowers",
+      "title": "The Flamingo Secret Nobody Tells You! \ud83e\udda9\u26a1 #shorts",
+      "key_facts": ["boiling_beak", "pink_shrimp_diet", "one_leg_gear_lock"]
+    }
+  ]
+}

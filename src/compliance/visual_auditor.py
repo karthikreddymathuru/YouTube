@@ -241,6 +241,15 @@ class VisualAuditor:
             ]
             if conflicts:
                 conflict_error = f"Topic Mismatch: Spoken audio is about Chameleon, but visual contains conflicting prop(s): {conflicts}"
+        else:
+            # Universal Dynamic Topic: Strictly bar any previous distinct species props
+            forbidden_props = ["flamingo", "octopus", "beak_shield", "knee_gear_lock", "one_leg_ice", "boiling_geyser", "tentacle", "blue_blood", "nine_brains", "chameleon", "radar_eyes", "ballistic_tongue"]
+            conflicts = [
+                s.get("visual_prop", "") for s in sync_timeline
+                if any(f in s.get("visual_prop", "").lower() for f in forbidden_props)
+            ]
+            if conflicts:
+                conflict_error = f"Topic Conflict: Visual contains old species prop(s) {conflicts} for dynamic topic '{topic_lower}'"
 
         if conflict_error:
             logger.error(f"❌ AUDIO-VISUAL VALIDATOR BLOCKED: {conflict_error}")

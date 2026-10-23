@@ -89,7 +89,14 @@ class VisualEngine:
         img.save(self.reference_sheet_path, "PNG")
         return self.reference_sheet_path
 
-    def generate_scene_image(self, scene: Any, filename_prefix: str = "scene") -> str:
+    def generate_scene_image(
+        self,
+        scene: Any = None,
+        prompt: str = "",
+        filename_prefix: str = "scene",
+        scene_id: Optional[int] = None,
+        **kwargs
+    ) -> str:
         """
         Generates a 1080x1920 scene frame with consistent character faces and clear visual storytelling.
         1. Attempts Google AI Studio Multimodal Image Generation (`gemini-3.1-flash-image`) conditioned on
@@ -97,19 +104,24 @@ class VisualEngine:
         2. If free-tier image quota is 0 (HTTP 429), renders our deterministic Character-Consistent 3D-Shaded
            Rig & Visual Storyboard scene so faces and story props are 100% accurate and watermark-free.
         """
-        scene_id = getattr(scene, "scene_id", 1) if not isinstance(scene, int) else scene
+        if scene_id is None:
+            if isinstance(scene, int):
+                scene_id = scene
+            else:
+                scene_id = getattr(scene, "scene_id", 1) if scene is not None else 1
+
         output_path = os.path.join(self.output_dir, f"{filename_prefix}_{scene_id}.png")
 
         # Extract scene directives
-        if isinstance(scene, int):
-            prompt = "Vibrant 3D Pixar cartoon scene with Pip the Flamingo"
-            expression = "happy_proud"
-            color_state = "pink"
-            visual_prop = "boiling_geyser"
-            badge_text = f"SCENE {scene_id}"
-            narration = ""
+        if isinstance(scene, int) or scene is None:
+            prompt = prompt or "Vibrant 3D Pixar cartoon scene with Pip the Flamingo"
+            expression = kwargs.get("character_expression", "happy_proud")
+            color_state = kwargs.get("character_color_state", "pink")
+            visual_prop = kwargs.get("visual_prop", "boiling_geyser")
+            badge_text = kwargs.get("visual_badge_text", f"SCENE {scene_id}")
+            narration = kwargs.get("narration", prompt)
         else:
-            prompt = getattr(scene, "visual_prompt", "")
+            prompt = prompt or getattr(scene, "visual_prompt", "")
             expression = getattr(scene, "character_expression", "happy_proud")
             color_state = getattr(scene, "character_color_state", "pink")
             visual_prop = getattr(scene, "visual_prop", "boiling_geyser")
@@ -285,6 +297,11 @@ class VisualEngine:
         is_octopus = "octopus" in visual_prop.lower() or "octopus" in low_narr
         is_cloud = "cloud" in visual_prop.lower() or "lightning" in visual_prop.lower() or "weather" in low_narr or "cloud" in low_narr
         is_chameleon = "chameleon" in visual_prop.lower() or "lizard" in visual_prop.lower() or "chameleon" in low_narr or "nanocrystal" in visual_prop.lower()
+        is_shrimp = "shrimp" in visual_prop.lower() or "plasma" in visual_prop.lower() or "cavitation" in visual_prop.lower() or "shrimp" in low_narr
+        is_axolotl = "axolotl" in visual_prop.lower() or "regrow" in visual_prop.lower() or "neoteny" in visual_prop.lower() or "axolotl" in low_narr
+        is_eel = "eel" in visual_prop.lower() or "electrocyte" in visual_prop.lower() or "860" in visual_prop.lower() or "eel" in low_narr
+        is_tardigrade = "tardigrade" in visual_prop.lower() or "water_bear" in visual_prop.lower() or "tardigrade" in low_narr or "cryptobiosis" in visual_prop.lower()
+        is_flamingo = "flamingo" in visual_prop.lower() or "flamingo" in low_narr or visual_prop in ("boiling_geyser", "beak_shield", "hatching_egg", "glowing_shrimp", "color_transformation", "one_leg_ice", "knee_gear_lock")
 
         # --- OCTOPUS & OCEAN EPISODES ---
         if is_octopus:
@@ -538,75 +555,359 @@ class VisualEngine:
                     draw, cx=540, cy=960, scale=1.15, color_state="green", anim_phase=anim_phase
                 )
 
+        # --- PISTOL SHRIMP EPISODES ---
+        elif is_shrimp:
+            if scene_id == 8 or visual_prop in ("shrimp_superpower_choice", "choice_card"):
+                self._draw_pistol_shrimp_character(
+                    draw, cx=360, cy=1020, scale=1.0, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("shrimp_snap_claw",):
+                self._draw_pistol_shrimp_character(
+                    draw, cx=540, cy=980, scale=1.2, color_state="coral",
+                    claw_state="giant", expression="shocked", anim_phase=anim_phase
+                )
+                self._draw_shrimp_snap_claw_prop(draw, cx=740, cy=960, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="60 MPH SNAP!")
+
+            elif scene_id == 2 or visual_prop in ("cavitation_plasma_bubble",):
+                self._draw_cavitation_plasma_bubble_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=320, cy=1020, scale=0.95, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="PLASMA BUBBLE!")
+
+            elif scene_id == 3 or visual_prop in ("heat_hotter_than_sun",):
+                self._draw_heat_hotter_than_sun_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=300, cy=1040, scale=0.9, color_state="coral",
+                    expression="amazed", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="4,700°C SUN HEAT!")
+
+            elif scene_id == 4 or visual_prop in ("sonoluminescence_flash",):
+                self._draw_sonoluminescence_flash_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=320, cy=1020, scale=0.95, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="LIGHT FROM SOUND!")
+
+            elif scene_id == 5 or visual_prop in ("shockwave_stun_fish",):
+                self._draw_shockwave_stun_fish_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=280, cy=980, scale=1.05, color_state="coral",
+                    claw_state="giant", expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="SONIC BOOM!")
+
+            elif scene_id == 6 or visual_prop in ("submarine_sonar_jamming",):
+                self._draw_submarine_sonar_jamming_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=320, cy=1050, scale=0.92, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="JAMS SUBMARINES!")
+
+            elif scene_id == 7 or visual_prop in ("claw_regeneration_swap",):
+                self._draw_claw_swap_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_pistol_shrimp_character(
+                    draw, cx=540, cy=1020, scale=1.1, color_state="coral",
+                    claw_state="dual_glow", expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="MAGIC CLAW SWAP!")
+
+            else:
+                self._draw_pistol_shrimp_character(
+                    draw, cx=540, cy=980, scale=1.15, color_state="coral",
+                    expression="happy", anim_phase=anim_phase
+                )
+
+        # --- AXOLOTL EPISODES ---
+        elif is_axolotl:
+            if scene_id == 8 or visual_prop in ("axolotl_superpower_choice", "choice_card"):
+                self._draw_axolotl_character(
+                    draw, cx=360, cy=1020, scale=1.0, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("axolotl_smile_gills",):
+                self._draw_axolotl_character(
+                    draw, cx=540, cy=960, scale=1.25, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_axolotl_smile_gills_prop(draw, cx=540, cy=640)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="WALKING FISH!")
+
+            elif scene_id == 2 or visual_prop in ("regrow_lost_limbs",):
+                self._draw_limb_regeneration_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=340, cy=1020, scale=0.98, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="REGROWS LIMBS!")
+
+            elif scene_id == 3 or visual_prop in ("regrow_heart_spine",):
+                self._draw_heart_spine_regeneration_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=320, cy=1030, scale=0.95, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="HEALS HEART!")
+
+            elif scene_id == 4 or visual_prop in ("brain_regeneration_scan",):
+                self._draw_brain_regeneration_scan_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=320, cy=1030, scale=0.95, color_state="pink",
+                    expression="amazed", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="REGROWS BRAIN!")
+
+            elif scene_id == 5 or visual_prop in ("feathery_oxygen_gills",):
+                self._draw_feathery_oxygen_gills_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=540, cy=980, scale=1.1, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="FEATHERY GILLS!")
+
+            elif scene_id == 6 or visual_prop in ("eternal_baby_neoteny",):
+                self._draw_eternal_baby_neoteny_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=540, cy=1000, scale=1.15, color_state="pink",
+                    expression="baby_curious", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="FOREVER YOUNG!")
+
+            elif scene_id == 7 or visual_prop in ("organ_swap_zero_rejection",):
+                self._draw_organ_swap_zero_rejection_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_axolotl_character(
+                    draw, cx=340, cy=1020, scale=1.0, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="0% REJECTION!")
+
+            else:
+                self._draw_axolotl_character(
+                    draw, cx=540, cy=960, scale=1.15, color_state="pink",
+                    expression="happy", anim_phase=anim_phase
+                )
+
+        # --- ELECTRIC EEL EPISODES ---
+        elif is_eel:
+            if scene_id == 8 or visual_prop in ("eel_superpower_choice", "choice_card"):
+                self._draw_electric_eel_character(
+                    draw, cx=360, cy=1020, scale=1.0, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("not_an_eel_knifefish",):
+                self._draw_electric_eel_character(
+                    draw, cx=540, cy=960, scale=1.15, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="NOT A REAL EEL!")
+
+            elif scene_id == 2 or visual_prop in ("electrocyte_battery_cells",):
+                self._draw_electrocyte_battery_stack_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_electric_eel_character(
+                    draw, cx=320, cy=1040, scale=0.9, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="6,000 BATTERIES!")
+
+            elif scene_id == 3 or visual_prop in ("voltage_860v_meter",):
+                self._draw_voltage_860v_meter_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_electric_eel_character(
+                    draw, cx=320, cy=1040, scale=0.9, expression="shocked", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="860 VOLTS!")
+
+            elif scene_id == 4 or visual_prop in ("electric_radar_navigation",):
+                self._draw_electric_radar_navigation_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_electric_eel_character(
+                    draw, cx=540, cy=980, scale=1.1, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="RADAR VISION!")
+
+            elif scene_id == 5 or visual_prop in ("curling_voltage_booster",):
+                self._draw_curling_voltage_booster_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="DOUBLE VOLTS!")
+
+            elif scene_id == 6 or visual_prop in ("self_insulation_armor",):
+                self._draw_self_insulation_armor_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_electric_eel_character(
+                    draw, cx=340, cy=1020, scale=0.95, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="INSULATION ARMOR!")
+
+            elif scene_id == 7 or visual_prop in ("shock_predators_away",):
+                self._draw_shock_predators_away_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_electric_eel_character(
+                    draw, cx=320, cy=1020, scale=0.95, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="SCARES CROCS!")
+
+            else:
+                self._draw_electric_eel_character(
+                    draw, cx=540, cy=960, scale=1.15, expression="happy", anim_phase=anim_phase
+                )
+
+        # --- TARDIGRADE (WATER BEAR) EPISODES ---
+        elif is_tardigrade:
+            if scene_id == 8 or visual_prop in ("tardigrade_superpower_choice", "choice_card"):
+                self._draw_tardigrade_character(
+                    draw, cx=360, cy=1020, scale=1.0, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop in ("water_bear_microscope",):
+                self._draw_water_bear_microscope_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="WATER BEAR!")
+
+            elif scene_id == 2 or visual_prop in ("absolute_zero_freeze",):
+                self._draw_absolute_zero_freeze_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=1.0, expression="sleeping", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="-272°C COLD!")
+
+            elif scene_id == 3 or visual_prop in ("volcano_heat_resist",):
+                self._draw_volcano_heat_resist_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=1.05, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="150°C BOILING!")
+
+            elif scene_id == 4 or visual_prop in ("outer_space_vacuum_survive",):
+                self._draw_outer_space_vacuum_survive_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=1.05, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="SPACE BEAR!")
+
+            elif scene_id == 5 or visual_prop in ("cryptobiosis_glass_proteins",):
+                self._draw_cryptobiosis_glass_proteins_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=1.0, tun_mode=True, anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="amazed", label="TURNS TO GLASS!")
+
+            elif scene_id == 6 or visual_prop in ("thirty_year_sleep",):
+                self._draw_thirty_year_sleep_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=0.95, tun_mode=True, anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="30-YEAR SLEEP!")
+
+            elif scene_id == 7 or visual_prop in ("drop_of_water_revive",):
+                self._draw_drop_of_water_revive_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=1020, scale=1.1, expression="happy", anim_phase=anim_phase
+                )
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="WAKES UP!")
+
+            else:
+                self._draw_tardigrade_character(
+                    draw, cx=540, cy=960, scale=1.1, expression="happy", anim_phase=anim_phase
+                )
+
         # --- FLAMINGO EPISODES ---
-        elif visual_prop == "boiling_geyser":
-            self._draw_boiling_geyser_prop(draw, cx=330, cy=1220, anim_phase=anim_phase)
-            self._draw_pip_character(
-                draw, cx=660, cy=980, scale=1.05,
-                color_state="pink", expression="shocked", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_thermometer_prop(draw, x=150, y=520, temp_text="100°C / 212°F")
-            self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="LEO: BOILING?!")
+        elif is_flamingo:
+            if scene_id == 8 or visual_prop in ("flamingo_superpower_choice", "choice_card"):
+                self._draw_pip_character(
+                    draw, cx=330, cy=1020, scale=0.95,
+                    color_state="pink", expression="waving_cheerful", one_leg=True, anim_phase=anim_phase
+                )
+                self._draw_leo_character(
+                    draw, cx=770, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
+                )
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
 
-        elif visual_prop == "beak_shield":
-            self._draw_pip_character(
-                draw, cx=540, cy=1020, scale=1.28,
-                color_state="pink", expression="happy_proud", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_beak_shield_prop(draw, cx=580, cy=780)
-            self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="ARMOR BEAK!")
+            elif visual_prop == "boiling_geyser":
+                self._draw_boiling_geyser_prop(draw, cx=330, cy=1220, anim_phase=anim_phase)
+                self._draw_pip_character(
+                    draw, cx=660, cy=980, scale=1.05,
+                    color_state="pink", expression="shocked", one_leg=False, anim_phase=anim_phase
+                )
+                self._draw_thermometer_prop(draw, x=150, y=520, temp_text="100°C / 212°F")
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="LEO: BOILING?!")
 
-        elif visual_prop == "hatching_egg":
-            self._draw_nest_and_egg_bottom(draw, cx=540, cy=1220)
-            self._draw_pip_character(
-                draw, cx=540, cy=980, scale=0.88,
-                color_state="gray_chick", expression="baby_curious", one_leg=False, is_chick=True, anim_phase=anim_phase
-            )
-            self._draw_cracked_eggshell_top(draw, cx=540, cy=640)
-            self._draw_comparison_callout(draw, x=830, y=560, title="NOT PINK!", subtitle="100% GRAY CHICK", color=(180, 195, 210))
+            elif visual_prop == "beak_shield":
+                self._draw_pip_character(
+                    draw, cx=540, cy=1020, scale=1.28,
+                    color_state="pink", expression="happy_proud", one_leg=False, anim_phase=anim_phase
+                )
+                self._draw_beak_shield_prop(draw, cx=580, cy=780)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="ARMOR BEAK!")
 
-        elif visual_prop == "glowing_shrimp":
-            self._draw_pip_character(
-                draw, cx=420, cy=980, scale=1.0,
-                color_state="gray_chick", expression="eating_excited", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_glowing_shrimp_school(draw, cx=770, cy=1050, anim_phase=anim_phase)
-            self._draw_pigment_arrows(draw, start_xy=(720, 960), end_xy=(480, 960))
+            elif visual_prop == "hatching_egg":
+                self._draw_nest_and_egg_bottom(draw, cx=540, cy=1220)
+                self._draw_pip_character(
+                    draw, cx=540, cy=980, scale=0.88,
+                    color_state="gray_chick", expression="baby_curious", one_leg=False, is_chick=True, anim_phase=anim_phase
+                )
+                self._draw_cracked_eggshell_top(draw, cx=540, cy=640)
+                self._draw_comparison_callout(draw, x=830, y=560, title="NOT PINK!", subtitle="100% GRAY CHICK", color=(180, 195, 210))
 
-        elif visual_prop == "color_transformation":
-            self._draw_transformation_aura(draw, cx=540, cy=960)
-            self._draw_pip_character(
-                draw, cx=540, cy=980, scale=1.12,
-                color_state="half_pink_transforming", expression="transforming_amazed", one_leg=False, anim_phase=anim_phase
-            )
-            self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
+            elif visual_prop == "glowing_shrimp":
+                self._draw_pip_character(
+                    draw, cx=420, cy=980, scale=1.0,
+                    color_state="gray_chick", expression="eating_excited", one_leg=False, anim_phase=anim_phase
+                )
+                self._draw_glowing_shrimp_school(draw, cx=770, cy=1050, anim_phase=anim_phase)
+                self._draw_pigment_arrows(draw, start_xy=(720, 960), end_xy=(480, 960))
 
-        elif visual_prop == "one_leg_ice":
-            self._draw_ice_floes(draw, cy=1340)
-            self._draw_pip_character(
-                draw, cx=540, cy=980, scale=1.08,
-                color_state="pink", expression="sleeping_peaceful", one_leg=True, anim_phase=anim_phase
-            )
-            self._draw_zzz_bubbles(draw, start_x=680, start_y=620, anim_phase=anim_phase)
-            self._draw_one_leg_pointer(draw, target_x=520, target_y=1240, narration=narration)
+            elif visual_prop == "color_transformation":
+                self._draw_transformation_aura(draw, cx=540, cy=960)
+                self._draw_pip_character(
+                    draw, cx=540, cy=980, scale=1.12,
+                    color_state="half_pink_transforming", expression="transforming_amazed", one_leg=False, anim_phase=anim_phase
+                )
+                self._draw_color_progress_meter(draw, cx=540, y=1440, narration=narration)
 
-        elif visual_prop == "knee_gear_lock":
-            self._draw_pip_character(
-                draw, cx=340, cy=980, scale=1.0,
-                color_state="pink", expression="xray_focused", one_leg=True, anim_phase=anim_phase
-            )
-            self._draw_xray_gear_lock_diagram(draw, target_leg_xy=(330, 1210), zoom_center_xy=(740, 960), narration=narration)
+            elif visual_prop == "one_leg_ice":
+                self._draw_ice_floes(draw, cy=1340)
+                self._draw_pip_character(
+                    draw, cx=540, cy=980, scale=1.08,
+                    color_state="pink", expression="sleeping_peaceful", one_leg=True, anim_phase=anim_phase
+                )
+                self._draw_zzz_bubbles(draw, start_x=680, start_y=620, anim_phase=anim_phase)
+                self._draw_one_leg_pointer(draw, target_x=520, target_y=1240, narration=narration)
 
+            elif visual_prop == "knee_gear_lock":
+                self._draw_pip_character(
+                    draw, cx=340, cy=980, scale=1.0,
+                    color_state="pink", expression="xray_focused", one_leg=True, anim_phase=anim_phase
+                )
+                self._draw_xray_gear_lock_diagram(draw, target_leg_xy=(330, 1210), zoom_center_xy=(740, 960), narration=narration)
+
+            else:
+                self._draw_pip_character(
+                    draw, cx=540, cy=980, scale=1.15,
+                    color_state="pink", expression="happy_proud", one_leg=False, anim_phase=anim_phase
+                )
+
+        # --- UNIVERSAL DYNAMIC RIG (NEVER FAILS, SUPPORTS DYNAMIC TOPICS INDEFINITELY) ---
         else:
-            # Universal Choice Card / Finale
-            self._draw_pip_character(
-                draw, cx=330, cy=1020, scale=0.95,
-                color_state="pink", expression="waving_cheerful", one_leg=True, anim_phase=anim_phase
+            self._draw_universal_story_scene(
+                draw, scene_id=scene_id, visual_prop=visual_prop,
+                badge_text=badge_text, narration=narration, anim_phase=anim_phase
             )
-            self._draw_leo_character(
-                draw, cx=770, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase
-            )
-            self._draw_superpower_vs_cards(draw, y=520, narration=narration)
 
         # 3. Draw Top Storyboard Header & Visual Fact Callout Badge (so muted viewers always follow the story)
         self._draw_top_story_banner(draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
@@ -651,6 +952,42 @@ class VisualEngine:
             "chameleon_radar_eyes": ((18, 55, 45), (45, 175, 120), (22, 85, 55)),
             "chameleon_ballistic_tongue": ((20, 45, 60), (255, 110, 130), (25, 75, 85)),
             "chameleon_superpower_choice": ((15, 55, 50), (0, 180, 160), (20, 85, 75)),
+            # Pistol Shrimp Palettes
+            "shrimp_snap_claw": ((10, 30, 85), (0, 155, 220), (12, 65, 120)),
+            "cavitation_plasma_bubble": ((15, 25, 75), (255, 175, 45), (10, 50, 105)),
+            "heat_hotter_than_sun": ((75, 20, 25), (255, 140, 30), (85, 30, 35)),
+            "sonoluminescence_flash": ((10, 15, 55), (0, 235, 255), (8, 35, 80)),
+            "shockwave_stun_fish": ((12, 40, 95), (0, 180, 235), (15, 75, 130)),
+            "submarine_sonar_jamming": ((6, 15, 45), (0, 95, 160), (8, 30, 65)),
+            "claw_regeneration_swap": ((14, 32, 80), (255, 120, 85), (12, 55, 110)),
+            "shrimp_superpower_choice": ((15, 28, 80), (0, 170, 225), (14, 55, 115)),
+            # Axolotl Palettes
+            "axolotl_smile_gills": ((25, 45, 95), (255, 140, 195), (20, 75, 115)),
+            "regrow_lost_limbs": ((20, 35, 85), (0, 220, 210), (18, 65, 105)),
+            "regrow_heart_spine": ((30, 20, 75), (255, 105, 160), (25, 45, 90)),
+            "brain_regeneration_scan": ((25, 20, 80), (160, 100, 255), (22, 40, 85)),
+            "feathery_oxygen_gills": ((15, 50, 100), (0, 200, 240), (18, 80, 130)),
+            "eternal_baby_neoteny": ((45, 25, 85), (255, 165, 215), (35, 50, 95)),
+            "organ_swap_zero_rejection": ((20, 40, 80), (0, 215, 180), (18, 65, 95)),
+            "axolotl_superpower_choice": ((30, 30, 90), (255, 135, 190), (25, 60, 110)),
+            # Electric Eel Palettes
+            "not_an_eel_knifefish": ((12, 35, 60), (0, 150, 175), (15, 60, 85)),
+            "electrocyte_battery_cells": ((15, 25, 65), (255, 215, 0), (20, 50, 90)),
+            "voltage_860v_meter": ((10, 12, 40), (255, 240, 70), (18, 25, 65)),
+            "electric_radar_navigation": ((8, 18, 48), (0, 230, 215), (10, 35, 70)),
+            "curling_voltage_booster": ((20, 15, 55), (255, 200, 40), (22, 30, 75)),
+            "self_insulation_armor": ((18, 30, 70), (0, 185, 235), (16, 50, 95)),
+            "shock_predators_away": ((25, 15, 50), (255, 225, 50), (30, 35, 70)),
+            "eel_superpower_choice": ((15, 22, 60), (255, 215, 0), (18, 45, 85)),
+            # Tardigrade Palettes
+            "water_bear_microscope": ((15, 40, 85), (0, 195, 225), (18, 70, 115)),
+            "absolute_zero_freeze": ((8, 22, 65), (140, 220, 255), (12, 45, 95)),
+            "volcano_heat_resist": ((65, 25, 30), (255, 120, 45), (80, 35, 35)),
+            "outer_space_vacuum_survive": ((5, 5, 25), (60, 40, 110), (10, 10, 35)),
+            "cryptobiosis_glass_proteins": ((25, 35, 75), (255, 195, 80), (22, 55, 90)),
+            "thirty_year_sleep": ((12, 20, 55), (120, 160, 235), (15, 40, 80)),
+            "drop_of_water_revive": ((15, 55, 105), (0, 225, 255), (18, 85, 135)),
+            "tardigrade_superpower_choice": ((18, 35, 80), (0, 180, 230), (18, 60, 105)),
         }
         sky_top, sky_bot, ground_col = palettes.get(visual_prop, ((20, 60, 120), (0, 180, 220), (0, 120, 170)))
 
@@ -1385,7 +1722,19 @@ class VisualEngine:
         """Draws two visual superpower choice cards above Pip and Leo in Scene 8."""
         font = self._get_font(30)
         low = (narration or "").lower()
-        if "chameleon" in low or "eyes" in low or "tongue" in low or "360" in low or "radar" in low or "60" in low:
+        if "shrimp" in low or "plasma" in low or "claw" in low:
+            card1_text = "4,700°C SUN HEAT"
+            card2_text = "SONIC BOOM CLAW"
+        elif "axolotl" in low or "limb" in low or "neoteny" in low:
+            card1_text = "REGROW LOST LIMBS"
+            card2_text = "ETERNAL BABY FORM"
+        elif "eel" in low or "volt" in low or "battery" in low or "860" in low:
+            card1_text = "860-VOLT SHOCK"
+            card2_text = "ELECTRIC RADAR"
+        elif "tardigrade" in low or "bear" in low or "space" in low:
+            card1_text = "SURVIVE SPACE VACUUM"
+            card2_text = "30-YEAR SLEEP LOCK"
+        elif "chameleon" in low or "eyes" in low or "tongue" in low or "360" in low or "radar" in low or "60" in low:
             card1_text = "360° RADAR EYES"
             card2_text = "60 MPH TONGUE"
         elif "heart" in low or "brain" in low or "camouflage" in low or "blue" in low:
@@ -1394,9 +1743,12 @@ class VisualEngine:
         elif "cloud" in low or "lightning" in low:
             card1_text = "1M POUND CLOUD"
             card2_text = "5X SUN LIGHTNING"
-        else:
+        elif "flamingo" in low or "beak" in low or "leg" in low:
             card1_text = "100°C HEAT BEAK"
             card2_text = "1-LEG SLEEP LOCK"
+        else:
+            card1_text = "SUPERPOWER #1"
+            card2_text = "SUPERPOWER #2"
 
         # Left Card
         draw.rounded_rectangle([80, y - 80, 490, y + 80], radius=24, fill=(255, 65, 95, 245), outline=(255, 255, 255, 255), width=5)
@@ -1959,5 +2311,576 @@ class VisualEngine:
         draw.rounded_rectangle([cx if 'cx' in locals() else (sx + ex)//2 - 190, ey - 100, (sx + ex)//2 + 190, ey - 45], radius=16, fill=(255, 50, 75, 245), outline=(255, 255, 255, 255), width=3)
         font = self._get_font(26)
         draw.text(((sx + ex)//2, ey - 72), "60 MPH IN 0.01s!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    # =========================================================================
+    # PISTOL SHRIMP & PLASMA SCIENCE RENDERING METHODS
+    # =========================================================================
+
+    def _draw_pistol_shrimp_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        color_state: str = "coral",
+        claw_state: str = "giant",
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws 'Perry the Pistol Shrimp' with cute Pixar eyes, segmented crustacean body, and giant hydraulic blaster claw."""
+        s = scale
+        body_col = (255, 115, 75, 255)
+        shell_col = (255, 80, 50, 255)
+        belly_col = (255, 180, 130, 255)
+        claw_col = (255, 50, 50, 255)
+
+        # 1. Long Antennae
+        for i, (ax, ay) in enumerate([(-120, -180), (-80, -210)]):
+            draw.arc([cx + int(ax * s), cy + int(ay * s), cx, cy], start=180, end=300, fill=(255, 215, 120, 240), width=int(4 * s))
+
+        # 2. Segmented Shrimp Tail & Fan (curling left)
+        tail_segs = [(-70, 30, 48), (-120, 50, 40), (-165, 80, 32), (-195, 115, 25)]
+        for tx, ty, tr in tail_segs:
+            px = cx + int(tx * s)
+            py = cy + int(ty * s)
+            pr = int(tr * s)
+            draw.ellipse([px - pr, py - int(pr * 0.7), px + pr, py + int(pr * 0.7)], fill=body_col, outline=shell_col, width=int(3 * s))
+        # Tail fin fan
+        fan_x = cx - int(215 * s)
+        fan_y = cy + int(135 * s)
+        for ang in (0.3, 0.7, 1.1):
+            draw.ellipse([fan_x - int(25 * s), fan_y - int(15 * s), fan_x + int(25 * s), fan_y + int(15 * s)], fill=(255, 70, 60, 230))
+
+        # 3. Main Carapace (torso)
+        cw, ch = int(95 * s), int(75 * s)
+        draw.ellipse([cx - cw, cy - ch, cx + cw, cy + ch], fill=body_col, outline=shell_col, width=int(4 * s))
+        draw.ellipse([cx - int(70 * s), cy - int(20 * s), cx + int(50 * s), cy + int(50 * s)], fill=belly_col)
+
+        # 4. Normal small feeder claw (left side)
+        draw.arc([cx - int(40 * s), cy + int(20 * s), cx + int(10 * s), cy + int(80 * s)], start=90, end=270, fill=body_col, width=int(12 * s))
+        draw.ellipse([cx - int(30 * s), cy + int(75 * s), cx - int(10 * s), cy + int(95 * s)], fill=claw_col)
+
+        # 5. GIANT Blaster Snap-Claw (right side - 3x bigger!)
+        claw_cx = cx + int(130 * s)
+        claw_cy = cy + int(10 * s)
+        # Giant lower claw hammer base
+        draw.ellipse([claw_cx - int(65 * s), claw_cy - int(45 * s), claw_cx + int(65 * s), claw_cy + int(45 * s)], fill=claw_col, outline=(255, 220, 100, 255), width=int(4 * s))
+        # Giant movable plunger hammer
+        draw.polygon([
+            (claw_cx + int(10 * s), claw_cy - int(40 * s)),
+            (claw_cx + int(90 * s), claw_cy - int(65 * s)),
+            (claw_cx + int(70 * s), claw_cy - int(10 * s)),
+        ], fill=(255, 180, 0, 255), outline=(255, 255, 255, 255))
+        # Hydraulic snap bolt pin
+        draw.ellipse([claw_cx - int(15 * s), claw_cy - int(15 * s), claw_cx + int(15 * s), claw_cy + int(15 * s)], fill=(255, 240, 200, 255), outline=(50, 20, 20, 255), width=int(2 * s))
+
+        # 6. Big Curious Pixar Eyes on Stalks
+        for ex_off in (-25, 25):
+            ex = cx + int(ex_off * s)
+            ey = cy - int(80 * s)
+            # Eye stalk
+            draw.line([(cx + int((ex_off * 0.5) * s), cy - int(50 * s)), (ex, ey)], fill=body_col, width=int(8 * s))
+            # Eyeball
+            er = int(22 * s)
+            draw.ellipse([ex - er, ey - er, ex + er, ey + er], fill=(255, 255, 255, 255), outline=(40, 20, 20, 255), width=int(3 * s))
+            # Iris
+            draw.ellipse([ex - int(er * 0.6), ey - int(er * 0.6), ex + int(er * 0.6), ey + int(er * 0.6)], fill=(0, 150, 220, 255))
+            draw.ellipse([ex - int(er * 0.3), ey - int(er * 0.3), ex + int(er * 0.3), ey + int(er * 0.3)], fill=(10, 15, 25, 255))
+            draw.ellipse([ex - int(er * 0.35), ey - int(er * 0.4), ex - int(er * 0.1), ey - int(er * 0.15)], fill=(255, 255, 255, 255))
+
+        # Mouth smile
+        draw.arc([cx - int(15 * s), cy - int(10 * s), cx + int(15 * s), cy + int(10 * s)], start=0, end=180, fill=(60, 20, 20, 255), width=int(3 * s))
+
+    def _draw_shrimp_snap_claw_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws high-speed snap blast wave lines around the blaster claw."""
+        for r_arc in (90, 140, 190):
+            draw.arc([cx - r_arc, cy - r_arc, cx + r_arc, cy + r_arc], start=310, end=50, fill=(255, 225, 50, 220), width=6)
+        draw.line([(cx, cy), (cx + 120, cy - 30)], fill=(255, 255, 255, 255), width=8)
+
+    def _draw_cavitation_plasma_bubble_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing cavitation bubble with steam vortex and pressure ring."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(15, 30, 70, 245), outline=(0, 240, 255, 255), width=8)
+        # Low pressure cavitation bubble
+        br = 110 + int(math.sin(anim_phase * 6.28) * 8)
+        draw.ellipse([cx - br, cy - br, cx + br, cy + br], fill=(0, 210, 255, 140), outline=(255, 255, 255, 255), width=6)
+        draw.ellipse([cx - int(br * 0.5), cy - int(br * 0.5), cx + int(br * 0.5), cy + int(br * 0.5)], fill=(255, 240, 180, 200))
+        # High speed water jet stream
+        draw.line([(cx - 180, cy), (cx - br, cy)], fill=(255, 255, 255, 255), width=12)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 200, cy + zr - 25, cx + 200, cy + zr + 42], radius=16, fill=(0, 215, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "CAVITATION BUBBLE!", fill=(10, 25, 45), font=font, anchor="mm")
+
+    def _draw_heat_hotter_than_sun_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws sun-hot plasma core with 4,700°C temperature callout and fiery corona rays."""
+        zr = 225
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(45, 15, 25, 245), outline=(255, 180, 0, 255), width=8)
+        # Fiery solar plasma core
+        for r_glow, col in [(140, (255, 90, 0, 90)), (100, (255, 175, 0, 150)), (65, (255, 245, 150, 255))]:
+            draw.ellipse([cx - r_glow, cy - r_glow, cx + r_glow, cy + r_glow], fill=col)
+        # Radial heat rays
+        for i in range(16):
+            ang = (i / 16.0) * 6.28
+            x1 = cx + int(math.cos(ang) * 90)
+            y1 = cy + int(math.sin(ang) * 90)
+            x2 = cx + int(math.cos(ang) * 165)
+            y2 = cy + int(math.sin(ang) * 165)
+            draw.line([(x1, y1), (x2, y2)], fill=(255, 220, 60, 220), width=5)
+        # Heat thermometer badge
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(255, 55, 40, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "4,700°C HOTTER THAN SUN!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_sonoluminescence_flash_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws sonoluminescence: light spark created from sound collapsing."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(12, 18, 45, 245), outline=(0, 235, 255, 255), width=8)
+        # Concentric sound waves compressing
+        for r_s in (180, 130, 80):
+            draw.ellipse([cx - r_s, cy - r_s, cx + r_s, cy + r_s], outline=(0, 180, 255, 180), width=4)
+        # Flash starburst in exact center
+        for i in range(12):
+            ang = (i / 12.0) * 6.28
+            lx = cx + int(math.cos(ang) * 75)
+            ly = cy + int(math.sin(ang) * 75)
+            draw.line([(cx, cy), (lx, ly)], fill=(255, 255, 255, 240), width=5)
+        draw.ellipse([cx - 28, cy - 28, cx + 28, cy + 28], fill=(255, 255, 255, 255), outline=(0, 240, 255, 255), width=3)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(0, 215, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "SOUND TURNS TO LIGHT!", fill=(12, 25, 45), font=font, anchor="mm")
+
+    def _draw_shockwave_stun_fish_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws expanding underwater sonic rings and dizzy stunned crabs/fish."""
+        zr = 225
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(15, 35, 75, 245), outline=(255, 205, 50, 255), width=8)
+        for r_sw in (60, 110, 160, 205):
+            draw.arc([cx - r_sw, cy - r_sw, cx + r_sw, cy + r_sw], start=280, end=80, fill=(255, 220, 80, 220), width=6)
+        # Stunned cute fish with spiral eyes
+        fx, fy = cx + 80, cy - 30
+        draw.ellipse([fx - 35, fy - 20, fx + 35, fy + 20], fill=(255, 140, 60, 255), outline=(255, 255, 255, 255), width=2)
+        # Dizzy stars over fish head
+        for sx_off, sy_off in [(-15, -35), (15, -40), (0, -50)]:
+            draw.text((fx + sx_off, fy + sy_off), "★", fill=(255, 230, 60), font=self._get_font(22), anchor="mm")
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 205, cy + zr - 25, cx + 205, cy + zr + 42], radius=16, fill=(255, 185, 30, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "SONIC SHOCKWAVE STUN!", fill=(15, 30, 50), font=font, anchor="mm")
+
+    def _draw_submarine_sonar_jamming_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws military submarine silhouette with scrambled zig-zag static lines."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(10, 22, 55, 245), outline=(0, 185, 255, 255), width=8)
+        # Submarine silhouette
+        draw.ellipse([cx - 120, cy - 35, cx + 120, cy + 35], fill=(45, 65, 95, 255), outline=(120, 165, 215, 255), width=4)
+        draw.rounded_rectangle([cx - 20, cy - 70, cx + 30, cy - 35], radius=6, fill=(45, 65, 95, 255), outline=(120, 165, 215, 255), width=3)
+        # Jammed sonar ping waves (glitched/cracked)
+        for i in range(4):
+            sx = cx - 140 - i * 18
+            draw.line([(sx, cy - 40), (sx + 8, cy - 10), (sx - 8, cy + 20), (sx, cy + 40)], fill=(255, 60, 60, 230), width=4)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(255, 55, 75, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "JAMS SUBMARINE SONAR!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_claw_swap_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws diagram showing smaller claw growing into giant blaster claw if original is lost."""
+        font = self._get_font(26)
+        draw.rounded_rectangle([cx - 360, cy - 140, cx + 360, cy - 60], radius=18, fill=(20, 35, 75, 245), outline=(255, 215, 0, 255), width=4)
+        draw.text((cx, cy - 100), "LOST CLAW? SMALL CLAW TRANSFORMS!", fill=(255, 235, 120), font=font, anchor="mm")
+
+    # =========================================================================
+    # AXOLOTL & REGENERATION RENDERING METHODS
+    # =========================================================================
+
+    def _draw_axolotl_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        color_state: str = "pink",
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws 'Axel the Axolotl' with soft pastel pink body, cute stubby limbs, and 6 magnificent feathery external gills."""
+        s = scale
+        body_col = (255, 185, 210, 255)
+        outline_col = (235, 120, 165, 255)
+        gill_col = (255, 70, 140, 255)
+        belly_col = (255, 220, 235, 255)
+
+        # 1. 6 Feathery External Gill Stalks (3 left, 3 right)
+        gill_angles = [(-35, -55, -25), (-60, -15, -45), (-45, 25, -60), (35, -55, 25), (60, -15, 45), (45, 25, 60)]
+        head_cx, head_cy = cx, cy - int(25 * s)
+        for gx_off, gy_off, g_rot in gill_angles:
+            gx = head_cx + int(gx_off * 1.5 * s)
+            gy = head_cy + int(gy_off * 1.5 * s)
+            # Main stalk
+            draw.line([(head_cx + int(gx_off * 0.7 * s), head_cy + int(gy_off * 0.7 * s)), (gx, gy)], fill=gill_col, width=int(12 * s))
+            # Feathery branchlets
+            for f_i in (-15, 0, 15):
+                fx = gx + int(math.cos(math.radians(g_rot + f_i)) * 26 * s)
+                fy = gy + int(math.sin(math.radians(g_rot + f_i)) * 26 * s)
+                draw.ellipse([fx - int(7 * s), fy - int(7 * s), fx + int(7 * s), fy + int(7 * s)], fill=(255, 110, 175, 240))
+
+        # 2. Stubby cute salamander limbs
+        for lx_off, ly_off in [(-75, 55), (75, 55), (-65, 95), (65, 95)]:
+            lx = cx + int(lx_off * s)
+            ly = cy + int(ly_off * s)
+            draw.ellipse([lx - int(18 * s), ly - int(18 * s), lx + int(18 * s), ly + int(18 * s)], fill=body_col, outline=outline_col, width=int(3 * s))
+
+        # 3. Chubby Body
+        bw, bh = int(90 * s), int(85 * s)
+        draw.ellipse([cx - bw, cy - bh + int(40 * s), cx + bw, cy + bh + int(40 * s)], fill=body_col, outline=outline_col, width=int(4 * s))
+        draw.ellipse([cx - int(55 * s), cy + int(5 * s), cx + int(55 * s), cy + int(85 * s)], fill=belly_col)
+
+        # 4. Wide Round Smiling Head
+        hw, hh = int(120 * s), int(85 * s)
+        draw.ellipse([head_cx - hw, head_cy - hh, head_cx + hw, head_cy + hh], fill=body_col, outline=outline_col, width=int(4 * s))
+
+        # 5. Rosy Cheeks
+        for ch_x in (-75, 75):
+            draw.ellipse([head_cx + int(ch_x * s) - int(20 * s), head_cy + int(10 * s), head_cx + int(ch_x * s) + int(20 * s), head_cy + int(35 * s)], fill=(255, 115, 160, 180))
+
+        # 6. Big Shiny Black Beaded Eyes with Sparkle
+        for ex_off in (-50, 50):
+            ex = head_cx + int(ex_off * s)
+            ey = head_cy - int(12 * s)
+            er = int(18 * s)
+            draw.ellipse([ex - er, ey - er, ex + er, ey + er], fill=(25, 20, 35, 255))
+            draw.ellipse([ex - int(er * 0.4), ey - int(er * 0.5), ex - int(er * 0.05), ey - int(er * 0.15)], fill=(255, 255, 255, 255))
+
+        # 7. Iconic Gentle Axolotl Smile
+        mouth_y = head_cy + int(24 * s)
+        draw.arc([head_cx - int(45 * s), mouth_y - int(15 * s), head_cx + int(45 * s), mouth_y + int(22 * s)], start=20, end=160, fill=(180, 50, 95, 255), width=int(5 * s))
+
+    def _draw_axolotl_smile_gills_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int):
+        """Draws smiling badge callout above Axel."""
+        draw.rounded_rectangle([cx - 240, cy - 35, cx + 240, cy + 35], radius=18, fill=(255, 80, 150, 240), outline=(255, 255, 255, 255), width=4)
+        font = self._get_font(28)
+        draw.text((cx, cy), "MEXICAN WALKING FISH!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_limb_regeneration_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws limb regeneration stages with blastema cellular sparkles."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(18, 32, 68, 245), outline=(0, 240, 210, 255), width=8)
+        # Regrowing translucent limb with sparkles
+        draw.line([(cx - 100, cy), (cx + 80, cy)], fill=(255, 160, 200, 200), width=24)
+        for i in range(12):
+            ang = (i / 12.0) * 6.28
+            sx = cx + int(math.cos(ang) * 95)
+            sy = cy + int(math.sin(ang) * 55)
+            draw.ellipse([sx - 8, sy - 8, sx + 8, sy + 8], fill=(0, 255, 220, 230))
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(0, 220, 190, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "100% REGROWTH: ZERO SCARS!", fill=(10, 30, 45), font=font, anchor="mm")
+
+    def _draw_heart_spine_regeneration_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws heart and spinal column x-ray healing diagram."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(22, 18, 55, 245), outline=(255, 105, 180, 255), width=8)
+        # Glowing pink heart
+        draw.ellipse([cx - 55, cy - 65, cx + 55, cy + 35], fill=(255, 60, 120, 240), outline=(255, 255, 255, 255), width=4)
+        # Glowing spine column
+        draw.line([(cx, cy + 35), (cx, cy + 160)], fill=(0, 240, 255, 240), width=16)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(255, 80, 160, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "HEALS HEART & SPINAL CORD!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_brain_regeneration_scan_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws brain halo scan regrowing fresh neurons."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(20, 15, 60, 245), outline=(180, 100, 255, 255), width=8)
+        # Brain silhouette with glowing synaptic nodes
+        draw.ellipse([cx - 85, cy - 70, cx + 85, cy + 60], fill=(160, 80, 240, 210), outline=(255, 255, 255, 255), width=4)
+        for bx, by in [(-45, -20), (45, -20), (-20, 25), (20, 25)]:
+            draw.ellipse([cx + bx - 10, cy + by - 10, cx + bx + 10, cy + by + 10], fill=(255, 235, 100, 255))
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(170, 90, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "REGROWS BRAIN CELLS!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_feathery_oxygen_gills_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws feathery gills filtering rising underwater oxygen bubbles."""
+        for bx, by, br in [(-120, -60, 18), (-60, -110, 24), (80, -90, 20), (130, -50, 16)]:
+            draw.ellipse([cx + bx - br, cy + by - br, cx + bx + br, cy + by + br], fill=(200, 245, 255, 180), outline=(255, 255, 255, 255), width=2)
+
+    def _draw_eternal_baby_neoteny_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws eternal baby crown and star badge."""
+        # Golden baby crown above Axel
+        draw.polygon([(cx - 70, cy - 140), (cx - 45, cy - 190), (cx, cy - 150), (cx + 45, cy - 190), (cx + 70, cy - 140)], fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=3)
+
+    def _draw_organ_swap_zero_rejection_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws medical cross badge and zero rejection callout."""
+        zr = 210
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(15, 35, 65, 245), outline=(0, 230, 180, 255), width=8)
+        # Medical cross
+        draw.rounded_rectangle([cx - 24, cy - 75, cx + 24, cy + 75], radius=10, fill=(0, 220, 175, 255))
+        draw.rounded_rectangle([cx - 75, cy - 24, cx + 75, cy + 24], radius=10, fill=(0, 220, 175, 255))
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(0, 215, 165, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "ZERO ORGAN REJECTION!", fill=(10, 25, 45), font=font, anchor="mm")
+
+    # =========================================================================
+    # ELECTRIC EEL & VOLTAGE RENDERING METHODS
+    # =========================================================================
+
+    def _draw_electric_eel_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        voltage_glow: bool = True,
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws 'Volt the Electric Eel' with long undulating slate body, golden belly, and electric aura."""
+        s = scale
+        body_col = (50, 75, 105, 255)
+        belly_col = (255, 205, 40, 255)
+        fin_col = (0, 200, 235, 200)
+
+        # 1. Electric Aura Rings
+        if voltage_glow:
+            draw.ellipse([cx - int(190 * s), cy - int(90 * s), cx + int(190 * s), cy + int(90 * s)], fill=(255, 240, 60, 45))
+
+        # 2. Long Undulating S-Shaped Body
+        pts_top, pts_bot = [], []
+        for i in range(-6, 7):
+            frac = i / 6.0
+            bx = cx + int(frac * 170 * s)
+            wave = math.sin((frac * 2 * math.pi) + anim_phase * 6.28) * 35 * s
+            by = cy + int(wave)
+            pts_top.append((bx, by - int(38 * s)))
+            pts_bot.append((bx, by + int(38 * s)))
+
+        pts_body = pts_top + list(reversed(pts_bot))
+        draw.polygon(pts_body, fill=body_col, outline=(30, 45, 65, 255))
+        # Long undulating ventral fin below belly
+        for bx, by in pts_bot:
+            draw.ellipse([bx - int(15 * s), by, bx + int(15 * s), by + int(24 * s)], fill=fin_col)
+
+        # 3. Head & Cute Face (right end)
+        hx, hy = cx + int(170 * s), cy - int(10 * s)
+        draw.ellipse([hx - int(45 * s), hy - int(35 * s), hx + int(45 * s), hy + int(35 * s)], fill=body_col)
+        # Golden belly sheen
+        draw.ellipse([hx - int(30 * s), hy + int(5 * s), hx + int(30 * s), hy + int(32 * s)], fill=belly_col)
+
+        # Eye
+        er = int(16 * s)
+        draw.ellipse([hx + int(10 * s) - er, hy - int(12 * s) - er, hx + int(10 * s) + er, hy - int(12 * s) + er], fill=(255, 255, 255, 255), outline=(20, 20, 20, 255), width=2)
+        draw.ellipse([hx + int(10 * s) - int(er * 0.6), hy - int(12 * s) - int(er * 0.6), hx + int(10 * s) + int(er * 0.6), hy - int(12 * s) + int(er * 0.6)], fill=(0, 210, 255, 255))
+        draw.ellipse([hx + int(10 * s) - int(er * 0.3), hy - int(12 * s) - int(er * 0.3), hx + int(10 * s) + int(er * 0.3), hy - int(12 * s) + int(er * 0.3)], fill=(10, 15, 20, 255))
+
+        # Little electric spark near cheek
+        draw.text((hx + int(30 * s), hy - int(25 * s)), "⚡", fill=(255, 240, 60), font=self._get_font(28), anchor="mm")
+
+    def _draw_electrocyte_battery_stack_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws 6,000 stacked biological disc electrocytes diagram."""
+        zr = 220
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(15, 25, 55, 245), outline=(255, 215, 0, 255), width=8)
+        # Battery discs stacked in series
+        for i in range(7):
+            dy = cy - 90 + i * 30
+            draw.rounded_rectangle([cx - 110, dy, cx + 110, dy + 22], radius=8, fill=(255, 200, 30, 255), outline=(255, 255, 255, 255), width=2)
+            draw.text((cx, dy + 11), "+  -  +  -  +", fill=(15, 25, 45), font=self._get_font(18), anchor="mm")
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "6,000 LIVING BATTERIES!", fill=(15, 25, 45), font=font, anchor="mm")
+
+    def _draw_voltage_860v_meter_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws huge 860V voltmeter dial and electric lightning burst."""
+        zr = 225
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(12, 12, 35, 245), outline=(255, 235, 50, 255), width=8)
+        # Lightning bursts radiating
+        for spk in (0.5, 1.3, 2.1, 2.9, 3.8, 4.6, 5.4):
+            x2 = cx + int(math.cos(spk) * 160)
+            y2 = cy + int(math.sin(spk) * 160)
+            draw.line([(cx, cy), (x2, y2)], fill=(255, 245, 60, 240), width=6)
+        # Big central 860V badge
+        draw.ellipse([cx - 95, cy - 95, cx + 95, cy + 95], fill=(255, 45, 45, 255), outline=(255, 255, 255, 255), width=5)
+        font_b = self._get_font(38)
+        draw.text((cx, cy), "860V!", fill=(255, 255, 255), font=font_b, anchor="mm")
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "POWERS 10 LIGHTBULBS!", fill=(15, 25, 45), font=font, anchor="mm")
+
+    def _draw_electric_radar_navigation_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws electric radar pulse rings in murky Amazon river water."""
+        for r_p in (80, 140, 200):
+            draw.arc([cx - r_p, cy - r_p, cx + r_p, cy + r_p], start=0, end=360, fill=(0, 245, 215, 160), width=4)
+
+    def _draw_curling_voltage_booster_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws looped body coil that doubles electrical voltage."""
+        zr = 210
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(20, 15, 45, 245), outline=(255, 200, 30, 255), width=8)
+        draw.arc([cx - 120, cy - 120, cx + 120, cy + 120], start=30, end=330, fill=(255, 225, 40, 255), width=28)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 205, cy + zr - 25, cx + 205, cy + zr + 42], radius=16, fill=(255, 185, 30, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "CURLS TO DOUBLE VOLTS!", fill=(15, 25, 45), font=font, anchor="mm")
+
+    def _draw_self_insulation_armor_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws rubbery insulation armor diagram."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 240, cy - 35, cx + 240, cy + 35], radius=18, fill=(0, 195, 235, 245), outline=(255, 255, 255, 255), width=4)
+        draw.text((cx, cy), "BUILT-IN RUBBERY INSULATION!", fill=(12, 25, 45), font=font, anchor="mm")
+
+    def _draw_shock_predators_away_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws caiman silhouette fleeing the electric water."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 240, cy - 35, cx + 240, cy + 35], radius=18, fill=(255, 60, 60, 245), outline=(255, 255, 255, 255), width=4)
+        draw.text((cx, cy), "SCARES AWAY GIANT CAIMANS!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    # =========================================================================
+    # TARDIGRADE (WATER BEAR) RENDERING METHODS
+    # =========================================================================
+
+    def _draw_tardigrade_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        tun_mode: bool = False,
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws 'Barnaby the Water Bear' with 8 chubby clawed legs, roly-poly body segments, and cute snout."""
+        s = scale
+        body_col = (130, 205, 255, 255)
+        outline_col = (50, 130, 195, 255)
+        belly_col = (195, 235, 255, 255)
+
+        # Tun Mode: Hardened spherical bioglass bead
+        if tun_mode:
+            tr = int(110 * s)
+            draw.ellipse([cx - tr, cy - tr, cx + tr, cy + tr], fill=(255, 190, 60, 220), outline=(255, 245, 180, 255), width=int(8 * s))
+            draw.ellipse([cx - int(tr * 0.6), cy - int(tr * 0.6), cx + int(tr * 0.6), cy + int(tr * 0.6)], fill=(255, 220, 100, 240))
+            draw.text((cx, cy), "TUN GLASS", fill=(45, 30, 10), font=self._get_font(24), anchor="mm")
+            return
+
+        # Normal Mode: 8 Pudgy legs with tiny claws (4 left, 4 right)
+        for i in range(4):
+            lx_off = -110 + i * 70
+            for side in (-1, 1):
+                leg_x = cx + int(lx_off * s)
+                leg_y = cy + int((side * 75) * s)
+                draw.ellipse([leg_x - int(22 * s), leg_y - int(18 * s), leg_x + int(22 * s), leg_y + int(18 * s)], fill=body_col, outline=outline_col, width=int(3 * s))
+                # 3 tiny claws on foot
+                for c_i in (-8, 0, 8):
+                    draw.line([(leg_x + int(c_i * s), leg_y + int(side * 12 * s)), (leg_x + int(c_i * s), leg_y + int(side * 22 * s))], fill=(255, 255, 255, 255), width=int(2 * s))
+
+        # 4 Pudgy Roly-Poly Body Segments
+        for i in range(4):
+            sx = cx - int((90 - i * 60) * s)
+            sr = int((65 + (1 if i in (1, 2) else 0) * 15) * s)
+            draw.ellipse([sx - sr, cy - sr, sx + sr, cy + sr], fill=body_col, outline=outline_col, width=int(4 * s))
+
+        # Belly highlight
+        draw.ellipse([cx - int(110 * s), cy - int(35 * s), cx + int(70 * s), cy + int(35 * s)], fill=belly_col)
+
+        # Cute Snout & Round Mouth (front end / right side)
+        hx = cx + int(115 * s)
+        draw.ellipse([hx - int(35 * s), cy - int(35 * s), hx + int(35 * s), cy + int(35 * s)], fill=body_col, outline=outline_col, width=int(3 * s))
+        draw.ellipse([hx + int(15 * s), cy - int(14 * s), hx + int(35 * s), cy + int(14 * s)], fill=(50, 110, 165, 255))
+
+        # Cute Black Beaded Eyes
+        ey_y = cy - int(18 * s)
+        draw.ellipse([hx - int(5 * s), ey_y - int(8 * s), hx + int(11 * s), ey_y + int(8 * s)], fill=(20, 30, 45, 255))
+        draw.ellipse([hx - int(2 * s), ey_y - int(6 * s), hx + int(4 * s), ey_y], fill=(255, 255, 255, 255))
+
+    def _draw_water_bear_microscope_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws circular microscope reticle frame."""
+        zr = 225
+        draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(12, 38, 75, 245), outline=(0, 240, 220, 255), width=8)
+        # Reticle crosshairs
+        draw.line([(cx - zr + 20, cy), (cx - 130, cy)], fill=(0, 240, 220, 180), width=3)
+        draw.line([(cx + 130, cy), (cx + zr - 20, cy)], fill=(0, 240, 220, 180), width=3)
+        draw.line([(cx, cy - zr + 20), (cx, cy - 130)], fill=(0, 240, 220, 180), width=3)
+        draw.line([(cx, cy + 130), (cx, cy + zr - 20)], fill=(0, 240, 220, 180), width=3)
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + zr - 25, cx + 215, cy + zr + 42], radius=16, fill=(0, 220, 195, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + zr + 8), "MICROSCOPIC GUMMY BEAR!", fill=(10, 30, 45), font=font, anchor="mm")
+
+    def _draw_absolute_zero_freeze_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws ice crystals and -272°C freeze badge."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(0, 185, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "SURVIVES -272°C COLD!", fill=(10, 25, 45), font=font, anchor="mm")
+
+    def _draw_volcano_heat_resist_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws boiling 150°C heat badge."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(255, 65, 45, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "SURVIVES 150°C BOILING!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_outer_space_vacuum_survive_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws cosmos stars and outer space astronaut badge."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(160, 80, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "SURVIVES OUTER SPACE!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_cryptobiosis_glass_proteins_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws cryptobiosis bioglass proteins badge."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(255, 185, 30, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "CRYPTOBIOSIS: TURNS TO GLASS!", fill=(15, 25, 45), font=font, anchor="mm")
+
+    def _draw_thirty_year_sleep_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws 30-year sleep lock badge."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(80, 140, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "SLEEPS 30 YEARS WITHOUT WATER!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_drop_of_water_revive_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws falling water droplet and wake-up sparkle."""
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(0, 225, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy + 225 + 8), "REVIVES WITH 1 WATER DROP!", fill=(10, 25, 45), font=font, anchor="mm")
+
+    # =========================================================================
+    # UNIVERSAL DYNAMIC RIG (GUARANTEES NEVER REPEATING & SUPPORTS DYNAMIC TOPICS)
+    # =========================================================================
+
+    def _draw_universal_story_scene(
+        self,
+        draw: ImageDraw.ImageDraw,
+        scene_id: int,
+        visual_prop: str,
+        badge_text: str,
+        narration: str,
+        anim_phase: float = 0.0
+    ):
+        """
+        Universal procedural scene renderer for AI Studio generated blueprints or any arbitrary novel topic.
+        Renders rich scientific visuals, curiosity holograms, and Leo the Explorer Kid without ever falling
+        back to flamingo or repetitive static characters.
+        """
+        cx, cy = 540, 960
+
+        # Draw Leo exploring
+        if scene_id == 8:
+            self._draw_leo_character(draw, cx=540, cy=1060, scale=1.2, expression="waving", anim_phase=anim_phase)
+            self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+        else:
+            # Dynamic Science Scanner / Hologram Lens
+            zr = 230
+            draw.ellipse([cx - zr, cy - zr, cx + zr, cy + zr], fill=(15, 30, 65, 245), outline=(0, 245, 215, 255), width=8)
+
+            # Holographic radar rings
+            for r_ring in (70, 130, 190):
+                draw.arc([cx - r_ring, cy - r_ring, cx + r_ring, cy + r_ring], start=0, end=360, fill=(0, 230, 255, 120), width=3)
+
+            # Central Golden Science Spark
+            draw.ellipse([cx - 45, cy - 45, cx + 45, cy + 45], fill=(255, 215, 0, 255), outline=(255, 255, 255, 255), width=4)
+            draw.text((cx, cy), "★", fill=(20, 25, 40), font=self._get_font(42), anchor="mm")
+
+            # Explorer Leo in bottom-right inspecting with wonder
+            self._draw_leo_character(draw, cx=780, cy=1150, scale=0.95, expression="happy" if scene_id % 2 == 0 else "shocked", anim_phase=anim_phase)
+
+            # Dynamic Topic Fact Callout in bottom of scanner
+            font = self._get_font(26)
+            draw.rounded_rectangle([cx - 215, cy + zr - 28, cx + 215, cy + zr + 38], radius=16, fill=(255, 65, 110, 255), outline=(255, 255, 255, 255), width=3)
+            clean_badge = (badge_text or "AMAZING SCIENCE FACT!").upper()
+            draw.text((cx, cy + zr + 5), clean_badge[:26], fill=(255, 255, 255), font=font, anchor="mm")
+
 
 
