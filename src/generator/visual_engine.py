@@ -196,6 +196,8 @@ class VisualEngine:
             if results[i] is None:
                 results[i] = self.generate_scene_image(scene=scenes[i], filename_prefix=filename_prefix)
 
+        return results
+
     def _generate_via_huggingface(
         self,
         scene_id: int,

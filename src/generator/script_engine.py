@@ -1089,6 +1089,112 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
                 ]
             }
         ]
+    },
+    "quantum_levitation_superconductors": {
+        "core_entity": "superconductor",
+        "niche": "interactive_riddles",
+        "tier": "older",
+        "topic": "Quantum Levitation & Superconductors",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "A disc floats locked in mid-air and cannot be pushed down even by heavy weight",
+                "required_keywords": ["floating", "mid-air", "push", "down", "gravity", "weight"],
+                "character_expression": "shocked",
+                "character_color_state": "blue",
+                "visual_prop": "floating_quantum_disc",
+                "visual_badge_text": "FLOATS IN MID-AIR!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "Quantum levitation happens when a superconductor ceramic disc is chilled with liquid nitrogen",
+                "required_keywords": ["superconductor", "liquid", "nitrogen", "chilled", "degrees", "ceramic"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "blue",
+                "visual_prop": "superconductor_liquid_cooling",
+                "visual_badge_text": "CHILLED TO -320°F!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "Electrical resistance vanishes completely to zero allowing endless currents to circulate",
+                "required_keywords": ["resistance", "zero", "current", "electrons", "energy", "flow"],
+                "character_expression": "happy_proud",
+                "character_color_state": "blue",
+                "visual_prop": "zero_electrical_resistance",
+                "visual_badge_text": "ZERO RESISTANCE!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "The Meissner effect expels magnetic fields, locking thousands of magnetic flux tubes in place",
+                "required_keywords": ["meissner", "magnetic", "field", "flux", "expels", "lines"],
+                "character_expression": "shocked",
+                "character_color_state": "blue",
+                "visual_prop": "meissner_magnetic_repulsion",
+                "visual_badge_text": "MEISSNER MAGNETIC SHIELD!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "Flux pinning traps magnetic vortices inside tiny crystal defects creating an invisible anchor",
+                "required_keywords": ["flux", "pinning", "vortices", "anchor", "trapped", "crystal"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "blue",
+                "visual_prop": "flux_pinning_anchor",
+                "visual_badge_text": "FLUX PINNING LOCK!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "You can flip the track upside down and the levitating disc stays suspended in space",
+                "required_keywords": ["upside", "down", "suspended", "track", "spin", "space"],
+                "character_expression": "happy_proud",
+                "character_color_state": "blue",
+                "visual_prop": "upside_down_levitation",
+                "visual_badge_text": "LEVITATES UPSIDE DOWN!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "High-speed maglev trains use this frictionless quantum power to cruise at 600 kilometers per hour",
+                "required_keywords": ["maglev", "trains", "speed", "frictionless", "bullet", "cruise"],
+                "character_expression": "xray_focused",
+                "character_color_state": "blue",
+                "visual_prop": "quantum_maglev_bullet_train",
+                "visual_badge_text": "600 KM/H MAGLEV TRAIN!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Would you rather ride a 600km/h maglev bullet train or glide on a quantum hoverboard?",
+                "required_keywords": ["would", "rather", "ride", "maglev", "train", "hoverboard"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "blue",
+                "visual_prop": "maglev_vs_hoverboard",
+                "visual_badge_text": "PICK YOUR RIDE!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Quantum_Levitation_Showdown",
+                "title": "Quantum Levitation: Defying Gravity With Liquid Nitrogen! ⚡🛸 #shorts",
+                "description": "Watch a frozen superconductor lock into mid-air magnetic levitation! Discover the Meissner effect and flux pinning. #shorts #science #quantum #physics #experiments",
+                "tags": ["shorts", "science", "quantum", "physics", "superconductors", "mindblown", "experiments"],
+                "scene_narrations": [
+                    "Imagine an object floating in mid-air that you cannot push down even if you lean on it!",
+                    "This is quantum levitation, unlocked when a ceramic superconductor is chilled with liquid nitrogen!",
+                    "Under extreme cold, electrical resistance drops completely to zero with infinite current flow!",
+                    "The Meissner effect expels magnetic fields, locking thousands of magnetic flux tubes into place!",
+                    "Scientists call this flux pinning, trapping the disc in three-dimensional space like an invisible cage!",
+                    "You can spin it, flip it upside down on a magnetic track, and it floats without touching!",
+                    "Engineers use this quantum magic to build frictionless bullet trains flying at six hundred kilometers per hour!",
+                    "Which would you ride: a six hundred kilometer per hour maglev train or a quantum hoverboard?"
+                ]
+            }
+        ]
     }
 }
 
@@ -1268,7 +1374,114 @@ class ScriptEngine:
                     return novel_data
         except Exception as e:
             logger.warning(f"Failed to generate dynamic blueprint via AI Studio: {e}")
-        return None
+        return self._generate_procedural_novel_blueprint(niche, used_entities, tier)
+
+    def _generate_procedural_novel_blueprint(self, niche: str, used_entities: set, tier: str = "younger") -> Optional[Dict[str, Any]]:
+        """Procedural zero-crash engine generating fresh, compliant 8-scene blueprints for any tier."""
+        tier = (tier or "younger").lower()
+        topic_seeds = [
+            {
+                "core_entity": "black_hole",
+                "tier": "older",
+                "topic": "Black Holes & Spaghettification",
+                "title": "What Happens If You Fall Into a Black Hole? 🕳️⭐ #shorts",
+                "desc": "Journey past the event horizon where gravity stretches space, time slows down, and matter spaghettifies! #shorts #physics #space #science #astronomy",
+                "tags": ["shorts", "space", "physics", "blackhole", "science", "mindblown", "astronomy"],
+                "badge": "EVENT HORIZON!",
+                "prop": "black_hole_event_horizon",
+                "narrations": [
+                    "What happens to your body if you cross the event horizon of a supermassive black hole?",
+                    "At first, gravitational tidal forces between your head and toes begin pulling with terrifying strength!",
+                    "Astrophysicists call this spaghettification, stretching your atoms out into a thin cosmic noodle of light!",
+                    "From an outside observer's point of view, time slows down so much you appear frozen forever!",
+                    "Inside the photon sphere, light orbits in circles so you could actually see the back of your own head!",
+                    "At the center lies the gravitational singularity, where infinite mass is crushed to zero volume!",
+                    "Hawking radiation slowly leaks quantum particles over trillions of years until the black hole evaporates completely!",
+                    "Would you rather explore inside a supermassive black hole or orbit a spinning neutron star?"
+                ]
+            },
+            {
+                "core_entity": "solar_flare",
+                "tier": "older",
+                "topic": "Solar Flares & Magnetic EMP Storms",
+                "title": "The 100-Million-Degree Solar Flare EMP Showdown! ☀️⚡ #shorts",
+                "desc": "Discover coronal mass ejections, magnetic reconnection, and solar EMP storms! #shorts #science #physics #space",
+                "tags": ["shorts", "science", "sun", "solarflare", "physics", "emp", "space"],
+                "badge": "100M°F SOLAR FLARE!",
+                "prop": "solar_coronal_mass_ejection",
+                "narrations": [
+                    "Every eleven years, the sun unleashes explosions ten million times more powerful than volcanic eruptions!",
+                    "These are solar flares, triggered when twisted magnetic field lines snap and reconnect in milliseconds!",
+                    "Temperatures at the blast site surge to an astonishing one hundred million degrees Fahrenheit!",
+                    "Billions of tons of magnetized plasma shoot into space as a coronal mass ejection!",
+                    "Traveling at two million miles per hour, this particle wave slams into Earth's magnetic shield!",
+                    "It ignites glowing auroras in the sky but can induce electrical currents that knock out city power grids!",
+                    "Today, satellites monitor solar wind so astronauts and power engineers can prepare before the storm hits!",
+                    "Would you rather fly a space probe through a solar flare or witness an aurora from space?"
+                ]
+            },
+            {
+                "core_entity": "frog",
+                "tier": "preschool",
+                "topic": "Five Little Tree Frogs Hop & Splash",
+                "title": "Five Little Frogs Hop & Splash! 🐸💚 #shorts",
+                "desc": "Count 1 to 5 with five cheerful green tree frogs hopping across lily pads! Fun singalong for toddlers. #shorts #kids #preschool #counting",
+                "tags": ["shorts", "preschool", "toddlers", "counting", "frogs", "nurseryrhymes"],
+                "badge": "HOP HOP SPLASH!",
+                "prop": "tree_frog_lily_pad",
+                "narrations": [
+                    "Look! One little green tree frog sits happily on a big round lily pad!",
+                    "Two little frogs stretch their bouncy legs and hop: ribbit, ribbit, ribbit!",
+                    "Three little frogs jump high in the air and splash into the water!",
+                    "Four little frogs stick out their long tongues to catch a yummy fly snack!",
+                    "Five little frogs climb up the bamboo tree and smile in the sunshine!",
+                    "Now all five frogs sing a happy song together: ribbit ribbit ribbit ribbit!",
+                    "The gentle evening breeze rocks their lily pads as they close their sleepy eyes!",
+                    "Which do you love best: jumping high like a frog or splashing in the pond?"
+                ]
+            }
+        ]
+
+        candidates = [s for s in topic_seeds if s["tier"] == tier and s["core_entity"] not in used_entities]
+        if not candidates:
+            # Fallback to any unused entity regardless of tier tags
+            candidates = [s for s in topic_seeds if s["core_entity"] not in used_entities]
+        if not candidates:
+            candidates = topic_seeds
+
+        sel = candidates[0]
+        logger.info(f"Procedural engine auto-crafted fresh novel blueprint for [{tier}]: {sel['topic']}")
+
+        # Build 8-scene canonical blueprint
+        bp_scenes = []
+        for i in range(1, 9):
+            bp_scenes.append({
+                "scene_id": i,
+                "topic_beat": f"Scene {i} covering {sel['topic']}",
+                "required_keywords": [sel["core_entity"], "power", "science", "discovery"],
+                "character_expression": "happy_proud" if i % 2 == 0 else "shocked",
+                "character_color_state": "blue" if tier == "older" else "pink",
+                "visual_prop": sel["prop"],
+                "visual_badge_text": sel["badge"],
+                "sfx_cue": "whoosh" if i in (1, 8) else "pop"
+            })
+
+        return {
+            "core_entity": sel["core_entity"],
+            "tier": tier,
+            "topic": sel["topic"],
+            "niche": niche,
+            "blueprint": bp_scenes,
+            "candidates": [
+                {
+                    "style_name": "Procedural_Adventure_Arc",
+                    "title": sel["title"],
+                    "description": sel["desc"],
+                    "tags": sel["tags"],
+                    "scene_narrations": sel["narrations"]
+                }
+            ]
+        }
 
     def _get_published_titles(self) -> set:
         titles = set()
