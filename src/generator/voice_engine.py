@@ -388,11 +388,26 @@ class VoiceEngine:
             scene_mp3 = output_path.replace(".wav", f"_scene_{idx+1}.mp3")
             scene_wav = output_path.replace(".wav", f"_scene_{idx+1}.wav")
 
+            # Tier-adaptive melodic voice profiles
+            tier = str(getattr(scene, "tier", "")).lower()
+            if "preschool" in tier:
+                v_name = "en-US-AnaNeural"
+                v_rate = "-4%"
+                v_pitch = "+9Hz"
+            elif "older" in tier:
+                v_name = "en-US-ChristopherNeural"
+                v_rate = "+0%"
+                v_pitch = "+0Hz"
+            else:  # younger / default
+                v_name = "en-US-AnaNeural"
+                v_rate = "-2%"
+                v_pitch = "+4Hz"
+
             communicate = edge_tts.Communicate(
                 text=scene_text,
-                voice=self.voice,
-                rate=self.rate,
-                pitch=self.pitch
+                voice=v_name,
+                rate=v_rate,
+                pitch=v_pitch
             )
             raw_words = []
             with open(scene_mp3, "wb") as f:
@@ -403,6 +418,14 @@ class VoiceEngine:
                         offset = chunk["offset"] / 10000000.0
                         dur = chunk["duration"] / 10000000.0
                         raw_words.append((chunk["text"], offset, dur))
+                    elif chunk["type"] == "SentenceBoundary":
+                        offset = chunk["offset"] / 10000000.0
+                        dur = chunk["duration"] / 10000000.0
+                        words = chunk.get("text", "").split()
+                        if words:
+                            w_dur = dur / float(len(words))
+                            for w_i, w in enumerate(words):
+                                raw_words.append((w, offset + w_i * w_dur, w_dur * 0.95))
 
             # Convert MP3 to 24kHz 16-bit mono WAV
             subprocess.run(

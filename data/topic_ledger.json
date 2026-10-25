@@ -99,6 +99,14 @@
       "topic": "What Happens If You Fall Into a Black Hole? \ud83d\udd73\ufe0f\u2b50 #shorts",
       "title": "What Happens If You Fall Into a Black Hole? \ud83d\udd73\ufe0f\u2b50 #shorts",
       "key_facts": []
+    },
+    {
+      "episode_number": 9,
+      "tier": "younger",
+      "core_entity": "unknown",
+      "topic": "The Animal That Can Regrow Its Entire Brain! \ud83e\udd8e\u2728 #shorts",
+      "title": "The Animal That Can Regrow Its Entire Brain! \ud83e\udd8e\u2728 #shorts",
+      "key_facts": []
     }
   ],
   "used_entities_by_tier": {
@@ -107,7 +115,8 @@
       "cloud",
       "flamingo",
       "octopus",
-      "shrimp"
+      "shrimp",
+      "unknown"
     ],
     "preschool": [
       "duckling"

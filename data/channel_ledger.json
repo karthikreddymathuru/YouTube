@@ -155,7 +155,27 @@
       "made_for_kids": true,
       "upload_status": "youtube_api_v3",
       "youtube_video_id": "GXgYDrKCpZw"
+    },
+    {
+      "episode_number": 9,
+      "timestamp": "2026-10-25T19:06:27.117826",
+      "date": "2026-10-25",
+      "niche": "interactive_riddles",
+      "tier": "younger",
+      "title": "The Animal That Can Regrow Its Entire Brain! \ud83e\udd8e\u2728 #shorts",
+      "package_dir": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261025_190622",
+      "video_file": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261025_190622/short_20261025_190423.mp4",
+      "duration_sec": 44.1,
+      "av_drift_sec": 0.0,
+      "tournament_score": 100.0,
+      "winning_archetype": "curiosity_mystery",
+      "silent_comprehension_score": 98.0,
+      "character_face_consistency_score": 100.0,
+      "all_gates_passed": true,
+      "made_for_kids": true,
+      "upload_status": "youtube_api_v3",
+      "youtube_video_id": "xOy9DuSwriU"
     }
   ],
-  "last_updated": "2026-10-25T17:45:19.958179"
+  "last_updated": "2026-10-25T19:06:27.118384"
 }

@@ -187,9 +187,13 @@ class VideoComposer:
                 "-vf", video_filter,
                 "-c:v", "libx264",
                 "-preset", "fast",
-                "-crf", "22",
+                "-b:v", "2200k",
+                "-maxrate", "2800k",
+                "-bufsize", "4500k",
+                "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
-                "-b:a", "192k",
+                "-b:a", "160k",
+                "-movflags", "+faststart",
                 "-t", str(duration),
                 output_file
             ]
@@ -201,9 +205,13 @@ class VideoComposer:
                 "-i", audio_input,
                 "-c:v", "libx264",
                 "-preset", "fast",
-                "-crf", "22",
+                "-b:v", "2200k",
+                "-maxrate", "2800k",
+                "-bufsize", "4500k",
+                "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
-                "-b:a", "192k",
+                "-b:a", "160k",
+                "-movflags", "+faststart",
                 "-t", str(duration),
                 output_file
             ]

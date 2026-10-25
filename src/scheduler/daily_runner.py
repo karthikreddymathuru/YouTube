@@ -174,7 +174,12 @@ class DailyRunner:
             "subtitles",
             f"subs_{timestamp_str}.ass"
         )
-        self.subtitle_engine.generate_ass_file(word_timestamps=word_timestamps, output_ass_path=ass_path)
+        self.subtitle_engine.generate_ass_file(
+            word_timestamps=word_timestamps,
+            output_ass_path=ass_path,
+            scene_narrations=[s.narration for s in script.scenes],
+            scene_durations=scene_durations
+        )
 
         bgm_path = self.asset_manager.get_bgm_path(tier=tier, niche=selected_niche)
         final_mp4 = self.composer.assemble_short(

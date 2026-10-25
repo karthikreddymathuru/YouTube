@@ -237,7 +237,12 @@ class StudioProductionAgent:
         ass_dir = os.path.join(self.output_dir, "subtitles")
         os.makedirs(ass_dir, exist_ok=True)
         ass_path = os.path.join(ass_dir, f"subs_{run_id}.ass")
-        self.subtitle_engine.generate_ass_file(word_timestamps=word_timestamps, output_ass_path=ass_path)
+        self.subtitle_engine.generate_ass_file(
+            word_timestamps=word_timestamps,
+            output_ass_path=ass_path,
+            scene_narrations=[s.narration for s in script.scenes],
+            scene_durations=scene_durations
+        )
 
         # 4. Frame-exact 30fps MP4 composition with scene-locked subtitle pills & ducked BGM
         tier = getattr(script, "tier", "younger")

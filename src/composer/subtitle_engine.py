@@ -62,8 +62,26 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             curr_time = 0.0
             for text, dur in zip(scene_narrations, scene_durations):
                 lines = [l.strip().upper() for l in text.split("\n") if l.strip()]
-                # Strip out trailing ellipses for clean visual text
-                clean_lines = [l.replace("...", "").strip() for l in lines]
+                clean_lines = [l.replace("...", "").strip() for l in lines if l.strip()]
+
+                # If only 1 line, split on '...', punctuation, or word midpoint into 2 balanced lines
+                if len(clean_lines) == 1:
+                    raw = text.strip()
+                    if "..." in raw:
+                        parts = [p.strip().upper().replace("...", "") for p in raw.split("...") if p.strip()]
+                        if len(parts) >= 2:
+                            clean_lines = [parts[0], " ".join(parts[1:])]
+                    elif any(punct in raw for punct in [",", "?", "!"]):
+                        import re
+                        chunks = [c.strip().upper() for c in re.split(r"(?<=[,?!])\s+", raw) if c.strip()]
+                        if len(chunks) >= 2:
+                            clean_lines = [chunks[0], " ".join(chunks[1:])]
+                    else:
+                        words = raw.split()
+                        if len(words) >= 6:
+                            mid = len(words) // 2
+                            clean_lines = [" ".join(words[:mid]).upper(), " ".join(words[mid:]).upper()]
+
                 scene_start = curr_time
                 scene_end = curr_time + dur
 

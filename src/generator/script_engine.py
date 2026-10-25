@@ -1380,64 +1380,127 @@ class ScriptEngine:
         """Procedural zero-crash engine generating fresh, compliant 8-scene blueprints for any tier."""
         tier = (tier or "younger").lower()
         topic_seeds = [
-            {
-                "core_entity": "black_hole",
-                "tier": "older",
-                "topic": "Black Holes & Spaghettification",
-                "title": "What Happens If You Fall Into a Black Hole? 🕳️⭐ #shorts",
-                "desc": "Journey past the event horizon where gravity stretches space, time slows down, and matter spaghettifies! #shorts #physics #space #science #astronomy",
-                "tags": ["shorts", "space", "physics", "blackhole", "science", "mindblown", "astronomy"],
-                "badge": "EVENT HORIZON!",
-                "prop": "black_hole_event_horizon",
-                "narrations": [
-                    "What happens to your body if you cross the event horizon of a supermassive black hole?",
-                    "At first, gravitational tidal forces between your head and toes begin pulling with terrifying strength!",
-                    "Astrophysicists call this spaghettification, stretching your atoms out into a thin cosmic noodle of light!",
-                    "From an outside observer's point of view, time slows down so much you appear frozen forever!",
-                    "Inside the photon sphere, light orbits in circles so you could actually see the back of your own head!",
-                    "At the center lies the gravitational singularity, where infinite mass is crushed to zero volume!",
-                    "Hawking radiation slowly leaks quantum particles over trillions of years until the black hole evaporates completely!",
-                    "Would you rather explore inside a supermassive black hole or orbit a spinning neutron star?"
-                ]
-            },
-            {
-                "core_entity": "solar_flare",
-                "tier": "older",
-                "topic": "Solar Flares & Magnetic EMP Storms",
-                "title": "The 100-Million-Degree Solar Flare EMP Showdown! ☀️⚡ #shorts",
-                "desc": "Discover coronal mass ejections, magnetic reconnection, and solar EMP storms! #shorts #science #physics #space",
-                "tags": ["shorts", "science", "sun", "solarflare", "physics", "emp", "space"],
-                "badge": "100M°F SOLAR FLARE!",
-                "prop": "solar_coronal_mass_ejection",
-                "narrations": [
-                    "Every eleven years, the sun unleashes explosions ten million times more powerful than volcanic eruptions!",
-                    "These are solar flares, triggered when twisted magnetic field lines snap and reconnect in milliseconds!",
-                    "Temperatures at the blast site surge to an astonishing one hundred million degrees Fahrenheit!",
-                    "Billions of tons of magnetized plasma shoot into space as a coronal mass ejection!",
-                    "Traveling at two million miles per hour, this particle wave slams into Earth's magnetic shield!",
-                    "It ignites glowing auroras in the sky but can induce electrical currents that knock out city power grids!",
-                    "Today, satellites monitor solar wind so astronauts and power engineers can prepare before the storm hits!",
-                    "Would you rather fly a space probe through a solar flare or witness an aurora from space?"
-                ]
-            },
+            # 1. PRESCHOOL (Ages 4 & Under): Simple rhymes, joyful counting, animal sounds
             {
                 "core_entity": "frog",
                 "tier": "preschool",
-                "topic": "Five Little Tree Frogs Hop & Splash",
+                "topic": "Five Little Frogs Hop & Splash",
                 "title": "Five Little Frogs Hop & Splash! 🐸💚 #shorts",
                 "desc": "Count 1 to 5 with five cheerful green tree frogs hopping across lily pads! Fun singalong for toddlers. #shorts #kids #preschool #counting",
                 "tags": ["shorts", "preschool", "toddlers", "counting", "frogs", "nurseryrhymes"],
                 "badge": "HOP HOP SPLASH!",
                 "prop": "tree_frog_lily_pad",
                 "narrations": [
-                    "Look! One little green tree frog sits happily on a big round lily pad!",
-                    "Two little frogs stretch their bouncy legs and hop: ribbit, ribbit, ribbit!",
-                    "Three little frogs jump high in the air and splash into the water!",
-                    "Four little frogs stick out their long tongues to catch a yummy fly snack!",
-                    "Five little frogs climb up the bamboo tree and smile in the sunshine!",
-                    "Now all five frogs sing a happy song together: ribbit ribbit ribbit ribbit!",
-                    "The gentle evening breeze rocks their lily pads as they close their sleepy eyes!",
-                    "Which do you love best: jumping high like a frog or splashing in the pond?"
+                    "One little froggy... sitting in the sun!\nBouncing on a lily pad... having so much fun!",
+                    "Two little frogs... stretch their legs so high!\nCatching yummy flies... as they flutter by!",
+                    "Three little frogs... jump into the pool!\nSwimming in the pond... feeling nice and cool!",
+                    "Four little frogs... sing a happy song!\nRibbit, ribbit, ribbit... singing all day long!",
+                    "Five little frogs... sitting side by side!\nWatching tiny ripples... on the water wide!",
+                    "Mama Frog calls out... time to come and eat!\nCrunchy little snacks... yummy and so sweet!",
+                    "Five sleepy frogs... rest their tired head!\nTucked in cozy leaves... time to go to bed!",
+                    "Which do you love best... when the frogs play?\nJumping up so high... or splashing all day?"
+                ]
+            },
+            {
+                "core_entity": "puppy",
+                "tier": "preschool",
+                "topic": "Three Happy Puppies Wag & Play",
+                "title": "Three Happy Puppies Wag & Play! 🐶🎾 #shorts",
+                "desc": "Play with three cute fluffy puppies running in the park! Fun puppy song for toddlers. #shorts #kids #preschool #puppy #nurseryrhymes",
+                "tags": ["shorts", "preschool", "toddlers", "puppies", "dogs", "nurseryrhymes"],
+                "badge": "PUPPY PLAYTIME!",
+                "prop": "cute_playful_puppy",
+                "narrations": [
+                    "One little puppy... fluffy and so sweet!\nPattering his paws... down the sunny street!",
+                    "Two little puppies... chasing round a ball!\nRolling in the grass... having such a ball!",
+                    "Three little puppies... wag their tails with glee!\nBarking happy barks... under the shade tree!",
+                    "Puppy number one... loves to fetch a stick!\nRunning super fast... clever and so quick!",
+                    "Puppy number two... jumps up for a treat!\nCatching little biscuits... crunchy and so sweet!",
+                    "Puppy number three... spins in circles round!\nTumbling in leaves... right onto the ground!",
+                    "Now all three puppies... cuddle in a heap!\nYawning tiny yawns... falling fast asleep!",
+                    "Which do you love best... when puppies run?\nChasing after balls... or cuddling in the sun?"
+                ]
+            },
+            # 2. YOUNGER (Ages 5–8): Easy animal superpowers and nature questions
+            {
+                "core_entity": "cat",
+                "tier": "younger",
+                "topic": "Why Do Cats Always Land on Their Feet?",
+                "title": "Why Do Cats Always Land on Their Feet? 🐱🤸 #shorts",
+                "desc": "Discover the incredible gymnastic flip that helps cats land on their paws every time! #shorts #animals #cats #science #kids",
+                "tags": ["shorts", "kids", "animals", "cats", "science", "facts"],
+                "badge": "CAT NINJA FLIP!",
+                "prop": "cat_midair_twist",
+                "narrations": [
+                    "Ever wonder how cats... always land on their feet?\nIt's a secret superpower... super cool and neat!",
+                    "Inside their ears... there is a balance guide!\nIt tells their clever brain... which way is up and wide!",
+                    "First their flexible shoulders... twist their front legs round!\nSpinning like a gymnast... high above the ground!",
+                    "Then their bendy backbone... snaps the back paws tight!\nLining up all four pads... ready for the flight!",
+                    "Their soft paw cushions... act like trampoline springs!\nAbsorbing all the landing bounce... better than anything!",
+                    "Even tiny kittens... learn this ninja trick!\nBy seven weeks of age... they are lightning quick!",
+                    "Their long fluffy tail... balances like a pole!\nHelping them land gently... in total calm control!",
+                    "Would you rather have... ninja cat landing feet?\nOr run up trees like a cat... down the sunny street?"
+                ]
+            },
+            {
+                "core_entity": "dog",
+                "tier": "younger",
+                "topic": "Why Do Dogs Wag Their Tails?",
+                "title": "Why Do Dogs Wag Their Tails? 🐕❤️ #shorts",
+                "desc": "Find out the secret language of dog tail wags and what your furry best friend is saying! #shorts #animals #dogs #pets #facts",
+                "tags": ["shorts", "kids", "dogs", "pets", "animals", "facts"],
+                "badge": "TAIL WAG SECRETS!",
+                "prop": "happy_wagging_dog",
+                "narrations": [
+                    "Have you ever wondered... why dogs wag their tails?\nIt's a secret language... with cheerful happy tales!",
+                    "When a dog is excited... and sees you at the door!\nTheir tail wags back and forth... sweeping on the floor!",
+                    "Wagging to the right side... means feeling super glad!\nWagging to the left side... means nervous or a little sad!",
+                    "A high spinning tail... is like a helicopter blade!\nSaying let's play fetch... in the backyard shade!",
+                    "Even tiny puppies... learn this friendly sign!\nTo tell all their puppy friends... everything is fine!",
+                    "Their wagging tail spreads... a friendly happy scent!\nShowing every friend... what their warm feelings meant!",
+                    "A soft gentle wag... says I love you so!\nGiving you big puppy hugs... everywhere you go!",
+                    "Would you rather speak... the secret language of dogs?\nOr talk to friendly birds... chirping on the logs?"
+                ]
+            },
+            # 3. OLDER (Ages 9–12): Easy everyday science, fun myths, food hacks
+            {
+                "core_entity": "soda",
+                "tier": "older",
+                "topic": "Why Does Soda Explode With Mentos?",
+                "title": "Why Does Soda Explode With Mentos? 🥤💥 #shorts",
+                "desc": "The real science behind the famous Mentos and Diet Coke backyard fountain explosion! #shorts #science #experiment #diy #coolfacts",
+                "tags": ["shorts", "science", "experiment", "soda", "coolfacts", "diy"],
+                "badge": "10-FT SODA GEYSER!",
+                "prop": "soda_geyser_explosion",
+                "narrations": [
+                    "Drop a single candy into soda... and boom!\nA giant fizzy geyser... shoots straight across the room!",
+                    "Is it a chemical explosion? ... Nope, it's physical science!\nSoda is packed with carbon gas... looking for defiance!",
+                    "A candy surface looks smooth... but zoom in super close!\nThere are millions of microscopic pits... on every single dose!",
+                    "Scientists call these... tiny nucleation sites!\nWhere trapped carbon gas bubbles... gather for their flights!",
+                    "The heavy candy sinks to the bottom... lightning fast!\nReleasing billions of gas bubbles... in a massive upward blast!",
+                    "All that foaming pressure... rushes toward the spout!\nBlasting ten feet into the air... with a fizzy shout!",
+                    "Diet soda works best... because aspartame lowers tension!\nCreating the ultimate... backyard science invention!",
+                    "Would you rather launch... a ten-foot soda fountain blast?\nOr build a water rocket... that zooms super fast?"
+                ]
+            },
+            {
+                "core_entity": "brain_freeze",
+                "tier": "older",
+                "topic": "What Actually Causes Brain Freeze?",
+                "title": "What Actually Causes Brain Freeze? 🍦🧠 #shorts",
+                "desc": "Why does eating ice cream too fast give you a crazy frozen headache? The secret science explained! #shorts #science #icecream #brainfreeze #facts",
+                "tags": ["shorts", "science", "icecream", "facts", "brainfreeze", "cool"],
+                "badge": "BRAIN FREEZE HACK!",
+                "prop": "ice_cream_brain_freeze",
+                "narrations": [
+                    "Take a giant bite of ice cream... and suddenly ouch!\nA massive frozen headache... knocks you onto the couch!",
+                    "Is your brain really freezing? ... No, it's an optical trick!\nYour mouth is playing games... super weird and quick!",
+                    "When freezing cold food... hits the roof of your mouth!\nNerves trigger an emergency alarm... heading north and south!",
+                    "Blood vessels instantly expand... rushing warm blood fast!\nTrying to heat your palate... from the icy cold blast!",
+                    "The trigeminal nerve... gets confused by the sudden pain!\nAnd tells your forehead... there is an ice attack again!",
+                    "To stop the brain freeze instantly... here is the secret trick!\nPress your warm tongue against the roof... super firm and quick!",
+                    "Within five seconds... blood vessels calm right down!\nMelting the icy freeze... into a happy smile from a frown!",
+                    "What gives you brain freeze fastest... a giant slushy drink?\nOr eating ice cream super quick... before you even think?"
                 ]
             }
         ]
