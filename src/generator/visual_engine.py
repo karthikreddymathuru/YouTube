@@ -41,6 +41,8 @@ class VisualEngine:
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
         self.hf_token = hf_token or os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN")
         self.hf_model = os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell")
+        self._local_pipeline = None
+        self._local_device = None
         os.makedirs(self.output_dir, exist_ok=True)
         self.reference_sheet_path = os.path.join(self.output_dir, "master_character_sheet.png")
         self._ensure_master_character_sheet()
@@ -163,7 +165,22 @@ class VisualEngine:
             if ai_studio_ok and os.path.exists(output_path):
                 return output_path
 
-        # 3. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer (Safety fallback)
+        # 3. Try Local Apple Silicon Mac Hardware Diffusion (100% Free, Offline, Zero-Quota)
+        local_ok = self._generate_via_local_diffusion(
+            scene_id=scene_id,
+            prompt=prompt,
+            expression=expression,
+            color_state=color_state,
+            visual_prop=visual_prop,
+            badge_text=badge_text,
+            output_path=output_path,
+            tier=tier,
+            narration=narration
+        )
+        if local_ok and os.path.exists(output_path):
+            return output_path
+
+        # 4. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer (Safety fallback)
         return self._render_consistent_character_scene(
             scene_id=scene_id,
             expression=expression,
@@ -231,6 +248,119 @@ class VisualEngine:
                         results[idx] = target_path
 
         return results
+
+    def _generate_via_local_diffusion(
+        self,
+        scene_id: int,
+        prompt: str,
+        expression: str,
+        color_state: str,
+        visual_prop: str,
+        badge_text: str,
+        output_path: str,
+        tier: str = "younger",
+        narration: str = ""
+    ) -> bool:
+        """
+        Generates a realistic 3D Pixar scene locally on MacBook Air (Apple M4 Silicon) using
+        hardware-accelerated Metal Performance Shaders (MPS) with stabilityai/sd-turbo.
+        100% free, offline, zero-quota, and permanent fallback.
+        """
+        try:
+            import torch
+            from diffusers import AutoPipelineForText2Image
+            from PIL import Image, ImageDraw
+
+            tier = (tier or "younger").lower()
+            if tier == "preschool":
+                style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, crystal clear cheerful characters, glowing warm sunlight, sparkling clean atmosphere, deep focus, sharp details, zero blur"
+            elif tier == "older":
+                style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution, pin-sharp details, deep focus"
+            else:
+                style_context = "vibrant 3D Pixar adventure scene, lush colorful nature, bright saturated colors, 8k cinematic lighting, master character art, pin-sharp focus on characters, zero blur"
+
+            clean_prompt = prompt or f"{visual_prop} with {expression} expression"
+            full_prompt = (
+                f"{style_context}, {clean_prompt}. "
+                "Masterpiece, ultra high quality, Disney Pixar 3D CGI animation style, sharp focus, clear detailed faces, family friendly, zero text, zero watermark."
+            )
+
+            # Lazy-load pipeline singleton on Apple Silicon MPS
+            if not hasattr(self, "_local_pipeline") or self._local_pipeline is None:
+                device = "mps" if torch.backends.mps.is_available() else "cpu"
+                try:
+                    pipe = AutoPipelineForText2Image.from_pretrained(
+                        "stabilityai/sd-turbo",
+                        torch_dtype=torch.float16 if device == "mps" else torch.float32,
+                        variant="fp16" if device == "mps" else None,
+                        local_files_only=True
+                    )
+                except Exception:
+                    pipe = AutoPipelineForText2Image.from_pretrained(
+                        "stabilityai/sd-turbo",
+                        torch_dtype=torch.float16 if device == "mps" else torch.float32,
+                        variant="fp16" if device == "mps" else None
+                    )
+                pipe.to(device)
+                self._local_pipeline = pipe
+                self._local_device = device
+
+            # Generate raw image in 1 step via distilled SD-Turbo
+            try:
+                raw_img = self._local_pipeline(
+                    prompt=full_prompt,
+                    num_inference_steps=1,
+                    guidance_scale=0.0
+                ).images[0]
+            except Exception as gen_err:
+                if getattr(self, "_local_device", "") == "mps":
+                    logger.info("MPS compiler restricted; seamlessly executing on CPU fallback...")
+                    self._local_pipeline.to("cpu")
+                    self._local_device = "cpu"
+                    raw_img = self._local_pipeline(
+                        prompt=full_prompt,
+                        num_inference_steps=1,
+                        guidance_scale=0.0
+                    ).images[0]
+                else:
+                    raise gen_err
+
+            im = raw_img.convert("RGB")
+            w, h = im.size
+
+            target_ratio = self.width / float(self.height)
+            curr_ratio = w / float(h)
+            if curr_ratio > target_ratio:
+                new_w = int(h * target_ratio)
+                left = (w - new_w) // 2
+                im = im.crop((left, 0, left + new_w, h))
+            else:
+                new_h = int(w / target_ratio)
+                top = (h - new_h) // 2
+                im = im.crop((0, top, w, top + new_h))
+
+            final_img = im.resize((self.width, self.height), Image.Resampling.LANCZOS)
+            draw = ImageDraw.Draw(final_img, "RGBA")
+
+            self.current_tier = tier
+            self._draw_top_story_banner(draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
+
+            reaction_label = (badge_text.split(":")[-1] if ":" in badge_text else badge_text).strip()[:18]
+            self._draw_leo_reaction_corner(
+                draw=draw,
+                cx=220,
+                cy=1480,
+                expression=expression,
+                label=reaction_label or "WOW!",
+                tier=tier
+            )
+
+            final_img.save(output_path, "PNG", quality=95)
+            logger.info(f"Local M4 Apple Silicon diffusion generated 3D Pixar frame {output_path} (1080x1920, Tier: {tier}).")
+            return True
+        except Exception as e:
+            logger.warning(f"Local offline diffusion generation note for scene {scene_id}: {e}")
+            return False
 
     def _generate_via_huggingface(
         self,
