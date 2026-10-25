@@ -120,9 +120,10 @@ class YouTubeUploader:
         scene_images: Optional[List[str]] = None,
         character_sheet_path: Optional[str] = None,
         visual_audit_report: Optional[Dict[str, Any]] = None,
-        tier: str = "younger"
+        tier: str = "younger",
+        auto_upload: bool = True
     ) -> UploadResult:
-        """Stages the video package locally and uploads to YouTube via API v3 if authenticated."""
+        """Stages the video package locally and uploads to YouTube via API v3 if authenticated and auto_upload is True."""
         stage_res = self._stage_local_package(
             video_path=video_path,
             title=title,
@@ -134,6 +135,10 @@ class YouTubeUploader:
             character_sheet_path=character_sheet_path,
             visual_audit_report=visual_audit_report
         )
+
+        if not auto_upload:
+            logger.info(f"Local test mode: Skipping YouTube upload. Video safely staged locally at {stage_res.package_dir}.")
+            return stage_res
 
         creds_file = self._find_credentials_file()
         token_path = "data/token.json"

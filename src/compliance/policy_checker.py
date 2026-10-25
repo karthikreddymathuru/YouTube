@@ -59,8 +59,9 @@ class PolicyChecker:
 
         full_text_lower = f"{title} {script_text}".lower()
 
-        # 1. Prohibited & dangerous content check
-        found_prohibited = [w for w in self.PROHIBITED_KIDS_TERMS if w in full_text_lower]
+        # 1. Prohibited & dangerous content check (whole words only to avoid false matches like knifefish or diet)
+        import re
+        found_prohibited = [w for w in self.PROHIBITED_KIDS_TERMS if re.search(r"\b" + re.escape(w) + r"\b", full_text_lower)]
         if found_prohibited:
             flags.append(f"Contains sensitive words for kids audience: {', '.join(found_prohibited)}")
             score -= 35.0

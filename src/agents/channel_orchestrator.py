@@ -391,6 +391,7 @@ class PublishingManagerAgent:
             character_sheet_path=self.visual_engine.reference_sheet_path,
             visual_audit_report=quality_result.get("visual_audit", {}),
             tier=tier,
+            auto_upload=auto_upload
         )
         upload_dict = upload_res.to_dict()
         package_dir = upload_dict.get("package_dir") or os.path.dirname(mp4_path)
