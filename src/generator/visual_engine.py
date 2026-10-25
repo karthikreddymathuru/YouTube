@@ -215,16 +215,16 @@ class VisualEngine:
         """
         tier = (tier or "younger").lower()
         if tier == "preschool":
-            style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, cute soft rounded shapes, glowing warm sunlight, sweet cheerful atmosphere"
+            style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, crystal clear cheerful characters, glowing warm sunlight, sparkling clean atmosphere, deep focus, f/8 aperture, entire frame in sharp focus, zero blur, zero bokeh"
         elif tier == "older":
-            style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution"
+            style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution, pin-sharp details, zero blur, deep focus"
         else:
-            style_context = "vibrant 3D Pixar adventure scene, lush tropical nature, bright saturated colors, 8k cinematic lighting, master character art"
+            style_context = "vibrant 3D Pixar adventure scene, lush tropical nature, bright saturated colors, 8k cinematic lighting, master character art, pin-sharp focus on all characters, zero blur"
 
         clean_prompt = prompt or f"{visual_prop} with {expression} expression"
         full_prompt = (
             f"{style_context}, {clean_prompt}. "
-            "Masterpiece, ultra high quality, Disney Pixar style, 3D render, Unreal Engine 5, smooth textures, sharp focus, family friendly, zero text, zero watermark."
+            "Masterpiece, ultra high quality, Disney Pixar 3D CGI animation style, sharp focus, clear detailed faces and eyes, family friendly, zero text, zero watermark, no depth of field blur, no bokeh."
         )
 
         image_bytes = None
