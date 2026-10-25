@@ -475,22 +475,25 @@ class VoiceEngine:
             scene_aiff = output_path.replace(".wav", f"_scene_{idx+1}.aiff")
             scene_wav = output_path.replace(".wav", f"_scene_{idx+1}.wav")
 
-            tier = getattr(scene, "tier", "younger")
+            tier = (getattr(scene, "tier", "younger") or "younger").lower()
             v_name = voice_name
             if tier == "preschool":
-                v_name = "Samantha"
+                v_name = "Junior"  # Playful energetic kid voice
             elif tier == "older":
-                v_name = "Daniel" if os.path.exists("/usr/bin/say") else voice_name
+                v_name = "Reed" if os.path.exists("/usr/bin/say") else voice_name
+            else:
+                v_name = "Sandy"
 
-            cmd_say = ["/usr/bin/say", "-v", v_name, "-r", "165", "-o", scene_aiff, scene_text]
+            cmd_say = ["/usr/bin/say", "-v", v_name, "-r", "160", "-o", scene_aiff, scene_text]
             res = subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if res.returncode != 0:
-                cmd_say = ["/usr/bin/say", "-v", "Samantha", "-r", "165", "-o", scene_aiff, scene_text]
+                cmd_say = ["/usr/bin/say", "-v", "Samantha", "-r", "160", "-o", scene_aiff, scene_text]
                 subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
 
-            # Convert AIFF to 24kHz 16-bit mono WAV
+            # Convert AIFF to 24kHz 16-bit mono WAV with melodic acoustic warmth and gentle presence
+            audio_filter = "equalizer=f=3200:t=q:w=1:g=2,aecho=0.8:0.25:18:0.12"
             subprocess.run(
-                [self.ffmpeg_exe, "-y", "-i", scene_aiff, "-ar", str(self.sample_rate), "-ac", "1", scene_wav],
+                [self.ffmpeg_exe, "-y", "-i", scene_aiff, "-af", audio_filter, "-ar", str(self.sample_rate), "-ac", "1", scene_wav],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 check=True

@@ -1958,18 +1958,39 @@ class VisualEngine:
     ):
         """Draws a circular Picture-in-Picture reaction cam featuring a realistic child avatar tailored to the age tier."""
         r = 135
-        # Outer golden ring with dark backdrop
-        draw.ellipse([cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8], fill=(255, 215, 0, 255))
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(28, 38, 66, 255))
-
-        # Render age-appropriate realistic kid avatar
         tier = (tier or getattr(self, "current_tier", "younger") or "younger").lower()
-        if tier == "preschool":
-            self._draw_realistic_toddler_avatar(draw, cx=cx, cy=cy - 8, scale=0.86, expression=expression)
-        elif tier == "older":
-            self._draw_realistic_older_tween_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
-        else:
-            self._draw_realistic_younger_kid_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
+        avatar_file = os.path.join("data", "branding", f"avatar_{tier}.png")
+
+        canvas = getattr(draw, "_image", None)
+        rendered_photo = False
+
+        if canvas and os.path.exists(avatar_file):
+            try:
+                from PIL import ImageOps
+                av_im = Image.open(avatar_file).convert("RGBA")
+                av_cropped = ImageOps.fit(av_im, (2 * r, 2 * r), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+                mask = Image.new("L", (2 * r, 2 * r), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.ellipse([0, 0, 2 * r, 2 * r], fill=255)
+                canvas.paste(av_cropped, (cx - r, cy - r), mask)
+                rendered_photo = True
+            except Exception as e:
+                logger.debug(f"Failed to composite photo avatar: {e}")
+
+        if not rendered_photo:
+            # Fallback backdrop if image asset is missing
+            draw.ellipse([cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8], fill=(255, 215, 0, 255))
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(28, 38, 66, 255))
+            if tier == "preschool":
+                self._draw_realistic_toddler_avatar(draw, cx=cx, cy=cy - 8, scale=0.86, expression=expression)
+            elif tier == "older":
+                self._draw_realistic_older_tween_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
+            else:
+                self._draw_realistic_younger_kid_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
+
+        # Double golden ring border on top of the photo
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 215, 0, 255), width=8)
+        draw.ellipse([cx - r - 6, cy - r - 6, cx + r + 6, cy + r + 6], outline=(255, 240, 150, 200), width=3)
 
         # Fitted reaction label badge at bottom of circular PiP
         badge_rect = [cx - 135, cy + r - 32, cx + 135, cy + r + 24]
