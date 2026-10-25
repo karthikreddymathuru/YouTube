@@ -1129,6 +1129,7 @@ class Scene(BaseModel):
     visual_prop: str = Field(default="boiling_geyser")
     visual_badge_text: str = Field(default="100°C BOILING!")
     sfx_cue: str = Field(default="whoosh")
+    tier: str = Field(default="younger")
 
 
 class ShortScript(BaseModel):
@@ -1437,7 +1438,8 @@ class ScriptEngine:
                     character_color_state=bp["character_color_state"],
                     visual_prop=bp["visual_prop"],
                     visual_badge_text=bp["visual_badge_text"],
-                    sfx_cue=bp["sfx_cue"]
+                    sfx_cue=bp["sfx_cue"],
+                    tier=tier
                 )
             )
 

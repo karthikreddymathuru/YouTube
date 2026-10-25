@@ -240,7 +240,8 @@ class StudioProductionAgent:
         self.subtitle_engine.generate_ass_file(word_timestamps=word_timestamps, output_ass_path=ass_path)
 
         # 4. Frame-exact 30fps MP4 composition with scene-locked subtitle pills & ducked BGM
-        bgm_path = self.asset_manager.get_default_bgm_path()
+        tier = getattr(script, "tier", "younger")
+        bgm_path = self.asset_manager.get_bgm_path(tier=tier)
         final_mp4 = self.composer.assemble_short(
             scene_images=scene_images,
             scene_durations=scene_durations,

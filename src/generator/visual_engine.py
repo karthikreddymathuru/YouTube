@@ -142,6 +142,8 @@ class VisualEngine:
             if ai_studio_ok and os.path.exists(output_path):
                 return output_path
 
+        tier = kwargs.get("tier") or getattr(scene, "tier", None)
+
         # 2. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer
         return self._render_consistent_character_scene(
             scene_id=scene_id,
@@ -150,7 +152,8 @@ class VisualEngine:
             visual_prop=visual_prop,
             badge_text=badge_text,
             narration=narration,
-            output_path=output_path
+            output_path=output_path,
+            tier=tier
         )
 
     def generate_all_scenes_parallel(self, scenes: List[Any], filename_prefix: str = "scene") -> List[str]:
@@ -280,7 +283,8 @@ class VisualEngine:
         badge_text: str,
         narration: str,
         output_path: str,
-        anim_phase: float = 0.0
+        anim_phase: float = 0.0,
+        tier: Optional[str] = None
     ) -> str:
         """
         Renders a 1080x1920 rich storyboard scene featuring Pip the Flamingo and Leo the Explorer Kid
@@ -304,6 +308,17 @@ class VisualEngine:
         is_eel = "eel" in visual_prop.lower() or "electrocyte" in visual_prop.lower() or "860" in visual_prop.lower() or "eel" in low_narr
         is_tardigrade = "tardigrade" in visual_prop.lower() or "water_bear" in visual_prop.lower() or "tardigrade" in low_narr or "cryptobiosis" in visual_prop.lower()
         is_flamingo = "flamingo" in visual_prop.lower() or "flamingo" in low_narr or visual_prop in ("boiling_geyser", "beak_shield", "hatching_egg", "glowing_shrimp", "color_transformation", "one_leg_ice", "knee_gear_lock")
+
+        # Automatically determine active age tier for kid avatar and visual styling
+        if tier:
+            current_tier = str(tier).lower()
+        elif is_duckling or "preschool" in low_narr or "toddler" in low_narr or "nursery" in low_narr:
+            current_tier = "preschool"
+        elif is_nitrogen or "older" in low_narr or "freeze" in low_narr or "kelvin" in low_narr or "quantum" in low_narr:
+            current_tier = "older"
+        else:
+            current_tier = "younger"
+        self.current_tier = current_tier
 
         # --- OCTOPUS & OCEAN EPISODES ---
         if is_octopus:
@@ -1498,80 +1513,328 @@ class VisualEngine:
         cy: int,
         scale: float = 1.0,
         expression: str = "happy",
-        anim_phase: float = 0.0
+        anim_phase: float = 0.0,
+        tier: Optional[str] = None
     ):
         """
-        Draws "Leo the Explorer Kid" (7-year-old boy with warm tan skin, curly dark brown hair,
-        bright yellow explorer cap, big brown 3D eyes, and teal explorer hoodie) with 100% face consistency.
+        Draws the age-appropriate realistic child avatar tailored to the current tier:
+        - Preschool: cute, realistic toddler avatar (Ages 4 & under)
+        - Younger: realistic elementary school kid avatar (Ages 5–8)
+        - Older: modern realistic tween student avatar (Ages 9–12)
         """
-        skin_col = (238, 182, 138, 255)
-        skin_outline = (145, 92, 58, 255)
-        hair_col = (58, 36, 24, 255)
-        cap_col = (255, 210, 25, 255)
-        hoodie_col = (0, 175, 195, 255)
+        active_tier = (tier or getattr(self, "current_tier", "younger") or "younger").lower()
+        if active_tier == "preschool":
+            self._draw_realistic_toddler_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
+        elif active_tier == "older":
+            self._draw_realistic_older_tween_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
+        else:
+            self._draw_realistic_younger_kid_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
 
-        # 1. Teal Explorer Hoodie Torso
-        tw = int(95 * scale)
-        th = int(125 * scale)
-        draw.rounded_rectangle([cx - tw, cy + int(55 * scale), cx + tw, cy + int(55 * scale) + th], radius=int(35 * scale), fill=hoodie_col, outline=(0, 105, 125, 255), width=5)
-        # Golden star explorer badge on hoodie
-        self._draw_gold_star_badge(draw, cx, cy + int(115 * scale), radius=int(22 * scale))
+    def _draw_realistic_toddler_avatar(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        expression: str = "happy"
+    ):
+        """Draws a cute, realistic toddler child avatar (Ages 4 & under: soft curls, chubby cheeks, big sparkly eyes)."""
+        skin_col = (244, 196, 170, 255)
+        skin_outline = (165, 108, 78, 255)
+        hair_col = (68, 42, 28, 255)
+        hair_highlight = (98, 65, 46, 255)
+        shirt_col = (255, 225, 120, 255)  # Pastel yellow cozy toddler crewneck
 
-        # 2. Head Circle
-        hr = int(78 * scale)
-        draw.ellipse([cx - hr, cy - hr, cx + hr, cy + hr], fill=skin_col, outline=skin_outline, width=5)
+        # 1. Pastel Toddler Crewneck Sweater
+        tw = int(90 * scale)
+        th = int(105 * scale)
+        draw.rounded_rectangle(
+            [cx - tw, cy + int(48 * scale), cx + tw, cy + int(48 * scale) + th],
+            radius=int(32 * scale), fill=shirt_col, outline=(215, 175, 75, 255), width=4
+        )
+        # Soft collar curve
+        draw.arc([cx - int(38 * scale), cy + int(42 * scale), cx + int(38 * scale), cy + int(68 * scale)], start=0, end=180, fill=(215, 175, 75, 255), width=4)
+
+        # 2. Rounded Toddler Head with cute baby proportions
+        hr = int(74 * scale)
+        draw.ellipse([cx - hr, cy - hr, cx + hr, cy + hr], fill=skin_col, outline=skin_outline, width=4)
 
         # Ears
-        er_ear = int(20 * scale)
-        draw.ellipse([cx - hr - er_ear // 2, cy - er_ear, cx - hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=4)
-        draw.ellipse([cx + hr - er_ear // 2, cy - er_ear, cx + hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=4)
+        er_ear = int(18 * scale)
+        draw.ellipse([cx - hr - er_ear // 2, cy - er_ear, cx - hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
+        draw.ellipse([cx + hr - er_ear // 2, cy - er_ear, cx + hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
 
-        # 3. Curly Dark Brown Hair puffs
-        for dx, dy, r_puff in [(-55, -52, 26), (-25, -66, 28), (15, -66, 28), (52, -52, 26)]:
+        # 3. Natural soft baby curls (framing face naturally, NO hat!)
+        curls = [
+            (-62, -45, 26), (-42, -68, 28), (-16, -78, 30),
+            (16, -78, 30), (42, -68, 28), (62, -45, 26),
+            (-52, -22, 20), (52, -22, 20), (-25, -60, 24), (25, -60, 24)
+        ]
+        for dx, dy, r_c in curls:
             px = cx + int(dx * scale)
             py = cy + int(dy * scale)
-            pr = int(r_puff * scale)
+            pr = int(r_c * scale)
             draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=hair_col)
 
-        # 4. Signature Bright Yellow Explorer Cap
-        draw.pieslice([cx - hr - 6, cy - int(128 * scale), cx + hr + 6, cy - int(25 * scale)], start=180, end=360, fill=cap_col, outline=(180, 130, 0, 255), width=4)
-        draw.rounded_rectangle([cx - hr - int(15 * scale), cy - int(82 * scale), cx + hr + int(35 * scale), cy - int(62 * scale)], radius=10, fill=(255, 190, 0, 255), outline=(180, 130, 0, 255), width=3)
+        # Soft curls highlights for depth
+        for dx, dy, r_c in [(-38, -65, 14), (0, -74, 16), (38, -65, 14)]:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int(r_c * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=hair_highlight)
 
-        # 5. Big Expressive Brown 3D Pixar Eyes
-        eye_y = cy - int(8 * scale)
-        for ex_off in (-30, 30):
+        # 4. Big Sparkly Curious Toddler Eyes
+        eye_y = cy - int(4 * scale)
+        for ex_off in (-28, 28):
             ex = cx + int(ex_off * scale)
             er = int(22 * scale)
-            draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=(55, 35, 25, 255), width=3)
+            draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=(55, 38, 28, 255), width=3)
+            ir = int(er * (0.75 if expression != "shocked" else 0.62))
+            draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=(125, 72, 36, 255))
+            pr = int(ir * 0.58)
+            draw.ellipse([ex - pr, eye_y - pr, ex + pr, eye_y + pr], fill=(25, 18, 14, 255))
+            hl = max(int(er * 0.32), 4)
+            draw.ellipse([ex - int(er * 0.36), eye_y - int(er * 0.42), ex - int(er * 0.36) + hl, eye_y - int(er * 0.42) + hl], fill=(255, 255, 255, 255))
+            hl2 = max(int(er * 0.16), 2)
+            draw.ellipse([ex + int(er * 0.14), eye_y + int(er * 0.18), ex + int(er * 0.14) + hl2, eye_y + int(er * 0.18) + hl2], fill=(255, 255, 255, 190))
+
+        # 5. Adorable button nose & rosy toddler cheeks
+        draw.ellipse([cx - int(6 * scale), cy + int(10 * scale), cx + int(6 * scale), cy + int(20 * scale)], fill=(225, 155, 120, 255))
+        for ch_off in (-42, 42):
+            draw.ellipse(
+                [cx + int(ch_off * scale) - int(16 * scale), cy + int(14 * scale), cx + int(ch_off * scale) + int(16 * scale), cy + int(34 * scale)],
+                fill=(255, 115, 125, 140)
+            )
+
+        # 6. Mouth: sweet baby smile or wide awe
+        if expression == "shocked":
+            mr = int(15 * scale)
+            draw.ellipse([cx - mr, cy + int(28 * scale), cx + mr, cy + int(28 * scale) + int(mr * 1.35)], fill=(185, 45, 65, 255), outline=skin_outline, width=3)
+        else:
+            draw.pieslice([cx - int(24 * scale), cy + int(20 * scale), cx + int(24 * scale), cy + int(50 * scale)], start=0, end=180, fill=(225, 65, 85, 255), outline=skin_outline, width=3)
+            draw.rounded_rectangle([cx - int(10 * scale), cy + int(22 * scale), cx + int(10 * scale), cy + int(30 * scale)], radius=3, fill=(255, 255, 255, 255))
+
+    def _draw_realistic_younger_kid_avatar(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        expression: str = "happy"
+    ):
+        """Draws a realistic elementary school child avatar (Ages 5–8: natural layered hair, cheerful smile, active tee)."""
+        skin_col = (238, 185, 145, 255)
+        skin_outline = (155, 96, 62, 255)
+        hair_col = (52, 34, 24, 255)
+        hair_highlight = (82, 54, 38, 255)
+        shirt_col = (0, 160, 235, 255)  # Bright explorer cyan tee
+
+        # 1. Modern Explorer Crewneck Tee
+        tw = int(95 * scale)
+        th = int(115 * scale)
+        draw.rounded_rectangle(
+            [cx - tw, cy + int(50 * scale), cx + tw, cy + int(50 * scale) + th],
+            radius=int(30 * scale), fill=shirt_col, outline=(0, 105, 175, 255), width=4
+        )
+        draw.arc([cx - int(35 * scale), cy + int(44 * scale), cx + int(35 * scale), cy + int(72 * scale)], start=0, end=180, fill=(255, 215, 0, 255), width=4)
+
+        # 2. Balanced Elementary Kid Head
+        hr = int(75 * scale)
+        draw.ellipse([cx - hr, cy - hr, cx + hr, cy + hr], fill=skin_col, outline=skin_outline, width=4)
+
+        # Ears
+        er_ear = int(19 * scale)
+        draw.ellipse([cx - hr - er_ear // 2, cy - er_ear, cx - hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
+        draw.ellipse([cx + hr - er_ear // 2, cy - er_ear, cx + hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
+
+        # 3. Modern textured side-parted hair (clean, natural, NO cap)
+        strands = [
+            (-64, -48, 26), (-45, -72, 28), (-18, -82, 30),
+            (14, -80, 28), (42, -70, 26), (64, -46, 24),
+            (-54, -26, 20), (54, -26, 20), (-32, -62, 24), (22, -64, 24)
+        ]
+        for dx, dy, r_s in strands:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int(r_s * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=hair_col)
+
+        # Side-swept bangs across forehead
+        draw.pieslice([cx - hr + int(5 * scale), cy - int(92 * scale), cx + hr - int(10 * scale), cy - int(32 * scale)], start=160, end=350, fill=hair_col)
+        draw.pieslice([cx - int(45 * scale), cy - int(86 * scale), cx + int(35 * scale), cy - int(38 * scale)], start=170, end=340, fill=hair_highlight)
+
+        # 4. Bright Hazel-Brown Expressive Eyes
+        eye_y = cy - int(6 * scale)
+        for ex_off in (-28, 28):
+            ex = cx + int(ex_off * scale)
+            er = int(21 * scale)
+            draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=(50, 32, 20, 255), width=3)
             ir = int(er * (0.68 if expression != "shocked" else 0.55))
-            draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=(115, 62, 28, 255))
+            draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=(110, 65, 30, 255))
             pr = int(ir * 0.55)
             draw.ellipse([ex - pr, eye_y - pr, ex + pr, eye_y + pr], fill=(20, 15, 12, 255))
-            # Catchlight
-            hl = max(int(er * 0.28), 4)
+            hl = max(int(er * 0.3), 4)
             draw.ellipse([ex - int(er * 0.35), eye_y - int(er * 0.4), ex - int(er * 0.35) + hl, eye_y - int(er * 0.4) + hl], fill=(255, 255, 255, 255))
 
-        # Cute nose & rosy cheeks
-        draw.ellipse([cx - int(8 * scale), cy + int(6 * scale), cx + int(8 * scale), cy + int(18 * scale)], fill=(215, 150, 108, 255))
+        # 5. Nose & Cheeks
+        draw.ellipse([cx - int(7 * scale), cy + int(8 * scale), cx + int(7 * scale), cy + int(18 * scale)], fill=(215, 150, 110, 255))
         for ch_off in (-44, 44):
-            draw.ellipse([cx + int(ch_off * scale) - int(16 * scale), cy + int(14 * scale), cx + int(ch_off * scale) + int(16 * scale), cy + int(32 * scale)], fill=(255, 105, 115, 130))
+            draw.ellipse(
+                [cx + int(ch_off * scale) - int(15 * scale), cy + int(12 * scale), cx + int(ch_off * scale) + int(15 * scale), cy + int(30 * scale)],
+                fill=(255, 110, 120, 120)
+            )
 
-        # Mouth expression
+        # 6. Cheerful grin
         if expression == "shocked":
-            mr = int(18 * scale)
+            mr = int(17 * scale)
+            draw.ellipse([cx - mr, cy + int(26 * scale), cx + mr, cy + int(26 * scale) + int(mr * 1.4)], fill=(185, 45, 65, 255), outline=skin_outline, width=3)
+        else:
+            draw.pieslice([cx - int(26 * scale), cy + int(16 * scale), cx + int(26 * scale), cy + int(52 * scale)], start=0, end=180, fill=(220, 60, 80, 255), outline=skin_outline, width=3)
+            draw.rectangle([cx - int(16 * scale), cy + int(18 * scale), cx + int(16 * scale), cy + int(26 * scale)], fill=(255, 255, 255, 255))
+
+    def _draw_realistic_older_tween_avatar(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        expression: str = "happy"
+    ):
+        """Draws a realistic older tween avatar (Ages 9–12: stylish haircut, defined jawline, sleek tech hoodie)."""
+        skin_col = (235, 180, 142, 255)
+        skin_outline = (150, 92, 60, 255)
+        hair_col = (38, 28, 24, 255)
+        hair_highlight = (65, 48, 42, 255)
+        hoodie_col = (24, 34, 54, 255)  # Modern dark navy tech hoodie
+
+        # 1. Sleek Tech Hoodie Torso
+        tw = int(98 * scale)
+        th = int(120 * scale)
+        draw.rounded_rectangle(
+            [cx - tw, cy + int(52 * scale), cx + tw, cy + int(52 * scale) + th],
+            radius=int(26 * scale), fill=hoodie_col, outline=(15, 22, 38, 255), width=4
+        )
+        draw.polygon(
+            [(cx - int(28 * scale), cy + int(52 * scale)), (cx, cy + int(92 * scale)), (cx + int(28 * scale), cy + int(52 * scale))],
+            fill=(0, 215, 245, 255)
+        )
+
+        # 2. Mature Tween Head (slightly leaner jaw)
+        hr = int(74 * scale)
+        draw.ellipse([cx - hr, cy - hr, cx + hr, cy + hr], fill=skin_col, outline=skin_outline, width=4)
+
+        # Ears
+        er_ear = int(19 * scale)
+        draw.ellipse([cx - hr - er_ear // 2, cy - er_ear, cx - hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
+        draw.ellipse([cx + hr - er_ear // 2, cy - er_ear, cx + hr + er_ear // 2, cy + er_ear], fill=skin_col, outline=skin_outline, width=3)
+
+        # 3. Modern Stylish Textured Haircut (cool textured fade/quiff)
+        fade_layers = [
+            (-65, -50, 24), (-48, -75, 26), (-20, -86, 28),
+            (12, -86, 28), (42, -76, 26), (62, -52, 24),
+            (-30, -70, 22), (20, -72, 22)
+        ]
+        for dx, dy, r_f in fade_layers:
+            px = cx + int(dx * scale)
+            py = cy + int(dy * scale)
+            pr = int(r_f * scale)
+            draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=hair_col)
+
+        draw.rounded_rectangle(
+            [cx - int(55 * scale), cy - int(96 * scale), cx + int(45 * scale), cy - int(56 * scale)],
+            radius=int(16 * scale), fill=hair_col
+        )
+        draw.rounded_rectangle(
+            [cx - int(38 * scale), cy - int(92 * scale), cx + int(32 * scale), cy - int(64 * scale)],
+            radius=int(12 * scale), fill=hair_highlight
+        )
+
+        # 4. Inquisitive Focused Eyes & Eyebrows
+        eye_y = cy - int(5 * scale)
+        for ex_off in (-28, 28):
+            ex = cx + int(ex_off * scale)
+            er = int(19 * scale)
+            by_off = -er - int(10 * scale)
+            draw.line([(ex - er, eye_y + by_off), (ex + er, eye_y + by_off + int(2 * scale))], fill=(40, 28, 22, 255), width=int(4 * scale))
+
+            draw.ellipse([ex - er, eye_y - er, ex + er, eye_y + er], fill=(255, 255, 255, 255), outline=(42, 28, 18, 255), width=3)
+            ir = int(er * (0.65 if expression != "shocked" else 0.52))
+            draw.ellipse([ex - ir, eye_y - ir, ex + ir, eye_y + ir], fill=(70, 48, 32, 255))
+            pr = int(ir * 0.52)
+            draw.ellipse([ex - pr, eye_y - pr, ex + pr, eye_y + pr], fill=(15, 12, 10, 255))
+            hl = max(int(er * 0.3), 3)
+            draw.ellipse([ex - int(er * 0.35), eye_y - int(er * 0.4), ex - int(er * 0.35) + hl, eye_y - int(er * 0.4) + hl], fill=(255, 255, 255, 255))
+
+        # 5. Refined Nose
+        draw.line([(cx, cy + int(4 * scale)), (cx - int(4 * scale), cy + int(16 * scale)), (cx + int(4 * scale), cy + int(16 * scale))], fill=skin_outline, width=3)
+
+        # 6. Smart Confident Smile or Shocked Mindblown mouth
+        if expression == "shocked":
+            mr = int(17 * scale)
             draw.ellipse([cx - mr, cy + int(28 * scale), cx + mr, cy + int(28 * scale) + int(mr * 1.4)], fill=(185, 45, 65, 255), outline=skin_outline, width=3)
         else:
-            draw.pieslice([cx - int(28 * scale), cy + int(18 * scale), cx + int(28 * scale), cy + int(56 * scale)], start=0, end=180, fill=(220, 60, 80, 255), outline=skin_outline, width=3)
+            draw.arc([cx - int(24 * scale), cy + int(18 * scale), cx + int(24 * scale), cy + int(48 * scale)], start=10, end=170, fill=(195, 55, 75, 255), width=4)
 
-    def _draw_leo_reaction_corner(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, expression: str, label: str):
-        """Draws a circular Picture-in-Picture reaction cam of Leo the Explorer Kid so both recurring characters appear."""
+    def _draw_realistic_companion_kid(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        expression: str = "happy",
+        tier: Optional[str] = None,
+        anim_phase: float = 0.0
+    ):
+        """Draws the age-appropriate realistic child companion (toddler for preschool, kid for younger, tween for older)."""
+        tier = (tier or getattr(self, "current_tier", "younger") or "younger").lower()
+        if tier == "preschool":
+            self._draw_realistic_toddler_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
+        elif tier == "older":
+            self._draw_realistic_older_tween_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
+        else:
+            self._draw_realistic_younger_kid_avatar(draw, cx=cx, cy=cy, scale=scale, expression=expression)
+
+    def _draw_leo_reaction_corner(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        expression: str,
+        label: str,
+        tier: Optional[str] = None
+    ):
+        """Draws a circular Picture-in-Picture reaction cam featuring a realistic child avatar tailored to the age tier."""
         r = 135
+        # Outer golden ring with dark backdrop
         draw.ellipse([cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8], fill=(255, 215, 0, 255))
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(32, 48, 88, 255))
-        self._draw_leo_character(draw, cx=cx, cy=cy - 10, scale=0.72, expression=expression)
-        draw.rounded_rectangle([cx - 130, cy + r - 32, cx + 130, cy + r + 22], radius=16, fill=(255, 60, 110, 255), outline=(255, 255, 255, 255), width=3)
-        font = self._get_font(26)
-        draw.text((cx, cy + r - 5), label, fill=(255, 255, 255), font=font, anchor="mm")
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(28, 38, 66, 255))
+
+        # Render age-appropriate realistic kid avatar
+        tier = (tier or getattr(self, "current_tier", "younger") or "younger").lower()
+        if tier == "preschool":
+            self._draw_realistic_toddler_avatar(draw, cx=cx, cy=cy - 8, scale=0.86, expression=expression)
+        elif tier == "older":
+            self._draw_realistic_older_tween_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
+        else:
+            self._draw_realistic_younger_kid_avatar(draw, cx=cx, cy=cy - 8, scale=0.84, expression=expression)
+
+        # Fitted reaction label badge at bottom of circular PiP
+        badge_rect = [cx - 135, cy + r - 32, cx + 135, cy + r + 24]
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=badge_rect,
+            text=label.upper(),
+            fill_text=(255, 255, 255),
+            box_fill=(255, 55, 105, 250),
+            box_outline=(255, 255, 255, 255),
+            outline_width=3,
+            radius=16,
+            initial_font_size=24,
+            min_font_size=14,
+            padding_x=12,
+            padding_y=4,
+            max_lines=2
+        )
 
     def _draw_gold_star_badge(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int = 24):
         """Draws the signature 5-point golden star badge worn by Pip and Leo in every scene."""
@@ -1875,34 +2138,157 @@ class VisualEngine:
 
         # Left Card
         draw.rounded_rectangle([80, y - 80, 490, y + 80], radius=24, fill=(255, 65, 95, 245), outline=(255, 255, 255, 255), width=5)
-        draw.text((285, y - 22), "SUPERPOWER #1", fill=(255, 235, 130), font=font, anchor="mm")
-        draw.text((285, y + 25), card1_text, fill=(255, 255, 255), font=font, anchor="mm")
+        draw.text((285, y - 28), "SUPERPOWER #1", fill=(255, 235, 130), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[95, y - 2, 475, y + 68],
+            text=card1_text,
+            fill_text=(255, 255, 255),
+            initial_font_size=28,
+            min_font_size=16,
+            padding_x=10,
+            padding_y=4,
+            max_lines=2
+        )
 
         # Right Card
         draw.rounded_rectangle([590, y - 80, 1000, y + 80], radius=24, fill=(0, 165, 235, 245), outline=(255, 255, 255, 255), width=5)
-        draw.text((795, y - 22), "SUPERPOWER #2", fill=(255, 235, 130), font=font, anchor="mm")
-        draw.text((795, y + 25), card2_text, fill=(255, 255, 255), font=font, anchor="mm")
+        draw.text((795, y - 28), "SUPERPOWER #2", fill=(255, 235, 130), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[605, y - 2, 985, y + 68],
+            text=card2_text,
+            fill_text=(255, 255, 255),
+            initial_font_size=28,
+            min_font_size=16,
+            padding_x=10,
+            padding_y=4,
+            max_lines=2
+        )
+
+    def _draw_fitted_box_text(
+        self,
+        draw: ImageDraw.ImageDraw,
+        box_rect: List[int],
+        text: str,
+        fill_text: Tuple[int, ...] = (255, 255, 255),
+        box_fill: Optional[Tuple[int, ...]] = None,
+        box_outline: Optional[Tuple[int, ...]] = None,
+        outline_width: int = 0,
+        radius: int = 20,
+        initial_font_size: int = 42,
+        min_font_size: int = 18,
+        padding_x: int = 24,
+        padding_y: int = 12,
+        max_lines: int = 2
+    ):
+        """
+        Draws text strictly contained within `box_rect` [x0, y0, x1, y1].
+        Dynamically calculates font bounding box and auto-scales down font size or wraps
+        so text NEVER overflows outside the box edges under any circumstances.
+        """
+        x0, y0, x1, y1 = box_rect
+        box_w = x1 - x0
+        box_h = y1 - y0
+        cx = (x0 + x1) // 2
+        cy = (y0 + y1) // 2
+
+        if box_fill is not None:
+            if box_outline is not None and outline_width > 0:
+                draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=box_fill, outline=box_outline, width=outline_width)
+            else:
+                draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=box_fill)
+
+        avail_w = max(box_w - 2 * padding_x, 20)
+        avail_h = max(box_h - 2 * padding_y, 16)
+        clean_text = " ".join(text.strip().split())
+
+        # Auto-fitting algorithm
+        chosen_font = None
+        chosen_lines = [clean_text]
+        line_height = 0
+
+        for f_size in range(initial_font_size, min_font_size - 1, -2):
+            font = self._get_font(f_size)
+            # Try single line
+            bbox = font.getbbox(clean_text)
+            text_w = bbox[2] - bbox[0]
+            text_h = bbox[3] - bbox[1]
+            if text_w <= avail_w and text_h <= avail_h:
+                chosen_font = font
+                chosen_lines = [clean_text]
+                line_height = text_h
+                break
+
+            # Try 2 lines if allowed
+            if max_lines >= 2:
+                words = clean_text.split()
+                if len(words) >= 2:
+                    mid = len(words) // 2
+                    line1 = " ".join(words[:mid])
+                    line2 = " ".join(words[mid:])
+                    bb1 = font.getbbox(line1)
+                    bb2 = font.getbbox(line2)
+                    w1 = bb1[2] - bb1[0]
+                    w2 = bb2[2] - bb2[0]
+                    h1 = bb1[3] - bb1[1]
+                    h2 = bb2[3] - bb2[1]
+                    total_h = h1 + h2 + 8
+                    if max(w1, w2) <= avail_w and total_h <= avail_h:
+                        chosen_font = font
+                        chosen_lines = [line1, line2]
+                        line_height = max(h1, h2)
+                        break
+
+        # If still doesn't fit at min_font_size, truncate with ellipsis
+        if chosen_font is None:
+            chosen_font = self._get_font(min_font_size)
+            words = clean_text.split()
+            if max_lines >= 2 and len(words) >= 2:
+                mid = len(words) // 2
+                l1 = " ".join(words[:mid])
+                l2 = " ".join(words[mid:])
+                while l1 and (chosen_font.getbbox(l1 + "...")[2] - chosen_font.getbbox(l1 + "...")[0]) > avail_w:
+                    l1 = " ".join(l1.split()[:-1])
+                while l2 and (chosen_font.getbbox(l2 + "...")[2] - chosen_font.getbbox(l2 + "...")[0]) > avail_w:
+                    l2 = " ".join(l2.split()[:-1])
+                chosen_lines = [l1, l2]
+            else:
+                l = clean_text
+                while l and (chosen_font.getbbox(l + "...")[2] - chosen_font.getbbox(l + "...")[0]) > avail_w:
+                    l = " ".join(l.split()[:-1])
+                chosen_lines = [l + "..." if l != clean_text else l]
+            bb = chosen_font.getbbox(chosen_lines[0])
+            line_height = bb[3] - bb[1]
+
+        # Draw centered lines
+        if len(chosen_lines) == 1:
+            draw.text((cx, cy), chosen_lines[0], fill=fill_text, font=chosen_font, anchor="mm")
+        elif len(chosen_lines) == 2:
+            spacing = 4
+            y_offset = (line_height + spacing) // 2
+            draw.text((cx, cy - y_offset), chosen_lines[0], fill=fill_text, font=chosen_font, anchor="mm")
+            draw.text((cx, cy + y_offset), chosen_lines[1], fill=fill_text, font=chosen_font, anchor="mm")
 
     def _draw_top_story_banner(self, draw: ImageDraw.ImageDraw, scene_id: int, total_scenes: int, badge_text: str):
-        """Draws a clean, kid-friendly visual story progress bar & fact badge at the top of the 9:16 frame."""
-        # Story progress pills at very top (y=90)
-        seg_w = (self.width - 160) // total_scenes
-        for i in range(total_scenes):
-            x0 = 80 + i * seg_w + 4
-            x1 = x0 + seg_w - 8
-            col = (0, 245, 200, 255) if (i + 1) <= scene_id else (255, 255, 255, 85)
-            draw.rounded_rectangle([x0, 75, x1, 95], radius=8, fill=col)
-
-        # Big High-Contrast Fact Badge (y=130..245)
-        draw.rounded_rectangle(
-            [90, 125, self.width - 90, 245],
+        """Draws a clean, kid-friendly visual story fact badge at the top of the 9:16 frame (progress pills removed)."""
+        # Story progress pills removed based on user feedback for clean uncluttered visual experience
+        # Big High-Contrast Fact Badge (y=90..215)
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[80, 90, self.width - 80, 215],
+            text=(badge_text or "AMAZING SCIENCE FACT!").upper(),
+            fill_text=(255, 235, 85),
+            box_fill=(22, 34, 68, 240),
+            box_outline=(255, 215, 0, 255),
+            outline_width=6,
             radius=32,
-            fill=(22, 34, 68, 240),
-            outline=(255, 215, 0, 255),
-            width=6
+            initial_font_size=42,
+            min_font_size=20,
+            padding_x=28,
+            padding_y=12,
+            max_lines=2
         )
-        badge_font = self._get_font(46)
-        draw.text((self.width // 2, 185), badge_text.upper(), fill=(255, 235, 85), font=badge_font, anchor="mm")
 
     def _draw_fluffy_cloud(
         self,
@@ -3222,9 +3608,18 @@ class VisualEngine:
             draw.polygon(poly, fill=(180, 240, 255, 230), outline=(255, 255, 255, 255))
         # Impact flash & Callout badge
         draw.ellipse([cx - 45, cy + 95, cx + 45, cy + 125], fill=(255, 255, 255, 240))
-        font = self._get_font(30)
-        draw.rounded_rectangle([cx - 230, cy - 320, cx + 230, cy - 250], radius=18, fill=(15, 25, 60, 240), outline=(255, 80, 80, 255), width=4)
-        draw.text((cx, cy - 285), "RUBBER SHATTERS LIKE GLASS!", fill=(255, 220, 220), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[cx - 240, cy - 320, cx + 240, cy - 250],
+            text="RUBBER SHATTERS LIKE GLASS!",
+            fill_text=(255, 220, 220),
+            box_fill=(15, 25, 60, 240),
+            box_outline=(255, 80, 80, 255),
+            outline_width=4,
+            radius=18,
+            initial_font_size=28,
+            min_font_size=16
+        )
 
     def _draw_leidenfrost_vapor_barrier_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
         """Draws scientific cross-section diagram of the Leidenfrost vapor barrier layer."""
@@ -3249,9 +3644,18 @@ class VisualEngine:
             draw.ellipse([cx + 320 - r, cy - r, cx + 320 + r, cy + r], fill=col)
         # Collision Center Shockwave Line
         draw.line([(cx, cy - 220), (cx, cy + 220)], fill=(255, 255, 255, 255), width=8)
-        font = self._get_font(32)
-        draw.rounded_rectangle([cx - 260, cy - 340, cx + 260, cy - 260], radius=20, fill=(15, 15, 35, 240), outline=(255, 255, 255, 255), width=4)
-        draw.text((cx, cy - 300), "-320°F ICE  VS  2,000°F FIRE!", fill=(255, 230, 120), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[cx - 260, cy - 340, cx + 260, cy - 260],
+            text="-320°F ICE  VS  2,000°F FIRE!",
+            fill_text=(255, 230, 120),
+            box_fill=(15, 15, 35, 240),
+            box_outline=(255, 255, 255, 255),
+            outline_width=4,
+            radius=20,
+            initial_font_size=30,
+            min_font_size=18
+        )
 
     def _draw_nitrogen_700x_expansion_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
         """Draws volumetric expansion ratio diagram: 1 drop liquid -> 700x massive gas explosion."""
@@ -3265,9 +3669,18 @@ class VisualEngine:
             draw.ellipse([cx + 160 - r, cy - r, cx + 160 + r, cy + r], fill=col)
         draw.text((cx + 160, cy), "700x\nGAS CLOUD", fill=(10, 30, 60), font=self._get_font(30), anchor="mm")
         # Header Badge
-        font = self._get_font(30)
-        draw.rounded_rectangle([cx - 240, cy - 320, cx + 240, cy - 250], radius=18, fill=(15, 30, 65, 240), outline=(0, 230, 255, 255), width=4)
-        draw.text((cx, cy - 285), "VIOLENT 700X EXPANSION!", fill=(255, 255, 255), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[cx - 240, cy - 320, cx + 240, cy - 250],
+            text="VIOLENT 700X EXPANSION!",
+            fill_text=(255, 255, 255),
+            box_fill=(15, 30, 65, 240),
+            box_outline=(0, 230, 255, 255),
+            outline_width=4,
+            radius=18,
+            initial_font_size=28,
+            min_font_size=16
+        )
 
     def _draw_fire_oxygen_starvation_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
         """Draws fire suffocation diagram showing dense nitrogen blanket choking off oxygen."""
@@ -3279,9 +3692,18 @@ class VisualEngine:
         # Dense nitrogen gas cloud blanket smothering the flame
         draw.ellipse([cx - 240, cy - 70, cx + 240, cy + 90], fill=(20, 60, 130, 200), outline=(0, 200, 255, 255), width=3)
         draw.text((cx, cy + 10), "HEAVY N2 DISPLACES ALL OXYGEN", fill=(255, 255, 255), font=self._get_font(24), anchor="mm")
-        font = self._get_font(30)
-        draw.rounded_rectangle([cx - 240, cy - 320, cx + 240, cy - 250], radius=18, fill=(20, 15, 35, 240), outline=(255, 120, 40, 255), width=4)
-        draw.text((cx, cy - 285), "FIRE SUFFOCATES INSTANTLY!", fill=(255, 220, 180), font=font, anchor="mm")
+        self._draw_fitted_box_text(
+            draw=draw,
+            box_rect=[cx - 240, cy - 320, cx + 240, cy - 250],
+            text="FIRE SUFFOCATES INSTANTLY!",
+            fill_text=(255, 220, 180),
+            box_fill=(20, 15, 35, 240),
+            box_outline=(255, 120, 40, 255),
+            outline_width=4,
+            radius=18,
+            initial_font_size=28,
+            min_font_size=16
+        )
 
     def _draw_cryo_quantum_rocket_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
         """Draws superconducting quantum computer chip and cryogenic space rocket thruster."""

@@ -176,7 +176,7 @@ class DailyRunner:
         )
         self.subtitle_engine.generate_ass_file(word_timestamps=word_timestamps, output_ass_path=ass_path)
 
-        bgm_path = self.asset_manager.get_default_bgm_path()
+        bgm_path = self.asset_manager.get_bgm_path(tier=tier, niche=selected_niche)
         final_mp4 = self.composer.assemble_short(
             scene_images=scene_images,
             scene_durations=scene_durations,

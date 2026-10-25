@@ -75,12 +75,18 @@ class VoiceEngine:
         for s in scenes:
             s.narration = sanitize_spoken_only(getattr(s, "narration", ""))
 
+        def _safe_set_duration(scene_obj, d):
+            try:
+                scene_obj.duration_sec = d
+            except Exception:
+                pass
+
         # 1. Try per-scene synthesis via Google AI Studio TTS (`Puck` voice across TTS model pool)
         if self.api_key:
             ok, word_timestamps, scene_durations = self._synthesize_scenes_ai_studio_exact(scenes, output_path)
             if ok and os.path.exists(output_path):
                 for s, dur in zip(scenes, scene_durations):
-                    s.duration_sec = dur
+                    _safe_set_duration(s, dur)
                 logger.info(
                     f"AI Studio Per-Scene TTS locked {len(scenes)} scenes "
                     f"({round(sum(scene_durations), 2)}s total, 0ms drift)."
@@ -93,20 +99,36 @@ class VoiceEngine:
                 self._synthesize_scenes_edge_tts_async(scenes, output_path)
             )
             for s, dur in zip(scenes, scene_durations):
-                s.duration_sec = dur
+                _safe_set_duration(s, dur)
             logger.info(
                 f"Edge-TTS Per-Scene synthesis locked {len(scenes)} scenes "
                 f"({round(sum(scene_durations), 2)}s total, 0ms drift)."
             )
             return out_file, word_timestamps, scene_durations
         except Exception as e:
-            logger.warning(f"Edge-TTS scene synthesis failed: {e}. Using procedural fallback.")
-            full_text = " ".join(s.narration for s in scenes)
-            out_file, word_timestamps = self._fallback_synthesize(full_text, output_path)
-            scene_durations = [round(max(len(s.narration.split()) * 0.38, 2.2), 2) for s in scenes]
-            for s, dur in zip(scenes, scene_durations):
-                s.duration_sec = dur
-            return out_file, word_timestamps, scene_durations
+            logger.warning(f"Edge-TTS scene synthesis failed: {e}. Trying native offline speech.")
+
+        # 3. macOS native high-fidelity offline voiceover (/usr/bin/say)
+        if os.path.exists("/usr/bin/say"):
+            try:
+                out_file, word_timestamps, scene_durations = self._synthesize_scenes_macos_say(scenes, output_path)
+                for s, dur in zip(scenes, scene_durations):
+                    _safe_set_duration(s, dur)
+                logger.info(
+                    f"macOS Native Speech locked {len(scenes)} scenes "
+                    f"({round(sum(scene_durations), 2)}s total, 0ms drift)."
+                )
+                return out_file, word_timestamps, scene_durations
+            except Exception as e:
+                logger.warning(f"macOS say synthesis failed: {e}. Using procedural fallback.")
+
+        # 4. Melodic procedural audio fallback
+        full_text = " ".join(s.narration for s in scenes)
+        out_file, word_timestamps = self._fallback_synthesize(full_text, output_path)
+        scene_durations = [round(max(len(s.narration.split()) * 0.38, 2.2), 2) for s in scenes]
+        for s, dur in zip(scenes, scene_durations):
+            _safe_set_duration(s, dur)
+        return out_file, word_timestamps, scene_durations
 
     def _synthesize_scenes_ai_studio_exact(
         self,
@@ -429,6 +451,89 @@ class VoiceEngine:
 
         return output_path, all_words, scene_durations
 
+    def _synthesize_scenes_macos_say(
+        self,
+        scenes: List[Any],
+        output_path: str,
+        voice_name: str = "Samantha"
+    ) -> Tuple[str, List[Dict[str, Any]], List[float]]:
+        """
+        Synthesizes each scene individually using macOS native `/usr/bin/say`,
+        converting to 24kHz 16-bit mono WAV, aligning to 30fps frames,
+        and concatenating with 0ms drift.
+        """
+        all_pcm = bytearray()
+        scene_durations: List[float] = []
+        all_words: List[Dict[str, Any]] = []
+        curr_offset = 0.0
+
+        for idx, scene in enumerate(scenes):
+            scene_text = sanitize_spoken_only(getattr(scene, "narration", ""))
+            if not scene_text:
+                scene_text = "Look at this amazing discovery!"
+
+            scene_aiff = output_path.replace(".wav", f"_scene_{idx+1}.aiff")
+            scene_wav = output_path.replace(".wav", f"_scene_{idx+1}.wav")
+
+            tier = getattr(scene, "tier", "younger")
+            v_name = voice_name
+            if tier == "preschool":
+                v_name = "Samantha"
+            elif tier == "older":
+                v_name = "Daniel" if os.path.exists("/usr/bin/say") else voice_name
+
+            cmd_say = ["/usr/bin/say", "-v", v_name, "-r", "165", "-o", scene_aiff, scene_text]
+            res = subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if res.returncode != 0:
+                cmd_say = ["/usr/bin/say", "-v", "Samantha", "-r", "165", "-o", scene_aiff, scene_text]
+                subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
+            # Convert AIFF to 24kHz 16-bit mono WAV
+            subprocess.run(
+                [self.ffmpeg_exe, "-y", "-i", scene_aiff, "-ar", str(self.sample_rate), "-ac", "1", scene_wav],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True
+            )
+
+            with wave.open(scene_wav, "rb") as wf:
+                pcm_bytes = wf.readframes(wf.getnframes())
+
+            # Add 0.15s pause at end of scene
+            tail_pad = int(0.15 * self.sample_rate) * 2
+            pcm_bytes += b"\x00" * tail_pad
+
+            # Align to exact 30fps video frame boundary (800 samples = 1600 bytes at 24kHz)
+            bytes_per_frame = (self.sample_rate // 30) * 2
+            rem = len(pcm_bytes) % bytes_per_frame
+            if rem != 0:
+                pcm_bytes += b"\x00" * (bytes_per_frame - rem)
+
+            exact_dur = round((len(pcm_bytes) // 2) / float(self.sample_rate), 4)
+
+            # Distribute words over active speech window
+            words = scene_text.split()
+            all_words.extend(self._distribute_words_over_duration(words, curr_offset, exact_dur - 0.15))
+
+            all_pcm.extend(pcm_bytes)
+            scene_durations.append(exact_dur)
+            curr_offset += exact_dur
+
+            for tf in (scene_aiff, scene_wav):
+                if os.path.exists(tf):
+                    try:
+                        os.remove(tf)
+                    except Exception:
+                        pass
+
+        with wave.open(output_path, "wb") as out_wf:
+            out_wf.setnchannels(1)
+            out_wf.setsampwidth(2)
+            out_wf.setframerate(self.sample_rate)
+            out_wf.writeframes(bytes(all_pcm))
+
+        return output_path, all_words, scene_durations
+
     def synthesize(self, text: str, output_path: str) -> Tuple[str, List[Dict[str, Any]]]:
         """Synthesizes single text string to audio file and extracts word timestamps."""
         clean_text = sanitize_spoken_only(text)
@@ -446,16 +551,56 @@ class VoiceEngine:
         return self._fallback_synthesize(clean_text, output_path)
 
     def _fallback_synthesize(self, text: str, output_path: str) -> Tuple[str, List[Dict[str, Any]]]:
-        words = sanitize_spoken_only(text).split()
+        clean_text = sanitize_spoken_only(text)
+        if not clean_text:
+            clean_text = "Look at this amazing discovery!"
+
+        if os.path.exists("/usr/bin/say"):
+            try:
+                tmp_aiff = output_path + ".aiff"
+                subprocess.run(
+                    ["/usr/bin/say", "-v", "Samantha", "-r", "165", "-o", tmp_aiff, clean_text],
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                subprocess.run(
+                    [self.ffmpeg_exe, "-y", "-i", tmp_aiff, "-ar", str(self.sample_rate), "-ac", "1", output_path],
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                if os.path.exists(tmp_aiff):
+                    os.remove(tmp_aiff)
+                with wave.open(output_path, "rb") as wf:
+                    dur = wf.getnframes() / float(wf.getframerate())
+                return output_path, self._distribute_words_over_duration(clean_text.split(), 0.0, dur)
+            except Exception as e:
+                logger.warning(f"macOS say fallback failed: {e}")
+
+        # Non-zero pleasant audio tone fallback
+        words = clean_text.split()
         word_duration = 0.38
         total_duration = max(len(words) * word_duration, 3.0)
         total_samples = int(self.sample_rate * total_duration)
+
+        samples = []
+        for i in range(total_samples):
+            t = i / float(self.sample_rate)
+            # Gentle speech-like formants: 261Hz + 329Hz + 392Hz soft modulated
+            envelope = 0.6 + 0.4 * math.sin(2 * math.pi * 3.5 * t)
+            tone = (
+                0.5 * math.sin(2 * math.pi * 261.63 * t) +
+                0.3 * math.sin(2 * math.pi * 329.63 * t) +
+                0.2 * math.sin(2 * math.pi * 392.00 * t)
+            )
+            samples.append(int(14000 * envelope * tone))
 
         with wave.open(output_path, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
             wav_file.setframerate(self.sample_rate)
-            wav_file.writeframes(struct.pack("<" + "h" * total_samples, *([0] * total_samples)))
+            wav_file.writeframes(struct.pack("<" + "h" * len(samples), *samples))
 
         words_data = self._distribute_words_over_duration(words, 0.0, total_duration)
         return output_path, words_data
