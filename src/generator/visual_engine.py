@@ -294,6 +294,8 @@ class VisualEngine:
 
         # 2. Render the specific visual story action & consistent characters
         low_narr = (narration or "").lower()
+        is_duckling = "duck" in visual_prop.lower() or "quack" in visual_prop.lower() or "duck" in low_narr or "quack" in low_narr
+        is_nitrogen = "nitrogen" in visual_prop.lower() or "cryo" in visual_prop.lower() or "leidenfrost" in visual_prop.lower() or "nitrogen" in low_narr
         is_octopus = "octopus" in visual_prop.lower() or "octopus" in low_narr
         is_cloud = "cloud" in visual_prop.lower() or "lightning" in visual_prop.lower() or "weather" in low_narr or "cloud" in low_narr
         is_chameleon = "chameleon" in visual_prop.lower() or "lizard" in visual_prop.lower() or "chameleon" in low_narr or "nanocrystal" in visual_prop.lower()
@@ -628,6 +630,103 @@ class VisualEngine:
                     draw, cx=540, cy=980, scale=1.15, color_state="coral",
                     expression="happy", anim_phase=anim_phase
                 )
+
+        # --- BABY DUCKLING PRESCHOOL EPISODES ---
+        elif is_duckling:
+            if scene_id == 8 or visual_prop in ("duckling_choice_quack_splash", "choice_card"):
+                self._draw_duckling_character(draw, cx=360, cy=1020, scale=1.2, expression="happy", anim_phase=anim_phase)
+                self._draw_leo_character(draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase)
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop == "duckling_one_waddle":
+                self._draw_duckling_one_waddle_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=540, cy=980, scale=1.35, expression="happy", anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="1 DUCKLING!")
+
+            elif scene_id == 2 or visual_prop == "duckling_two_splash":
+                self._draw_duckling_two_splash_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=380, cy=980, scale=1.1, expression="happy", anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=700, cy=980, scale=1.1, expression="happy", anim_phase=anim_phase + 0.3)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="2 SPLASHING!")
+
+            elif scene_id == 3 or visual_prop == "duckling_three_quack":
+                self._draw_duckling_three_quack_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=300, cy=990, scale=0.95, expression="quack", anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=540, cy=970, scale=1.05, expression="quack", anim_phase=anim_phase + 0.2)
+                self._draw_duckling_character(draw, cx=780, cy=990, scale=0.95, expression="quack", anim_phase=anim_phase + 0.4)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="QUACK QUACK!")
+
+            elif scene_id == 4 or visual_prop == "duckling_four_shake":
+                self._draw_duckling_four_shake_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                for idx, x_pos in enumerate([240, 440, 640, 840]):
+                    self._draw_duckling_character(draw, cx=x_pos, cy=1000, scale=0.88, expression="happy", anim_phase=anim_phase + idx * 0.15)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="4 WIGGLY TAILS!")
+
+            elif scene_id == 5 or visual_prop == "duckling_five_paddle":
+                self._draw_duckling_five_paddle_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                for idx, x_pos in enumerate([180, 360, 540, 720, 900]):
+                    self._draw_duckling_character(draw, cx=x_pos, cy=1010, scale=0.8, expression="happy", anim_phase=anim_phase + idx * 0.1)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="5 IN A ROW!")
+
+            elif scene_id == 6 or visual_prop == "duckling_mama_snack":
+                self._draw_duckling_mama_snack_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_mama_duck_character(draw, cx=350, cy=940, scale=1.45, anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=720, cy=1020, scale=0.9, expression="eating", anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="YUMMY SNACK!")
+
+            elif scene_id == 7 or visual_prop == "duckling_cuddle_sleep":
+                self._draw_duckling_cuddle_sleep_prop(draw, cx=540, cy=960, anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=470, cy=1020, scale=0.95, expression="sleeping", anim_phase=anim_phase)
+                self._draw_duckling_character(draw, cx=600, cy=1020, scale=0.95, expression="sleeping", anim_phase=anim_phase + 0.2)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="SLEEPY NAP!")
+
+            else:
+                self._draw_duckling_character(draw, cx=540, cy=980, scale=1.2, expression="happy", anim_phase=anim_phase)
+
+        # --- LIQUID NITROGEN OLDER EPISODES ---
+        elif is_nitrogen:
+            if scene_id == 8 or visual_prop in ("nitrogen_superpower_choice", "choice_card"):
+                self._draw_dr_nova_character(draw, cx=360, cy=1020, scale=1.0, anim_phase=anim_phase)
+                self._draw_leo_character(draw, cx=780, cy=1060, scale=1.15, expression="waving", anim_phase=anim_phase)
+                self._draw_superpower_vs_cards(draw, y=520, narration=narration)
+
+            elif scene_id == 1 or visual_prop == "nitrogen_minus_320f":
+                self._draw_nitrogen_minus_320f_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="-320°F BOILING!")
+
+            elif scene_id == 2 or visual_prop == "nitrogen_shatter_ball":
+                self._draw_nitrogen_shatter_ball_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="SHATTERS LIKE GLASS!")
+
+            elif scene_id == 3 or visual_prop == "leidenfrost_vapor_barrier":
+                self._draw_leidenfrost_vapor_barrier_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="VAPOR SHIELD!")
+
+            elif scene_id == 4 or visual_prop == "nitrogen_vs_fire_standoff":
+                self._draw_nitrogen_vs_fire_standoff_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=260, cy=1040, scale=0.92, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="-320°F VS 2000°F!")
+
+            elif scene_id == 5 or visual_prop == "nitrogen_700x_expansion":
+                self._draw_nitrogen_700x_expansion_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="shocked", label="700X EXPANSION!")
+
+            elif scene_id == 6 or visual_prop == "fire_oxygen_starvation":
+                self._draw_fire_oxygen_starvation_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="SUFFOCATES FIRE!")
+
+            elif scene_id == 7 or visual_prop == "cryo_quantum_rocket":
+                self._draw_cryo_quantum_rocket_prop(draw, cx=540, cy=950, anim_phase=anim_phase)
+                self._draw_dr_nova_character(draw, cx=280, cy=1040, scale=0.95, anim_phase=anim_phase)
+                self._draw_leo_reaction_corner(draw, cx=220, cy=1480, expression="happy", label="QUANTUM & ROCKETS!")
+
+            else:
+                self._draw_dr_nova_character(draw, cx=540, cy=980, scale=1.1, anim_phase=anim_phase)
 
         # --- AXOLOTL EPISODES ---
         elif is_axolotl:
@@ -988,6 +1087,24 @@ class VisualEngine:
             "thirty_year_sleep": ((12, 20, 55), (120, 160, 235), (15, 40, 80)),
             "drop_of_water_revive": ((15, 55, 105), (0, 225, 255), (18, 85, 135)),
             "tardigrade_superpower_choice": ((18, 35, 80), (0, 180, 230), (18, 60, 105)),
+            # Preschool Duckling Palettes
+            "duckling_one_waddle": ((20, 120, 180), (120, 225, 255), (85, 190, 80)),
+            "duckling_two_splash": ((15, 100, 195), (60, 200, 255), (0, 160, 215)),
+            "duckling_three_quack": ((25, 130, 190), (140, 230, 255), (90, 195, 85)),
+            "duckling_four_shake": ((20, 115, 185), (110, 215, 250), (80, 185, 75)),
+            "duckling_five_paddle": ((18, 95, 190), (70, 205, 255), (0, 150, 210)),
+            "duckling_mama_snack": ((22, 110, 175), (100, 210, 245), (75, 180, 70)),
+            "duckling_cuddle_sleep": ((10, 25, 65), (35, 60, 125), (20, 40, 90)),
+            "duckling_choice_quack_splash": ((25, 120, 195), (130, 225, 255), (85, 190, 80)),
+            # Older Liquid Nitrogen Palettes
+            "nitrogen_minus_320f": ((8, 18, 48), (0, 140, 220), (12, 45, 95)),
+            "nitrogen_shatter_ball": ((10, 22, 55), (0, 195, 240), (15, 55, 110)),
+            "leidenfrost_vapor_barrier": ((12, 20, 50), (0, 220, 210), (18, 60, 115)),
+            "nitrogen_vs_fire_standoff": ((60, 15, 30), (255, 120, 40), (15, 45, 100)),
+            "nitrogen_700x_expansion": ((10, 25, 60), (0, 180, 245), (14, 50, 115)),
+            "fire_oxygen_starvation": ((20, 15, 35), (180, 70, 50), (15, 30, 60)),
+            "cryo_quantum_rocket": ((5, 12, 35), (0, 160, 255), (10, 30, 75)),
+            "nitrogen_superpower_choice": ((10, 25, 58), (0, 180, 235), (12, 50, 110)),
         }
         sky_top, sky_bot, ground_col = palettes.get(visual_prop, ((20, 60, 120), (0, 180, 220), (0, 120, 170)))
 
@@ -1746,6 +1863,12 @@ class VisualEngine:
         elif "flamingo" in low or "beak" in low or "leg" in low:
             card1_text = "100°C HEAT BEAK"
             card2_text = "1-LEG SLEEP LOCK"
+        elif "duck" in low or "quack" in low or "pond" in low:
+            card1_text = "SPLASH IN POND"
+            card2_text = "SAY QUACK QUACK"
+        elif "nitrogen" in low or "freeze" in low or "flame" in low or "cryo" in low:
+            card1_text = "-320°F FREEZE BLAST"
+            card2_text = "LEIDENFROST SHIELD"
         else:
             card1_text = "SUPERPOWER #1"
             card2_text = "SUPERPOWER #2"
@@ -2835,6 +2958,357 @@ class VisualEngine:
         font = self._get_font(28)
         draw.rounded_rectangle([cx - 215, cy + 225 - 25, cx + 215, cy + 225 + 42], radius=16, fill=(0, 225, 255, 255), outline=(255, 255, 255, 255), width=3)
         draw.text((cx, cy + 225 + 8), "REVIVES WITH 1 WATER DROP!", fill=(10, 25, 45), font=font, anchor="mm")
+
+    # =========================================================================
+    # PRESCHOOL (AGES 4 & UNDER) DUCKLING & NURSERY RHYME RENDERING METHODS
+    # =========================================================================
+
+    def _draw_duckling_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        expression: str = "happy",
+        anim_phase: float = 0.0
+    ):
+        """Draws 'Ducky the Fluffy Duckling' with adorable 3D Pixar round shapes, sparkly eyes, and orange bill."""
+        s = scale
+        yellow = (255, 218, 38, 255)
+        yellow_dark = (235, 180, 20, 255)
+        yellow_light = (255, 245, 130, 255)
+        orange = (255, 130, 20, 255)
+        orange_dark = (220, 95, 10, 255)
+
+        # 1. Webbed orange feet
+        if expression != "sleeping":
+            for fx in (-28, 28):
+                foot_x = cx + int(fx * s)
+                foot_y = cy + int(60 * s)
+                draw.polygon([
+                    (foot_x, foot_y),
+                    (foot_x - int(24 * s), foot_y + int(24 * s)),
+                    (foot_x, foot_y + int(28 * s)),
+                    (foot_x + int(24 * s), foot_y + int(24 * s)),
+                ], fill=orange, outline=orange_dark)
+
+        # 2. Fluffy round body
+        bw, bh = int(72 * s), int(58 * s)
+        draw.ellipse([cx - bw, cy - int(10 * s), cx + bw, cy + bh], fill=yellow, outline=yellow_dark, width=int(3 * s))
+        # Highlight belly
+        draw.ellipse([cx - int(45 * s), cy + int(5 * s), cx + int(45 * s), cy + int(48 * s)], fill=yellow_light)
+
+        # 3. Flapping baby wing
+        ww, wh = int(36 * s), int(26 * s)
+        draw.ellipse([cx - int(55 * s), cy + int(8 * s), cx - int(55 * s) + ww, cy + int(8 * s) + wh], fill=yellow_dark)
+
+        # 4. Chubby head
+        hw, hh = int(58 * s), int(52 * s)
+        head_cy = cy - int(48 * s)
+        draw.ellipse([cx - hw, head_cy - hh, cx + hw, head_cy + hh], fill=yellow, outline=yellow_dark, width=int(3 * s))
+        # Cheek blush
+        draw.ellipse([cx - int(48 * s), head_cy + int(5 * s), cx - int(24 * s), head_cy + int(26 * s)], fill=(255, 175, 175, 180))
+        draw.ellipse([cx + int(24 * s), head_cy + int(5 * s), cx + int(48 * s), head_cy + int(26 * s)], fill=(255, 175, 175, 180))
+
+        # 5. Eyes
+        if expression == "sleeping":
+            for ex in (-24, 24):
+                eye_x = cx + int(ex * s)
+                draw.arc([eye_x - int(14 * s), head_cy - int(8 * s), eye_x + int(14 * s), head_cy + int(8 * s)], start=0, end=180, fill=(40, 20, 10, 255), width=int(4 * s))
+        else:
+            for ex in (-24, 24):
+                eye_x = cx + int(ex * s)
+                eye_y = head_cy - int(8 * s)
+                er = int(14 * s)
+                draw.ellipse([eye_x - er, eye_y - er, eye_x + er, eye_y + er], fill=(20, 15, 25, 255))
+                # Catchlight shine sparkles
+                draw.ellipse([eye_x - int(7 * s), eye_y - int(7 * s), eye_x - int(2 * s), eye_y - int(2 * s)], fill=(255, 255, 255, 255))
+                draw.ellipse([eye_x + int(2 * s), eye_y + int(2 * s), eye_x + int(6 * s), eye_y + int(6 * s)], fill=(255, 255, 255, 255))
+
+        # 6. Smiling Orange Beak / Bill
+        beak_w = int(24 * s)
+        beak_h = int(16 * s) if expression == "quack" else int(11 * s)
+        beak_cy = head_cy + int(14 * s)
+        draw.ellipse([cx - beak_w, beak_cy - beak_h, cx + beak_w, beak_cy + beak_h], fill=orange, outline=orange_dark, width=int(2 * s))
+        if expression == "quack":
+            draw.ellipse([cx - int(12 * s), beak_cy - int(4 * s), cx + int(12 * s), beak_cy + int(8 * s)], fill=(120, 20, 20, 255))
+
+    def _draw_mama_duck_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.3,
+        anim_phase: float = 0.0
+    ):
+        """Draws gentle Mama Duck with beautiful glossy feathers and caring expression."""
+        s = scale
+        feather_col = (248, 248, 245, 255)
+        feather_shadow = (205, 218, 225, 255)
+        orange = (255, 140, 20, 255)
+        # Body
+        draw.ellipse([cx - int(90 * s), cy - int(20 * s), cx + int(90 * s), cy + int(70 * s)], fill=feather_col, outline=feather_shadow, width=int(3 * s))
+        # Wing
+        draw.arc([cx - int(60 * s), cy - int(10 * s), cx + int(40 * s), cy + int(50 * s)], start=45, end=225, fill=(0, 160, 130, 255), width=int(12 * s))
+        # Neck & Head
+        draw.polygon([
+            (cx - int(40 * s), cy + int(10 * s)),
+            (cx - int(10 * s), cy - int(70 * s)),
+            (cx + int(30 * s), cy - int(70 * s)),
+            (cx + int(40 * s), cy + int(10 * s)),
+        ], fill=(0, 125, 100, 255))
+        head_cy = cy - int(80 * s)
+        draw.ellipse([cx - int(35 * s), head_cy - int(30 * s), cx + int(35 * s), head_cy + int(30 * s)], fill=(0, 135, 110, 255))
+        # Eye
+        draw.ellipse([cx + int(8 * s), head_cy - int(12 * s), cx + int(24 * s), head_cy + int(4 * s)], fill=(20, 20, 20, 255))
+        draw.ellipse([cx + int(12 * s), head_cy - int(10 * s), cx + int(18 * s), head_cy - int(4 * s)], fill=(255, 255, 255, 255))
+        # Beak
+        draw.polygon([
+            (cx + int(25 * s), head_cy - int(5 * s)),
+            (cx + int(65 * s), head_cy + int(5 * s)),
+            (cx + int(25 * s), head_cy + int(15 * s)),
+        ], fill=orange)
+
+    def _draw_duckling_one_waddle_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing golden '1' badge and pond water ripples."""
+        font_big = self._get_font(44)
+        draw.ellipse([cx - 70, cy - 340, cx + 70, cy - 200], fill=(255, 215, 0, 240), outline=(255, 255, 255, 255), width=5)
+        draw.text((cx, cy - 270), "1", fill=(120, 50, 0), font=font_big, anchor="mm")
+        # Floating water ripples
+        for rx, ry in [(-200, 220), (220, 200)]:
+            draw.arc([cx + rx - 80, cy + ry - 20, cx + rx + 80, cy + ry + 20], start=0, end=180, fill=(0, 220, 255, 200), width=4)
+
+    def _draw_duckling_two_splash_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing '2' badge and big playful water splash drops."""
+        font_big = self._get_font(44)
+        draw.ellipse([cx - 70, cy - 340, cx + 70, cy - 200], fill=(0, 210, 255, 240), outline=(255, 255, 255, 255), width=5)
+        draw.text((cx, cy - 270), "2", fill=(10, 40, 80), font=font_big, anchor="mm")
+        # Water droplets splashing
+        for dx, dy in [(-120, 80), (-60, 40), (0, 70), (60, 30), (130, 85)]:
+            draw.ellipse([cx + dx - 12, cy + dy - 16, cx + dx + 12, cy + dy + 16], fill=(0, 235, 255, 240))
+
+    def _draw_duckling_three_quack_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing '3' badge and colorful musical notes."""
+        font_big = self._get_font(44)
+        draw.ellipse([cx - 70, cy - 340, cx + 70, cy - 200], fill=(255, 120, 180, 240), outline=(255, 255, 255, 255), width=5)
+        draw.text((cx, cy - 270), "3", fill=(80, 10, 40), font=font_big, anchor="mm")
+        # Musical notes
+        font_notes = self._get_font(38)
+        for nx, ny, col, note in [(-240, -180, (255, 100, 100), "🎵"), (0, -160, (255, 220, 0), "🎶"), (240, -180, (0, 220, 255), "🎵")]:
+            draw.text((cx + nx, cy + ny), note, fill=col, font=font_notes, anchor="mm")
+
+    def _draw_duckling_four_shake_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing '4' badge and playful motion wiggle arcs."""
+        font_big = self._get_font(44)
+        draw.ellipse([cx - 70, cy - 340, cx + 70, cy - 200], fill=(130, 230, 90, 240), outline=(255, 255, 255, 255), width=5)
+        draw.text((cx, cy - 270), "4", fill=(20, 70, 15), font=font_big, anchor="mm")
+        # Wiggle motion lines
+        for wx in (-300, -100, 100, 300):
+            draw.arc([cx + wx - 30, cy + 120, cx + wx + 30, cy + 160], start=45, end=315, fill=(255, 220, 50, 220), width=4)
+
+    def _draw_duckling_five_paddle_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws glowing '5' badge, bright smiling sun, and paddling water waves."""
+        font_big = self._get_font(44)
+        draw.ellipse([cx - 70, cy - 340, cx + 70, cy - 200], fill=(255, 180, 40, 240), outline=(255, 255, 255, 255), width=5)
+        draw.text((cx, cy - 270), "5", fill=(90, 40, 0), font=font_big, anchor="mm")
+        # Smiling cartoon sun in sky
+        sun_x, sun_y = 180, 220
+        draw.ellipse([sun_x - 45, sun_y - 45, sun_x + 45, sun_y + 45], fill=(255, 220, 0, 240), outline=(255, 255, 255, 255), width=4)
+
+    def _draw_duckling_mama_snack_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws fresh green leafy pondweed snacks and water lily pad."""
+        # Lily pad
+        draw.ellipse([cx - 160, cy + 160, cx + 160, cy + 240], fill=(35, 165, 85, 240), outline=(25, 120, 60, 255), width=4)
+        # Pondweed snacks
+        for lx, ly in [(-40, 180), (0, 170), (45, 185), (20, 195)]:
+            draw.ellipse([cx + lx - 15, cy + ly - 8, cx + lx + 15, cy + ly + 8], fill=(120, 230, 80, 255))
+        font = self._get_font(28)
+        draw.rounded_rectangle([cx - 190, cy - 320, cx + 190, cy - 250], radius=16, fill=(40, 175, 95, 240), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx, cy - 285), "HEALTHY GREEN SNACK!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_duckling_cuddle_sleep_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws warm straw nest, night crescent moon, and dreamy ZZZ bubbles."""
+        # Cozy straw nest
+        draw.ellipse([cx - 240, cy + 80, cx + 240, cy + 220], fill=(185, 140, 75, 240), outline=(140, 95, 45, 255), width=5)
+        # Crescent moon
+        moon_x, moon_y = 860, 260
+        draw.ellipse([moon_x - 45, moon_y - 45, moon_x + 45, moon_y + 45], fill=(255, 240, 130, 240))
+        draw.ellipse([moon_x - 25, moon_y - 55, moon_x + 55, moon_y + 25], fill=(10, 25, 65, 255))
+        # ZZZ bubbles
+        font_z = self._get_font(34)
+        draw.text((cx + 140, cy - 140), "Z", fill=(180, 210, 255), font=font_z, anchor="mm")
+        draw.text((cx + 175, cy - 190), "Z", fill=(210, 230, 255), font=font_z, anchor="mm")
+        draw.text((cx + 215, cy - 245), "Z", fill=(255, 255, 255), font=font_z, anchor="mm")
+
+    # =========================================================================
+    # OLDER (AGES 9-12) LIQUID NITROGEN & THERMODYNAMICS RENDERING METHODS
+    # =========================================================================
+
+    def _draw_dr_nova_character(
+        self,
+        draw: ImageDraw.ImageDraw,
+        cx: int,
+        cy: int,
+        scale: float = 1.0,
+        anim_phase: float = 0.0
+    ):
+        """Draws Dr. Nova in sleek futuristic cryogenic lab coat with neon-cyan safety goggles."""
+        s = scale
+        coat_col = (245, 248, 255, 255)
+        trim_col = (0, 180, 240, 255)
+        skin_col = (255, 205, 165, 255)
+
+        # 1. Lab Coat Torso
+        draw.polygon([
+            (cx - int(65 * s), cy - int(40 * s)),
+            (cx + int(65 * s), cy - int(40 * s)),
+            (cx + int(85 * s), cy + int(110 * s)),
+            (cx - int(85 * s), cy + int(110 * s)),
+        ], fill=coat_col, outline=trim_col, width=int(3 * s))
+        # Cyan collar and ID badge
+        draw.line([(cx, cy - int(40 * s)), (cx, cy + int(110 * s))], fill=trim_col, width=int(3 * s))
+        draw.rounded_rectangle([cx + int(25 * s), cy - int(10 * s), cx + int(55 * s), cy + int(25 * s)], radius=6, fill=(0, 220, 255, 255))
+
+        # 2. Head & Hair
+        head_cy = cy - int(95 * s)
+        draw.ellipse([cx - int(48 * s), head_cy - int(50 * s), cx + int(48 * s), head_cy + int(50 * s)], fill=skin_col)
+        # Modern haircut (deep purple/navy)
+        draw.ellipse([cx - int(52 * s), head_cy - int(60 * s), cx + int(52 * s), head_cy - int(10 * s)], fill=(35, 25, 65, 255))
+
+        # 3. Futuristic Laser Safety Goggles
+        goggle_y = head_cy - int(5 * s)
+        draw.rounded_rectangle([cx - int(44 * s), goggle_y - int(18 * s), cx + int(44 * s), goggle_y + int(18 * s)], radius=12, fill=(0, 210, 255, 220), outline=(255, 255, 255, 255), width=int(3 * s))
+        # Goggle reflection shine
+        draw.line([(cx - int(30 * s), goggle_y - int(10 * s)), (cx - int(15 * s), goggle_y + int(10 * s))], fill=(255, 255, 255, 255), width=int(3 * s))
+        draw.line([(cx + int(15 * s), goggle_y - int(10 * s)), (cx + int(30 * s), goggle_y + int(10 * s))], fill=(255, 255, 255, 255), width=int(3 * s))
+
+        # 4. Confident Smile
+        draw.arc([cx - int(18 * s), head_cy + int(15 * s), cx + int(18 * s), head_cy + int(35 * s)], start=10, end=170, fill=(180, 60, 60, 255), width=int(3 * s))
+
+        # 5. Cryogenic Insulated Gloves
+        for gx, gy in [(-80, 30), (80, 30)]:
+            draw.ellipse([cx + int(gx * s) - int(18 * s), cy + int(gy * s) - int(18 * s), cx + int(gx * s) + int(18 * s), cy + int(gy * s) + int(18 * s)], fill=(0, 140, 210, 255))
+
+    def _draw_nitrogen_minus_320f_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws cryogenic dewar pouring boiling liquid nitrogen, dense fog mist, and -320°F digital readout."""
+        # Dewar Flask pouring (silver cylinder tilted)
+        flask_cx, flask_cy = cx + 80, cy - 140
+        draw.rounded_rectangle([flask_cx - 45, flask_cy - 90, flask_cx + 45, flask_cy + 90], radius=18, fill=(190, 205, 220, 255), outline=(255, 255, 255, 255), width=4)
+        draw.rectangle([flask_cx - 30, flask_cy + 85, flask_cx + 30, flask_cy + 120], fill=(140, 160, 180, 255))
+        # Pouring stream of cryogenic fluid
+        draw.line([(flask_cx, flask_cy + 120), (cx, cy + 60)], fill=(0, 235, 255, 240), width=16)
+        # Rolling fog cloud bank at bottom
+        for fx, fy, fr in [(-180, 120, 75), (-80, 80, 90), (40, 110, 85), (160, 90, 80)]:
+            draw.ellipse([cx + fx - fr, cy + fy - fr, cx + fx + fr, cy + fy + fr], fill=(240, 250, 255, 190))
+        # Digital Thermometer Callout Badge
+        font_temp = self._get_font(36)
+        draw.rounded_rectangle([cx - 240, cy - 340, cx + 240, cy - 250], radius=20, fill=(10, 30, 70, 240), outline=(0, 220, 255, 255), width=4)
+        draw.text((cx, cy - 295), "-320°F / 77 KELVIN!", fill=(0, 240, 255), font=font_temp, anchor="mm")
+
+    def _draw_nitrogen_shatter_ball_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws frozen bouncy ball shattering into sharp crystalline glass shards upon hitting anvil."""
+        # Steel anvil base
+        draw.rounded_rectangle([cx - 200, cy + 120, cx + 200, cy + 180], radius=14, fill=(110, 125, 140, 255), outline=(200, 215, 230, 255), width=3)
+        # Frozen shattered glass crystal shards flying outwards
+        shards = [
+            [(cx - 40, cy + 100), (cx - 120, cy + 20), (cx - 70, cy + 50)],
+            [(cx + 30, cy + 100), (cx + 130, cy + 10), (cx + 80, cy + 45)],
+            [(cx - 20, cy + 80), (cx - 40, cy - 60), (cx + 10, cy - 20)],
+            [(cx + 15, cy + 70), (cx + 60, cy - 70), (cx + 90, cy - 10)],
+            [(cx - 90, cy + 80), (cx - 170, cy + 85), (cx - 130, cy + 115)],
+            [(cx + 80, cy + 80), (cx + 160, cy + 90), (cx + 120, cy + 115)],
+        ]
+        for poly in shards:
+            draw.polygon(poly, fill=(180, 240, 255, 230), outline=(255, 255, 255, 255))
+        # Impact flash & Callout badge
+        draw.ellipse([cx - 45, cy + 95, cx + 45, cy + 125], fill=(255, 255, 255, 240))
+        font = self._get_font(30)
+        draw.rounded_rectangle([cx - 230, cy - 320, cx + 230, cy - 250], radius=18, fill=(15, 25, 60, 240), outline=(255, 80, 80, 255), width=4)
+        draw.text((cx, cy - 285), "RUBBER SHATTERS LIKE GLASS!", fill=(255, 220, 220), font=font, anchor="mm")
+
+    def _draw_leidenfrost_vapor_barrier_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws scientific cross-section diagram of the Leidenfrost vapor barrier layer."""
+        # Hot surface base plate (orange glow)
+        draw.rounded_rectangle([cx - 240, cy + 90, cx + 240, cy + 160], radius=12, fill=(240, 90, 20, 255), outline=(255, 200, 100, 255), width=3)
+        font_sub = self._get_font(24)
+        draw.text((cx, cy + 125), "WARM SURFACE (+200°C)", fill=(255, 255, 255), font=font_sub, anchor="mm")
+        # Microscopic Vapor Cushion (cyan glowing gap)
+        draw.rounded_rectangle([cx - 220, cy + 50, cx + 220, cy + 80], radius=8, fill=(0, 235, 255, 220), outline=(255, 255, 255, 255), width=2)
+        draw.text((cx, cy + 65), "INSULATING VAPOR GAS CUSHION", fill=(10, 30, 50), font=self._get_font(20), anchor="mm")
+        # Levitating Liquid Nitrogen Droplet (blue sphere hovering)
+        draw.ellipse([cx - 80, cy - 100, cx + 80, cy + 40], fill=(0, 160, 245, 240), outline=(255, 255, 255, 255), width=4)
+        draw.text((cx, cy - 30), "-320°F DROP", fill=(255, 255, 255), font=font_sub, anchor="mm")
+
+    def _draw_nitrogen_vs_fire_standoff_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws cinematic clash between -320°F ice blast on left and 2,000°F fire blast on right."""
+        # Left Ice Blast Vortex
+        for r, col in [(180, (0, 120, 220, 140)), (130, (0, 190, 255, 180)), (80, (220, 250, 255, 230))]:
+            draw.ellipse([cx - 320 - r, cy - r, cx - 320 + r, cy + r], fill=col)
+        # Right Roaring Fire Vortex
+        for r, col in [(180, (230, 40, 10, 140)), (130, (255, 130, 20, 180)), (80, (255, 235, 80, 230))]:
+            draw.ellipse([cx + 320 - r, cy - r, cx + 320 + r, cy + r], fill=col)
+        # Collision Center Shockwave Line
+        draw.line([(cx, cy - 220), (cx, cy + 220)], fill=(255, 255, 255, 255), width=8)
+        font = self._get_font(32)
+        draw.rounded_rectangle([cx - 260, cy - 340, cx + 260, cy - 260], radius=20, fill=(15, 15, 35, 240), outline=(255, 255, 255, 255), width=4)
+        draw.text((cx, cy - 300), "-320°F ICE  VS  2,000°F FIRE!", fill=(255, 230, 120), font=font, anchor="mm")
+
+    def _draw_nitrogen_700x_expansion_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws volumetric expansion ratio diagram: 1 drop liquid -> 700x massive gas explosion."""
+        # Small 1 mL Liquid droplet on left
+        draw.ellipse([cx - 260, cy - 25, cx - 210, cy + 25], fill=(0, 200, 255, 255), outline=(255, 255, 255, 255), width=3)
+        draw.text((cx - 235, cy + 55), "1 mL LIQUID", fill=(0, 220, 255), font=self._get_font(24), anchor="mm")
+        # Arrow pointing right
+        draw.polygon([(cx - 160, cy), (cx - 100, cy - 25), (cx - 100, cy + 25)], fill=(255, 255, 255, 255))
+        # Giant 700x Gas Cloud on right
+        for r, col in [(190, (10, 50, 110, 140)), (140, (0, 150, 230, 180)), (90, (230, 245, 255, 230))]:
+            draw.ellipse([cx + 160 - r, cy - r, cx + 160 + r, cy + r], fill=col)
+        draw.text((cx + 160, cy), "700x\nGAS CLOUD", fill=(10, 30, 60), font=self._get_font(30), anchor="mm")
+        # Header Badge
+        font = self._get_font(30)
+        draw.rounded_rectangle([cx - 240, cy - 320, cx + 240, cy - 250], radius=18, fill=(15, 30, 65, 240), outline=(0, 230, 255, 255), width=4)
+        draw.text((cx, cy - 285), "VIOLENT 700X EXPANSION!", fill=(255, 255, 255), font=font, anchor="mm")
+
+    def _draw_fire_oxygen_starvation_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws fire suffocation diagram showing dense nitrogen blanket choking off oxygen."""
+        # Dying campfire / candle base
+        draw.ellipse([cx - 120, cy + 110, cx + 120, cy + 160], fill=(60, 45, 40, 255))
+        # Wisp of dying smoke curling upward
+        for sy, sw in [(80, 20), (30, 35), (-25, 45), (-80, 55)]:
+            draw.ellipse([cx - sw, cy + sy - 15, cx + sw, cy + sy + 15], fill=(200, 210, 220, 160))
+        # Dense nitrogen gas cloud blanket smothering the flame
+        draw.ellipse([cx - 240, cy - 70, cx + 240, cy + 90], fill=(20, 60, 130, 200), outline=(0, 200, 255, 255), width=3)
+        draw.text((cx, cy + 10), "HEAVY N2 DISPLACES ALL OXYGEN", fill=(255, 255, 255), font=self._get_font(24), anchor="mm")
+        font = self._get_font(30)
+        draw.rounded_rectangle([cx - 240, cy - 320, cx + 240, cy - 250], radius=18, fill=(20, 15, 35, 240), outline=(255, 120, 40, 255), width=4)
+        draw.text((cx, cy - 285), "FIRE SUFFOCATES INSTANTLY!", fill=(255, 220, 180), font=font, anchor="mm")
+
+    def _draw_cryo_quantum_rocket_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, anim_phase: float = 0.0):
+        """Draws superconducting quantum computer chip and cryogenic space rocket thruster."""
+        # Superconducting Quantum Chip on left
+        chip_cx, chip_cy = cx - 180, cy
+        draw.rounded_rectangle([chip_cx - 90, chip_cy - 90, chip_cx + 90, chip_cy + 90], radius=16, fill=(10, 25, 55, 255), outline=(0, 235, 255, 255), width=4)
+        # Gold circuit pins
+        for py in (-60, -20, 20, 60):
+            draw.line([(chip_cx - 110, chip_cy + py), (chip_cx - 90, chip_cy + py)], fill=(255, 215, 0, 255), width=4)
+            draw.line([(chip_cx + 90, chip_cy + py), (chip_cx + 110, chip_cy + py)], fill=(255, 215, 0, 255), width=4)
+        draw.text((chip_cx, chip_cy), "QUANTUM\nCHIP", fill=(0, 235, 255), font=self._get_font(24), anchor="mm")
+
+        # Cryogenic Rocket Thruster on right
+        rock_cx, rock_cy = cx + 180, cy
+        draw.polygon([
+            (rock_cx - 50, rock_cy - 90),
+            (rock_cx + 50, rock_cy - 90),
+            (rock_cx + 70, rock_cy + 20),
+            (rock_cx - 70, rock_cy + 20),
+        ], fill=(220, 230, 240, 255), outline=(0, 140, 220, 255), width=3)
+        # Plume
+        draw.polygon([
+            (rock_cx - 60, rock_cy + 20),
+            (rock_cx + 60, rock_cy + 20),
+            (rock_cx, rock_cy + 130),
+        ], fill=(0, 210, 255, 230), outline=(255, 255, 255, 255))
+        draw.text((rock_cx, rock_cy - 40), "CRYO\nROCKET", fill=(20, 40, 80), font=self._get_font(24), anchor="mm")
 
     # =========================================================================
     # UNIVERSAL DYNAMIC RIG (GUARANTEES NEVER REPEATING & SUPPORTS DYNAMIC TOPICS)

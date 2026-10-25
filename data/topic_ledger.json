@@ -4,7 +4,9 @@
   "used_entities": [
     "chameleon",
     "cloud",
+    "duckling",
     "flamingo",
+    "nitrogen",
     "octopus",
     "shrimp"
   ],
@@ -19,7 +21,8 @@
         "boiling_beak",
         "pink_shrimp_diet",
         "one_leg_gear_lock"
-      ]
+      ],
+      "tier": "younger"
     },
     {
       "episode_number": 2,
@@ -32,7 +35,8 @@
         "nine_brains",
         "blue_copper_blood",
         "color_dreams"
-      ]
+      ],
+      "tier": "younger"
     },
     {
       "episode_number": 3,
@@ -45,7 +49,8 @@
         "updraft_wind_lock",
         "ice_crystals",
         "lightning_sun_heat"
-      ]
+      ],
+      "tier": "younger"
     },
     {
       "episode_number": 4,
@@ -59,14 +64,47 @@
         "photonic_nanocrystals",
         "radar_eyes",
         "60mph_tongue"
-      ]
+      ],
+      "tier": "younger"
     },
     {
       "episode_number": 5,
       "core_entity": "shrimp",
       "topic": "The Shrimp That Shoots SUN-HOT Plasma! \ud83e\udd90\ud83d\udca5 #shorts",
       "title": "The Shrimp That Shoots SUN-HOT Plasma! \ud83e\udd90\ud83d\udca5 #shorts",
+      "key_facts": [],
+      "tier": "younger"
+    },
+    {
+      "episode_number": 6,
+      "tier": "preschool",
+      "core_entity": "duckling",
+      "topic": "Five Little Ducklings Count & Quack! \ud83d\udc25\ud83d\udc9b #shorts",
+      "title": "Five Little Ducklings Count & Quack! \ud83d\udc25\ud83d\udc9b #shorts",
+      "key_facts": []
+    },
+    {
+      "episode_number": 7,
+      "tier": "older",
+      "core_entity": "nitrogen",
+      "topic": "Liquid Nitrogen (-320\u00b0F) VS 2,000\u00b0F Fire! \u2744\ufe0f\ud83d\udd25 #shorts",
+      "title": "Liquid Nitrogen (-320\u00b0F) VS 2,000\u00b0F Fire! \u2744\ufe0f\ud83d\udd25 #shorts",
       "key_facts": []
     }
-  ]
+  ],
+  "used_entities_by_tier": {
+    "younger": [
+      "chameleon",
+      "cloud",
+      "flamingo",
+      "octopus",
+      "shrimp"
+    ],
+    "preschool": [
+      "duckling"
+    ],
+    "older": [
+      "nitrogen"
+    ]
+  }
 }

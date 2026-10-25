@@ -62,19 +62,40 @@ class DailyRunner:
                 return yaml.safe_load(f)
         return {}
 
-    def run_daily_pipeline(self, niche: Optional[str] = None, auto_publish: bool = False) -> Dict[str, Any]:
+    def run_daily_pipeline(
+        self,
+        niche: Optional[str] = None,
+        auto_publish: bool = False,
+        tier: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Executes the full automated video generation cycle for today."""
         start_time = datetime.datetime.now()
         timestamp_str = start_time.strftime("%Y%m%d_%H%M%S")
         logger.info(f"=== Starting Daily YouTube Shorts Generator Pipeline [{timestamp_str}] ===")
 
-        # 1. Select niche
+        # 1. Resolve age tier (Option A schedule rotation fallback)
+        if not tier:
+            tiers_path = os.path.join("data", "age_tiers.json")
+            if os.path.exists(tiers_path):
+                try:
+                    import json
+                    with open(tiers_path, "r", encoding="utf-8") as f:
+                        tdata = json.load(f)
+                    weekday_str = str(start_time.weekday())
+                    tier = tdata.get("weekly_rotation_schedule", {}).get(weekday_str, "younger")
+                except Exception:
+                    tier = "younger"
+            else:
+                tier = "younger"
+        logger.info(f"[1/9] Active Age Tier: {tier.upper()}")
+
+        # 2. Select niche
         active_niches = self.config.get("niches", {}).get("active", ["animal_secrets"])
         selected_niche = niche or active_niches[0]
-        logger.info(f"[1/9] Selected Niche: {selected_niche}")
+        logger.info(f"[2/9] Selected Niche: {selected_niche}")
 
-        # 2. Scout trending shorts & update Playbook (/learn)
-        logger.info("[2/9] Scouting trending shorts & analyzing retention mechanics...")
+        # 3. Scout trending shorts & update Playbook (/learn)
+        logger.info("[3/9] Scouting trending shorts & analyzing retention mechanics...")
         trending_items = self.scout.scout_trending_topics(niche=selected_niche, max_results=3)
         analyzed_patterns = []
         for item in trending_items:
@@ -89,11 +110,11 @@ class DailyRunner:
         winning_formula = self.playbook.get_winning_formula(niche=selected_niche)
         logger.info(f"Playbook updated. Active winning archetype: {winning_formula['archetype']['id']}")
 
-        # 3. Generate character-consistent script using winning formula
+        # 4. Generate character-consistent script using winning formula & tier
         today_topic = trending_items[0].get("topic", "Flamingo Superpowers") if trending_items else "Flamingo Superpowers"
-        logger.info(f"[3/9] Generating character-consistent script for topic: '{today_topic}'...")
-        script = self.script_engine.generate_script(topic=today_topic, formula=winning_formula, niche=selected_niche)
-        logger.info(f"Script generated: '{script.title}' ({len(script.scenes)} scenes)")
+        logger.info(f"[4/9] Generating script for topic: '{today_topic}' [Tier: {tier}]...")
+        script = self.script_engine.generate_script(topic=today_topic, formula=winning_formula, niche=selected_niche, tier=tier)
+        logger.info(f"Script generated: '{script.title}' ({len(script.scenes)} scenes) [Tier: {tier}]")
 
         # 4. Compliance & Originality Pre-flight Check
         logger.info("[4/9] Running COPPA and Reused Content pre-flight check...")
@@ -183,7 +204,8 @@ class DailyRunner:
             made_for_kids=made_for_kids,
             scene_images=scene_images,
             character_sheet_path=self.visual_engine.reference_sheet_path,
-            visual_audit_report=visual_audit
+            visual_audit_report=visual_audit,
+            tier=tier
         )
         logger.info(f"[9/9] Distribution result: {upload_res.message}")
 

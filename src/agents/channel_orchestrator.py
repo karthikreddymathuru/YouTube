@@ -42,22 +42,55 @@ class ChannelDirectorAgent:
         6: "interactive_riddles",   # Sunday
     }
 
-    def __init__(self, ledger_path: str):
+    def __init__(self, ledger_path: str, age_tiers_path: str = "data/age_tiers.json"):
         self.ledger_path = ledger_path
+        self.age_tiers_path = age_tiers_path
 
-    def plan_daily_assignment(self, requested_niche: Optional[str] = None) -> Dict[str, Any]:
+    def plan_daily_assignment(
+        self,
+        requested_niche: Optional[str] = None,
+        requested_tier: Optional[str] = None
+    ) -> Dict[str, Any]:
         ledger = self._load_ledger()
-        weekday = datetime.now().weekday()
+        now = datetime.now()
+        weekday = now.weekday()
         assigned_niche = requested_niche or self.WEEKLY_CURRICULUM.get(weekday, "animal_secrets")
+
+        # Load age tiers config for Option A daily rotation schedule
+        tiers_config = {}
+        if os.path.exists(self.age_tiers_path):
+            try:
+                with open(self.age_tiers_path, "r", encoding="utf-8") as f:
+                    tiers_config = json.load(f)
+            except Exception as e:
+                logger.warning(f"Failed to load age_tiers.json: {e}")
+
+        rotation_schedule = tiers_config.get("weekly_rotation_schedule", {
+            "0": "younger",
+            "1": "preschool",
+            "2": "younger",
+            "3": "older",
+            "4": "younger",
+            "5": "preschool",
+            "6": "older"
+        })
+
+        assigned_tier = requested_tier or rotation_schedule.get(str(weekday), "younger")
+        tier_meta = tiers_config.get("tiers", {}).get(assigned_tier, {})
         published_titles = [ep.get("title", "") for ep in ledger.get("episodes", [])]
+
         return {
             "agent": self.ROLE,
-            "date": datetime.now().strftime("%Y-%m-%d"),
-            "weekday_name": datetime.now().strftime("%A"),
+            "date": now.strftime("%Y-%m-%d"),
+            "weekday_name": now.strftime("%A"),
             "assigned_niche": assigned_niche,
+            "assigned_tier": assigned_tier,
+            "tier_display_name": tier_meta.get("display_name", assigned_tier.capitalize()),
+            "target_age": tier_meta.get("target_age", "5-8"),
+            "tier_focus": tier_meta.get("focus", ""),
             "total_episodes_produced": len(ledger.get("episodes", [])),
             "recent_titles": published_titles[-5:],
-            "character_anchors": ["Pip the Flamingo", "Leo the Explorer Kid"],
+            "character_anchors": tier_meta.get("lead_characters", ["Pip the Flamingo", "Leo the Explorer Kid"]),
         }
 
     def _load_ledger(self) -> Dict[str, Any]:
@@ -133,9 +166,10 @@ class ShowrunnerScriptAgent:
         self,
         topic: str,
         winning_formula: Dict[str, Any],
-        niche: str
+        niche: str,
+        tier: str = "younger"
     ) -> Dict[str, Any]:
-        script = self.script_engine.generate_script(topic=topic, formula=winning_formula, niche=niche)
+        script = self.script_engine.generate_script(topic=topic, formula=winning_formula, niche=niche, tier=tier)
         tournament_report = getattr(script, "tournament_report", {}) or {}
 
         # Augment with HuggingFace-style Flesch-Kincaid kid readability score from WorkspaceProjectBridge
@@ -334,11 +368,12 @@ class PublishingManagerAgent:
         auto_upload: bool = False,
         privacy_status: str = "unlisted",
         made_for_kids: bool = True,
+        tier: str = "younger",
     ) -> Dict[str, Any]:
         # 1. Register script in history_scripts.json for automatic multi-day episode rotation
         self.policy_checker.register_published_script(title=script.title, script_text=full_script_text)
 
-        # 2. Stage / publish package via YouTubeUploader
+        # 2. Stage / publish package via YouTubeUploader (with tier-aware playlist assignment)
         upload_res = self.uploader.publish_short(
             video_path=mp4_path,
             title=script.title,
@@ -348,7 +383,8 @@ class PublishingManagerAgent:
             made_for_kids=made_for_kids,
             scene_images=scene_images,
             character_sheet_path=self.visual_engine.reference_sheet_path,
-            visual_audit_report=quality_result.get("visual_audit", {})
+            visual_audit_report=quality_result.get("visual_audit", {}),
+            tier=tier,
         )
         upload_dict = upload_res.to_dict()
         package_dir = upload_dict.get("package_dir") or os.path.dirname(mp4_path)
@@ -361,6 +397,7 @@ class PublishingManagerAgent:
             "timestamp": datetime.now().isoformat(),
             "date": director_plan.get("date"),
             "niche": director_plan.get("assigned_niche"),
+            "tier": tier,
             "title": script.title,
             "package_dir": package_dir,
             "video_file": os.path.join(package_dir, os.path.basename(mp4_path)),
@@ -375,7 +412,7 @@ class PublishingManagerAgent:
             "upload_status": upload_dict.get("mode", "staged_locally"),
             "youtube_video_id": upload_dict.get("video_id"),
         }
-        self._append_to_ledger(ledger_entry)
+        self._append_to_ledger(ledger_entry, tier=tier)
 
         return {
             "agent": self.ROLE,
@@ -384,7 +421,7 @@ class PublishingManagerAgent:
             "ledger_entry": ledger_entry,
         }
 
-    def _append_to_ledger(self, entry: Dict[str, Any]):
+    def _append_to_ledger(self, entry: Dict[str, Any], tier: str = "younger"):
         os.makedirs(os.path.dirname(self.ledger_path), exist_ok=True)
         ledger = {"channel_name": "Pip & Leo Kids Science Shorts", "episodes": []}
         if os.path.exists(self.ledger_path):
@@ -403,15 +440,16 @@ class PublishingManagerAgent:
             from src.compliance.topic_registry import TopicRegistry
             title = entry.get("title", "")
             core_entity = "unknown"
-            for known in ["shrimp", "axolotl", "eel", "tardigrade", "beetle", "falcon", "frog", "gecko", "archerfish", "jellyfish", "flamingo", "octopus", "cloud", "chameleon"]:
+            for known in ["duck", "duckling", "nitrogen", "shrimp", "axolotl", "eel", "tardigrade", "beetle", "falcon", "frog", "gecko", "archerfish", "jellyfish", "flamingo", "octopus", "cloud", "chameleon"]:
                 if known in title.lower():
-                    core_entity = known
+                    core_entity = "duckling" if "duck" in known else known
                     break
             TopicRegistry.register_episode(
                 episode_number=entry.get("episode_number", 1),
                 core_entity=core_entity,
                 topic=title,
-                title=title
+                title=title,
+                tier=tier
             )
         except Exception as e:
             logger.warning(f"Could not update TopicRegistry: {e}")
@@ -477,6 +515,7 @@ class ChannelOrchestrator:
     def run_autonomous_daily_cycle(
         self,
         niche: Optional[str] = None,
+        age_group: Optional[str] = None,
         top_k: int = 3,
         auto_upload: bool = False,
         max_retries: int = 2,
@@ -492,10 +531,15 @@ class ChannelOrchestrator:
         logger.info("=" * 72)
 
         # Agent 1: Channel Director & Curriculum Planner
-        director_plan = self.director_agent.plan_daily_assignment(requested_niche=niche)
+        director_plan = self.director_agent.plan_daily_assignment(
+            requested_niche=niche,
+            requested_tier=age_group
+        )
         assigned_niche = director_plan["assigned_niche"]
+        assigned_tier = director_plan["assigned_tier"]
         logger.info(
-            f"[1/6 {self.director_agent.ROLE}] Assigned Niche: '{assigned_niche}' "
+            f"[1/6 {self.director_agent.ROLE}] Assigned Niche: '{assigned_niche}' | "
+            f"Tier: '{assigned_tier}' ({director_plan.get('tier_display_name')}) "
             f"(Total Episodes Produced: {director_plan['total_episodes_produced']})"
         )
 
@@ -514,12 +558,13 @@ class ChannelOrchestrator:
                 topic=research_res["today_topic"],
                 winning_formula=research_res["winning_formula"],
                 niche=assigned_niche,
+                tier=assigned_tier,
             )
             script = showrunner_res["script"]
             logger.info(
                 f"[3/6 {self.showrunner_agent.ROLE}] Selected Episode '{showrunner_res['selected_title']}' "
                 f"({showrunner_res['winning_archetype']} - {showrunner_res['winning_score']}/100 | "
-                f"Kid Readability: {showrunner_res['nlp_readability']['kid_comprehension_score']}/100)"
+                f"Kid Readability: {showrunner_res['nlp_readability']['kid_comprehension_score']}/100) [Tier: {assigned_tier}]"
             )
 
             # Agent 4: Studio Voice & Animation Production
@@ -557,6 +602,7 @@ class ChannelOrchestrator:
                     quality_result=quality_res,
                     director_plan=director_plan,
                     auto_upload=auto_upload,
+                    tier=assigned_tier,
                 )
                 elapsed = round(time.time() - start_ts, 2)
                 logger.info(

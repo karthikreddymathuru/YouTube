@@ -1,0 +1,23 @@
+{
+  "channel_name": "Kurious Kids",
+  "playlists": {
+    "preschool": {
+      "playlist_id": null,
+      "title": "Preschool Fun & Learning (Ages 4 & Under) \ud83c\udf88 | Kurious Kids",
+      "url": null,
+      "videos": []
+    },
+    "younger": {
+      "playlist_id": null,
+      "title": "Curious Explorers: Animal & Science Superpowers (Ages 5\u20138) \ud83d\udd0d | Kurious Kids",
+      "url": null,
+      "videos": []
+    },
+    "older": {
+      "playlist_id": null,
+      "title": "Mind-Blown Science, Tech & Challenges (Ages 9\u201312) \u26a1 | Kurious Kids",
+      "url": null,
+      "videos": []
+    }
+  }
+}

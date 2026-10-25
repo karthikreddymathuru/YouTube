@@ -7,6 +7,7 @@ import subprocess
 from typing import Dict, Any, List, Optional
 import shutil
 import imageio_ffmpeg
+from src.publisher.playlist_manager import PlaylistManager
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +33,12 @@ class UploadResult:
 
 
 class YouTubeUploader:
-    """Manages YouTube Data API v3 uploads and staging export packages."""
+    """Manages YouTube Data API v3 uploads, age-tiered playlist assignments, and staging export packages."""
 
     SCOPES = [
         "https://www.googleapis.com/auth/youtube.upload",
-        "https://www.googleapis.com/auth/youtube.readonly"
+        "https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/youtube"
     ]
 
     def __init__(
@@ -47,6 +49,7 @@ class YouTubeUploader:
         self.client_secrets_path = client_secrets_path or self._find_credentials_file()
         self.staging_dir = staging_dir
         self.ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        self.playlist_manager = PlaylistManager()
         os.makedirs(self.staging_dir, exist_ok=True)
 
     def _find_credentials_file(self) -> Optional[str]:
@@ -117,7 +120,8 @@ class YouTubeUploader:
         category_id: str = "27",
         scene_images: Optional[List[str]] = None,
         character_sheet_path: Optional[str] = None,
-        visual_audit_report: Optional[Dict[str, Any]] = None
+        visual_audit_report: Optional[Dict[str, Any]] = None,
+        tier: str = "younger"
     ) -> UploadResult:
         """Stages the video package locally and uploads to YouTube via API v3 if authenticated."""
         stage_res = self._stage_local_package(
@@ -145,7 +149,8 @@ class YouTubeUploader:
                     tags=tags,
                     privacy_status=privacy_status,
                     made_for_kids=made_for_kids,
-                    category_id=category_id
+                    category_id=category_id,
+                    tier=tier
                 )
                 api_res.package_dir = stage_res.package_dir
                 return api_res
@@ -162,9 +167,10 @@ class YouTubeUploader:
         tags: List[str],
         privacy_status: str,
         made_for_kids: bool,
-        category_id: str
+        category_id: str,
+        tier: str = "younger"
     ) -> UploadResult:
-        """Executes authorized upload using googleapiclient."""
+        """Executes authorized upload using googleapiclient and adds video to tier playlist."""
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
 
@@ -190,6 +196,12 @@ class YouTubeUploader:
 
         video_id = response.get("id", "")
         video_url = f"https://youtube.com/shorts/{video_id}"
+
+        # Assign to dedicated age-tier playlist
+        try:
+            self.playlist_manager.add_video_to_playlist(youtube, video_id, tier)
+        except Exception as e:
+            logger.warning(f"Could not assign video {video_id} to playlist for tier '{tier}': {e}")
 
         return UploadResult(
             success=True,

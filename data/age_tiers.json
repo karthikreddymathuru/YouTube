@@ -1,0 +1,116 @@
+{
+  "tiers": {
+    "preschool": {
+      "id": "preschool",
+      "display_name": "Preschool (Ages 4 & Under)",
+      "target_age": "0-4",
+      "focus": "Fun, playfulness, learning, and exploration",
+      "content_types": [
+        "Nursery rhymes",
+        "Simple catchy songs",
+        "Playful cartoons",
+        "Basic educational clips"
+      ],
+      "learning_goals": [
+        "Counting 1-5",
+        "Colors & shapes",
+        "Animal sounds",
+        "Bedtime & nature wonder"
+      ],
+      "reading_grade_target": "Pre-K to Kindergarten (Grade 0-1)",
+      "max_words_per_scene": 12,
+      "pacing": "Gentle, rhythmic, catchy rhyming hooks",
+      "playlist": {
+        "title": "Preschool Fun & Learning (Ages 4 & Under) 🎈 | Kurious Kids",
+        "description": "Joyful nursery rhymes, colorful animal sounds, and playful early learning adventures for babies, toddlers, and preschoolers!"
+      },
+      "lead_characters": [
+        "Pip the Baby Chick",
+        "Sunny the Cloud",
+        "Barnaby the Baby Bear"
+      ],
+      "schedule_days": [
+        "Tuesday",
+        "Saturday"
+      ]
+    },
+    "younger": {
+      "id": "younger",
+      "display_name": "Younger Explorers (Ages 5–8)",
+      "target_age": "5-8",
+      "focus": "Designed for early elementary-aged children to explore topics they love",
+      "content_types": [
+        "Cartoons",
+        "Animal superpowers",
+        "DIY crafts",
+        "Kids' music",
+        "Educational science",
+        "Simple gaming videos"
+      ],
+      "learning_goals": [
+        "Animal adaptations",
+        "Earth & weather science",
+        "Curiosity mysteries",
+        "Interactive showdowns"
+      ],
+      "reading_grade_target": "Early Elementary (Grade 2-3)",
+      "max_words_per_scene": 18,
+      "pacing": "Playful, energetic, curiosity-gap hooks",
+      "playlist": {
+        "title": "Curious Explorers: Animal & Science Superpowers (Ages 5–8) 🔍 | Kurious Kids",
+        "description": "Incredible animal superpowers, nature mysteries, and fun science adventures with Pip the Flamingo and Leo the Explorer Kid!"
+      },
+      "lead_characters": [
+        "Pip the Flamingo",
+        "Leo the Explorer Kid"
+      ],
+      "schedule_days": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+      ]
+    },
+    "older": {
+      "id": "older",
+      "display_name": "Older Kids & Tweens (Ages 9–12)",
+      "target_age": "9-12",
+      "focus": "Gives kids more independence to explore wider interests",
+      "content_types": [
+        "Mind-blown science experiments",
+        "Gaming walkthroughs & hacks",
+        "Science tutorials",
+        "Physics & logic challenges"
+      ],
+      "learning_goals": [
+        "Physics & chemistry mechanics",
+        "Deep space & astrophysics",
+        "Engineering hacks",
+        "Mythbusting & illusions"
+      ],
+      "reading_grade_target": "Upper Elementary / Middle School (Grade 4-6)",
+      "max_words_per_scene": 22,
+      "pacing": "Fast-paced, high-energy, cinematic, punchy facts",
+      "playlist": {
+        "title": "Mind-Blown Science, Tech & Challenges (Ages 9–12) ⚡ | Kurious Kids",
+        "description": "Crazy science experiments, space mysteries, engineering hacks, and brain-bending challenges for pre-teens and curious minds!"
+      },
+      "lead_characters": [
+        "Leo's Tech Lab",
+        "Robo-Drone Vector"
+      ],
+      "schedule_days": [
+        "Thursday",
+        "Sunday"
+      ]
+    }
+  },
+  "weekly_rotation_schedule": {
+    "0": "younger",
+    "1": "preschool",
+    "2": "younger",
+    "3": "older",
+    "4": "younger",
+    "5": "preschool",
+    "6": "older"
+  }
+}

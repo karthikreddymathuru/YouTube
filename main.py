@@ -26,7 +26,11 @@ def cmd_generate(args):
     """Executes daily automated video generation pipeline."""
     logger.info(f"Triggering automated Short generation for niche: {args.niche or 'default'}")
     runner = DailyRunner(config_path=args.config)
-    result = runner.run_daily_pipeline(niche=args.niche, auto_publish=args.auto_publish)
+    result = runner.run_daily_pipeline(
+        niche=args.niche,
+        auto_publish=args.auto_publish,
+        tier=getattr(args, "age_group", None)
+    )
     print("\n" + "=" * 50)
     print("🎬 VIDEO GENERATION COMPLETE")
     print("=" * 50)
@@ -40,6 +44,7 @@ def cmd_agent_run(args):
     orchestrator = ChannelOrchestrator()
     res = orchestrator.run_autonomous_daily_cycle(
         niche=args.niche,
+        age_group=getattr(args, "age_group", None),
         top_k=args.top_k,
         auto_upload=args.auto_publish,
     )
@@ -51,6 +56,7 @@ def cmd_agent_run(args):
     print("🤖 6-AGENT AUTONOMOUS KIDS CHANNEL CREW — DAILY RUN SUMMARY")
     print("=" * 72)
     print(f"  • Episode #{ledger.get('episode_number')}: {ledger.get('title')}")
+    print(f"  • Age Tier             : {ledger.get('tier', 'younger').upper()}")
     print(f"  • Assigned Niche       : {ledger.get('niche')}")
     print(f"  • Winning Archetype    : {ledger.get('winning_archetype')} ({ledger.get('tournament_score')}/100)")
     print(f"  • Duration & A/V Drift : {ledger.get('duration_sec')}s | Drift: {ledger.get('av_drift_sec')}s")
@@ -72,11 +78,12 @@ def cmd_schedule_daemon(args):
         logger.info(f"⏰ Scheduled daily trigger fired at {target_time}! Launching 6-Agent Crew...")
         orchestrator.run_autonomous_daily_cycle(
             niche=args.niche,
+            age_group=getattr(args, "age_group", None),
             auto_upload=args.auto_publish,
         )
 
     schedule.every().day.at(target_time).do(_job)
-    logger.info(f"🗓️ Autonomous Kids Channel Daemon active — scheduled daily at {target_time} local time.")
+    logger.info(f"🗓️ Autonomous Kids Channel Daemon active — scheduled daily at {target_time} local time (Schedule Option A active).")
     if args.run_immediately:
         _job()
     while True:
@@ -205,6 +212,7 @@ def main():
 
     # Subcommand: agent-run
     agent_parser = subparsers.add_parser("agent-run", help="Run the 6-Agent Autonomous Channel Crew for today's Short")
+    agent_parser.add_argument("--age-group", type=str, choices=["preschool", "younger", "older"], default=None, help="Target age tier: preschool (4 & under), younger (5-8), older (9-12). Defaults to Option A rotating schedule.")
     agent_parser.add_argument("--niche", type=str, default=None, help="Optional niche override (defaults to 7-day curriculum)")
     agent_parser.add_argument("--top-k", type=int, default=2, help="Number of viral Shorts to analyze")
     agent_parser.add_argument("--auto-publish", action="store_true", help="Automatically upload to YouTube Kids")
@@ -214,6 +222,7 @@ def main():
     # Subcommand: schedule-daemon
     sched_parser = subparsers.add_parser("schedule-daemon", help="Run continuous daily scheduler daemon for the 6-Agent Crew")
     sched_parser.add_argument("--time", type=str, default="17:00", help="Daily 24h time to trigger generation (default: 17:00)")
+    sched_parser.add_argument("--age-group", type=str, choices=["preschool", "younger", "older"], default=None, help="Optional age tier override")
     sched_parser.add_argument("--niche", type=str, default=None, help="Optional niche override")
     sched_parser.add_argument("--auto-publish", action="store_true", help="Automatically upload to YouTube Kids")
     sched_parser.add_argument("--run-immediately", action="store_true", help="Trigger an immediate run on daemon startup")
@@ -221,6 +230,7 @@ def main():
 
     # Subcommand: generate
     gen_parser = subparsers.add_parser("generate", help="Generate today's YouTube Short")
+    gen_parser.add_argument("--age-group", type=str, choices=["preschool", "younger", "older"], default=None, help="Target age tier: preschool (4 & under), younger (5-8), older (9-12)")
     gen_parser.add_argument("--niche", type=str, default="animal_secrets", help="Content niche")
     gen_parser.add_argument("--config", type=str, default="config.yaml", help="Path to config file")
     gen_parser.add_argument("--auto-publish", action="store_true", help="Automatically upload to YouTube")

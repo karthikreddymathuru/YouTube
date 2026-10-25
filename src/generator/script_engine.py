@@ -877,6 +877,218 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
                 ]
             }
         ]
+    },
+    "baby_ducklings_counting_quack": {
+        "core_entity": "duckling",
+        "tier": "preschool",
+        "niche": "nursery_rhyme_singalong",
+        "topic": "Five Baby Ducklings Count & Splash",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "One tiny fluffy yellow baby duckling waddles cheerfully down to the green pond",
+                "required_keywords": ["one", "1", "duckling", "fluffy", "yellow", "waddles"],
+                "character_expression": "happy_proud",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_one_waddle",
+                "visual_badge_text": "1 LITTLE DUCKLING!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "Two baby ducklings splash and kick their tiny orange feet in the water",
+                "required_keywords": ["two", "2", "ducklings", "splash", "water", "feet"],
+                "character_expression": "happy_proud",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_two_splash",
+                "visual_badge_text": "2 SPLASHING DUCKS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "Three baby ducklings open their tiny beaks and sing quack quack quack",
+                "required_keywords": ["three", "3", "quack", "sing", "song", "beaks"],
+                "character_expression": "eating_excited",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_three_quack",
+                "visual_badge_text": "3 SINGING QUACKS!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "Four baby ducklings shake their soft fluffy feather tails with happy wiggles",
+                "required_keywords": ["four", "4", "shake", "tails", "fluffy", "wiggle"],
+                "character_expression": "happy_proud",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_four_shake",
+                "visual_badge_text": "4 WIGGLY TAILS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "Five baby ducklings swim in a neat little line under the bright smiling sunshine",
+                "required_keywords": ["five", "5", "swim", "line", "sunshine", "together"],
+                "character_expression": "happy_proud",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_five_paddle",
+                "visual_badge_text": "5 HAPPY DUCKLINGS!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "Mama duck calls them over for delicious crunchy green pondweed snacks",
+                "required_keywords": ["mama", "duck", "calls", "snacks", "crunchy", "yummy"],
+                "character_expression": "eating_excited",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_mama_snack",
+                "visual_badge_text": "MAMA DUCK'S SNACK!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "All five tired ducklings cuddle close together for a warm cozy sleepy nap",
+                "required_keywords": ["cuddle", "nap", "sleep", "cozy", "tired", "dreams"],
+                "character_expression": "sleeping_peaceful",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_cuddle_sleep",
+                "visual_badge_text": "COZY SLEEPY NAP!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the toddler which they like best: splashing in the pond or saying quack quack",
+                "required_keywords": ["which", "love", "like", "best", "splash", "quack"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "yellow",
+                "visual_prop": "duckling_choice_quack_splash",
+                "visual_badge_text": "WHAT'S YOUR FAVORITE?",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Joyful_Preschool_Counting_Singalong",
+                "title": "Five Little Ducklings Count & Quack! 🐥💛 #shorts",
+                "description": "Count 1 to 5 with five cute fluffy baby ducklings splashing in the pond! Fun singalong for toddlers and preschoolers. #shorts #kids #preschool #ducklings #nurseryrhymes",
+                "tags": ["shorts", "preschool", "toddlers", "nurseryrhymes", "counting", "ducklings", "kidslearning"],
+                "scene_narrations": [
+                    "Look! One little fluffy yellow duckling waddles down to the pond!",
+                    "Now two happy ducklings splash and kick in the cool water!",
+                    "Three little ducklings open their beaks and sing: quack, quack, quack!",
+                    "Four fluffy ducklings shake and wiggle their soft little feather tails!",
+                    "Five little ducklings paddle in a line under the warm sunshine!",
+                    "Mama duck calls them over to munch on yummy green snacks!",
+                    "Now all five ducklings cuddle up together for a cozy nap!",
+                    "Which do you love best: splashing in water or saying quack quack?"
+                ]
+            }
+        ]
+    },
+    "liquid_nitrogen_fire_showdown": {
+        "core_entity": "nitrogen",
+        "tier": "older",
+        "niche": "mindblown_experiments",
+        "topic": "Liquid Nitrogen vs 2,000°F Fire Showdown",
+        "blueprint": [
+            {
+                "scene_id": 1,
+                "topic_beat": "Liquid nitrogen boils at an extreme cryogenic temperature of minus 320 degrees Fahrenheit",
+                "required_keywords": ["liquid", "nitrogen", "boils", "minus", "320", "cryogenic"],
+                "character_expression": "shocked",
+                "character_color_state": "blue",
+                "visual_prop": "nitrogen_minus_320f",
+                "visual_badge_text": "-320°F CRYOGENIC LIQUID!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 2,
+                "topic_beat": "Submerging a bouncy rubber ball freezes it instantly so it shatters into glass-like shards",
+                "required_keywords": ["ball", "rubber", "freezes", "shatters", "glass", "instant"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "blue",
+                "visual_prop": "nitrogen_shatter_ball",
+                "visual_badge_text": "RUBBER SHATTERS LIKE GLASS!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 3,
+                "topic_beat": "The Leidenfrost effect creates a protective microscopic vapor cushion around warm surfaces",
+                "required_keywords": ["leidenfrost", "vapor", "cushion", "protective", "boils", "layer"],
+                "character_expression": "happy_proud",
+                "character_color_state": "blue",
+                "visual_prop": "leidenfrost_vapor_barrier",
+                "visual_badge_text": "LEIDENFROST VAPOR SHIELD!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 4,
+                "topic_beat": "What happens when minus 320°F cryogenic nitrogen collides directly with roaring 2,000°F fire?",
+                "required_keywords": ["fire", "collides", "thousand", "flame", "degrees", "roaring"],
+                "character_expression": "shocked",
+                "character_color_state": "blue",
+                "visual_prop": "nitrogen_vs_fire_standoff",
+                "visual_badge_text": "-320°F VS 2,000°F FIRE!",
+                "sfx_cue": "whoosh",
+            },
+            {
+                "scene_id": 5,
+                "topic_beat": "Liquid nitrogen violently expands seven hundred times its liquid volume into a massive gas cloud",
+                "required_keywords": ["expands", "700", "seven", "hundred", "times", "cloud"],
+                "character_expression": "transforming_amazed",
+                "character_color_state": "blue",
+                "visual_prop": "nitrogen_700x_expansion",
+                "visual_badge_text": "700X GAS EXPANSION!",
+                "sfx_cue": "pop",
+            },
+            {
+                "scene_id": 6,
+                "topic_beat": "The massive nitrogen gas cloud displaces all oxygen and instantly suffocates the roaring fire",
+                "required_keywords": ["oxygen", "displaces", "suffocates", "flame", "extinguishes", "smoke"],
+                "character_expression": "happy_proud",
+                "character_color_state": "blue",
+                "visual_prop": "fire_oxygen_starvation",
+                "visual_badge_text": "FIRE SUFFOCATES INSTANTLY!",
+                "sfx_cue": "chime",
+            },
+            {
+                "scene_id": 7,
+                "topic_beat": "Scientists use this cryogenic power to supercool quantum computers and liquid rocket propellant",
+                "required_keywords": ["quantum", "rocket", "supercool", "computers", "space", "power"],
+                "character_expression": "xray_focused",
+                "character_color_state": "blue",
+                "visual_prop": "cryo_quantum_rocket",
+                "visual_badge_text": "POWERS QUANTUM & ROCKETS!",
+                "sfx_cue": "ding",
+            },
+            {
+                "scene_id": 8,
+                "topic_beat": "Asking the pre-teen viewer which superpower they would choose: flash freeze blast or vapor heat shield",
+                "required_keywords": ["which", "pick", "choose", "superpower", "freeze", "shield"],
+                "character_expression": "waving_cheerful",
+                "character_color_state": "blue",
+                "visual_prop": "nitrogen_superpower_choice",
+                "visual_badge_text": "PICK YOUR SUPERPOWER!",
+                "sfx_cue": "whoosh",
+            },
+        ],
+        "candidates": [
+            {
+                "style_name": "Extreme_Thermodynamics_Showdown",
+                "title": "Liquid Nitrogen (-320°F) VS 2,000°F Fire! ❄️🔥 #shorts",
+                "description": "What happens when minus 320°F liquid nitrogen collides with roaring 2,000°F fire? Discover the Leidenfrost effect and quantum cooling! #shorts #science #physics #experiments",
+                "tags": ["shorts", "science", "physics", "experiments", "liquidnitrogen", "mindblown", "teenscience"],
+                "scene_narrations": [
+                    "Liquid nitrogen boils at an extreme cryogenic temperature of minus 320 degrees Fahrenheit!",
+                    "Dip a bouncy rubber ball inside, and it freezes so fast it shatters like fragile glass!",
+                    "Even crazier, the Leidenfrost effect creates a microscopic vapor cushion protecting warm hands!",
+                    "So what happens when minus 320-degree nitrogen is poured directly onto 2,000-degree fire?",
+                    "The cryogenic liquid violently expands seven hundred times its volume in less than a second!",
+                    "This massive nitrogen cloud starves the flame of oxygen and suffocates the fire instantly!",
+                    "Today, engineers use this extreme cold to supercool quantum computers and liquid rocket engines!",
+                    "Which superpower would you choose: the instant flash freeze blast or the Leidenfrost vapor shield?"
+                ]
+            }
+        ]
     }
 }
 
@@ -922,6 +1134,7 @@ class Scene(BaseModel):
 class ShortScript(BaseModel):
     title: str
     topic: str
+    tier: str = "younger"
     target_audience: str = "family_co_viewing"
     character_spec: CharacterSpec = Field(default_factory=CharacterSpec)
     description: str
@@ -949,64 +1162,91 @@ class ScriptEngine:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
 
-    def _select_episode_blueprint(self, topic: str, niche: str) -> Dict[str, Any]:
+    def _select_episode_blueprint(self, topic: str, niche: str, tier: str = "younger") -> Dict[str, Any]:
         """
-        Selects a 100% brand-new, never-before-covered episode blueprint.
-        Strictly enforces indefinite zero-repetition across entities, topics, and titles.
+        Selects a 100% brand-new, never-before-covered episode blueprint for the given age tier.
+        Strictly enforces indefinite zero-repetition across entities, topics, and titles within the tier.
         """
-        used_entities = TopicRegistry.load_used_entities()
-        used_titles = TopicRegistry.load_used_titles()
+        used_entities_tier = TopicRegistry.load_used_entities(tier=tier)
+        used_titles_tier = TopicRegistry.load_used_titles(tier=tier)
         topic_lower = (topic or "").lower()
 
-        logger.info(f"Enforcing Zero-Repetition Lifetime Registry: {len(used_entities)} entities permanently locked out: {sorted(list(used_entities))}")
+        logger.info(f"Enforcing Zero-Repetition Registry for [{tier.upper()}]: {len(used_entities_tier)} entities locked out: {sorted(list(used_entities_tier))}")
 
-        # If a specific topic was requested, verify it is NOT in used entities or past titles
+        # If a specific topic was requested, verify it is NOT in used entities or past titles for this tier
         if topic_lower:
             for ep_key, ep_data in EPISODE_LIBRARY.items():
+                if ep_data.get("tier", "younger") != tier:
+                    continue
                 ent = ep_data.get("core_entity", ep_key).lower()
                 if ent in topic_lower or ep_key in topic_lower or ep_data["topic"].lower() in topic_lower:
-                    if not TopicRegistry.is_forbidden(ent, ep_data["topic"]):
-                        if not any(c["title"] in used_titles for c in ep_data["candidates"]):
-                            logger.info(f"Selected requested fresh episode blueprint: '{ep_key}' ({ep_data['topic']})")
+                    if not TopicRegistry.is_forbidden(ent, ep_data["topic"], tier=tier):
+                        if not any(c["title"] in used_titles_tier for c in ep_data["candidates"]):
+                            logger.info(f"Selected requested fresh episode blueprint: '{ep_key}' ({ep_data['topic']}) for [{tier}]")
                             return ep_data
                     else:
-                        logger.warning(f"Requested topic '{topic}' contains previously used entity '{ent}'. Bypassing to enforce zero repetition!")
+                        logger.warning(f"Requested topic '{topic}' in tier '{tier}' was already used. Bypassing to enforce zero repetition!")
 
-        # Find all blueprints in EPISODE_LIBRARY whose core entity and topic have NEVER been used
+        # Find all blueprints in EPISODE_LIBRARY matching this tier whose core entity and topic have NEVER been used in this tier
         fresh_blueprints = []
         for ep_key, ep_data in EPISODE_LIBRARY.items():
-            ent = ep_data.get("core_entity", ep_key).lower()
-            if TopicRegistry.is_forbidden(ent, ep_data["topic"]):
+            if ep_data.get("tier", "younger") != tier:
                 continue
-            if any(c["title"] in used_titles for c in ep_data["candidates"]):
+            ent = ep_data.get("core_entity", ep_key).lower()
+            if TopicRegistry.is_forbidden(ent, ep_data["topic"], tier=tier):
+                continue
+            if any(c["title"] in used_titles_tier for c in ep_data["candidates"]):
                 continue
             fresh_blueprints.append((ep_key, ep_data))
 
         if fresh_blueprints:
-            # Match niche if possible, otherwise take next fresh blueprint
             niche_matches = [b for b in fresh_blueprints if b[1].get("niche") == niche]
             selected_key, selected_ep = niche_matches[0] if niche_matches else fresh_blueprints[0]
-            logger.info(f"Auto-selected fresh non-repeating blueprint: '{selected_key}' ({selected_ep['topic']})")
+            logger.info(f"Auto-selected fresh non-repeating blueprint for [{tier}]: '{selected_key}' ({selected_ep['topic']})")
             return selected_ep
 
-        # If static library is exhausted, dynamically generate a novel blueprint with AI Studio / Gemini!
-        logger.info("All static library blueprints exhausted. Dynamically generating novel blueprint via AI Studio...")
-        novel_ep = self._generate_novel_blueprint_with_ai(niche, used_entities)
+        # If static library for this tier is exhausted, dynamically generate a novel blueprint with AI Studio!
+        logger.info(f"All static blueprints for tier [{tier}] exhausted. Dynamically generating novel blueprint via AI Studio...")
+        novel_ep = self._generate_novel_blueprint_with_ai(niche, used_entities_tier, tier=tier)
         if novel_ep:
             return novel_ep
 
-        raise RuntimeError(f"FATAL ZERO-REPETITION LOCK: All {len(used_entities)} topics in library have been used. No fresh blueprint available.")
+        raise RuntimeError(f"FATAL ZERO-REPETITION LOCK: All {len(used_entities_tier)} topics in tier [{tier}] have been used. No fresh blueprint available.")
 
-    def _generate_novel_blueprint_with_ai(self, niche: str, used_entities: set) -> Optional[Dict[str, Any]]:
-        """Dynamically synthesizes a brand-new, never-before-covered 8-scene blueprint using Gemini."""
+    def _generate_novel_blueprint_with_ai(self, niche: str, used_entities: set, tier: str = "younger") -> Optional[Dict[str, Any]]:
+        """Dynamically synthesizes a brand-new, never-before-covered 8-scene blueprint using Gemini tailored to age tier."""
         if not self.api_key:
             return None
         forbidden_str = ", ".join(sorted(list(used_entities)))
+
+        tier_instructions = {
+            "preschool": (
+                "TARGET AUDIENCE: Preschool & Toddlers (Ages 4 & under).\n"
+                "TONE & STYLE: Joyful, gentle, rhythmic, catchy rhyming singalong.\n"
+                "TOPIC THEMES: Counting 1-5, primary colors, baby animal sounds, simple nature wonders.\n"
+                "VOCABULARY: Maximum 10-12 simple phonetic words per scene. Zero complex words."
+            ),
+            "younger": (
+                "TARGET AUDIENCE: Early Elementary Kids (Ages 5–8).\n"
+                "TONE & STYLE: Curious, playful, energetic, mystery & superpower showdown.\n"
+                "TOPIC THEMES: Animal superpowers, nature secrets, cool body facts, interactive 2-choice questions.\n"
+                "VOCABULARY: 14-18 lively words per scene."
+            ),
+            "older": (
+                "TARGET AUDIENCE: Older Kids & Tweens (Ages 9–12).\n"
+                "TONE & STYLE: Fast-paced, high-energy, intellectual curiosity, mind-blown, mythbusting, ZERO baby talk.\n"
+                "TOPIC THEMES: Extreme physics, cryogenic chemistry, space phenomena, engineering hacks.\n"
+                "VOCABULARY: 18-22 punchy, intellectually stimulating words per scene."
+            )
+        }
+        tier_prompt_info = tier_instructions.get(tier, tier_instructions["younger"])
+
         prompt = (
             f"You are the Lead Curriculum Showrunner for KuriousKids YouTube Channel.\n"
-            f"Task: Generate a completely new, kid-friendly 8-scene scientific Short blueprint for niche '{niche}'.\n"
-            f"CRITICAL MANDATE: The following entities and topics have ALREADY been produced and are STRICTLY FORBIDDEN from repeating: {forbidden_str}.\n"
-            f"You MUST select a completely different, unmentioned animal superpower or natural phenomenon.\n"
+            f"Task: Generate a completely new 8-scene Short blueprint for niche '{niche}' and age tier '{tier}'.\n"
+            f"{tier_prompt_info}\n"
+            f"CRITICAL MANDATE: The following entities and topics have ALREADY been produced in this tier and are STRICTLY FORBIDDEN from repeating: {forbidden_str}.\n"
+            f"You MUST select a completely different, unmentioned animal or scientific concept.\n"
             f"Return JSON with keys: core_entity, topic, niche, candidates (list of dict with title, description, tags, scene_narrations), "
             f"blueprint (8 scenes with scene_id, topic_beat, required_keywords, character_expression, visual_prop, visual_badge_text, sfx_cue)."
         )
@@ -1022,7 +1262,8 @@ class ScriptEngine:
                 text = data["candidates"][0]["content"]["parts"][0]["text"]
                 novel_data = json.loads(text)
                 if novel_data.get("blueprint") and len(novel_data["blueprint"]) == 8:
-                    logger.info(f"AI Studio synthesized brand-new blueprint: {novel_data.get('topic')}")
+                    novel_data["tier"] = tier
+                    logger.info(f"AI Studio synthesized brand-new blueprint for [{tier}]: {novel_data.get('topic')}")
                     return novel_data
         except Exception as e:
             logger.warning(f"Failed to generate dynamic blueprint via AI Studio: {e}")
@@ -1051,12 +1292,18 @@ class ScriptEngine:
                 pass
         return titles
 
-    def generate_script(self, topic: str, formula: Dict[str, Any], niche: str = "animal_secrets") -> ShortScript:
+    def generate_script(
+        self,
+        topic: str = "",
+        formula: Dict[str, Any] = None,
+        niche: str = "animal_secrets",
+        tier: str = "younger"
+    ) -> ShortScript:
         """
-        Selects the active episode blueprint, generates/evaluates competing candidate scripts,
-        scores each candidate on 5 viral & sync criteria, and returns the highest-scoring fresh script.
+        Selects the active episode blueprint for the given age tier, generates/evaluates competing
+        candidate scripts, scores each candidate, and returns the highest-scoring fresh script.
         """
-        episode = self._select_episode_blueprint(topic, niche)
+        episode = self._select_episode_blueprint(topic, niche, tier=tier)
         active_blueprint = episode["blueprint"]
         active_topic = episode["topic"]
         candidates: List[Dict[str, Any]] = list(episode["candidates"])
@@ -1089,11 +1336,27 @@ class ScriptEngine:
 
         logger.info(
             f"Daily Script Tournament Winner: '{winner['candidate_id']}' - '{winner['title']}' "
-            f"(Score: {winner['total_score']}/100 across {len(scored_candidates)} candidates)"
+            f"(Score: {winner['total_score']}/100 across {len(scored_candidates)} candidates) [Tier: {tier}]"
         )
 
         topic_low = winner["topic"].lower()
-        if "shrimp" in topic_low:
+        if "duck" in topic_low:
+            char_name = "Ducky the Fluffy Duckling"
+            char_spec = CharacterSpec(
+                name="Ducky the Fluffy Duckling",
+                species_or_role="duckling",
+                face_traits="Cute round baby yellow duckling, fluffy cheeks, tiny smiling orange bill, sparkly black eyes",
+                companion_name="Mama Duck"
+            )
+        elif "nitrogen" in topic_low:
+            char_name = "Dr. Nova & Leo's Lab"
+            char_spec = CharacterSpec(
+                name="Dr. Nova",
+                species_or_role="scientist",
+                face_traits="Sleek safety goggles, futuristic white lab coat, cryogenic frost mist aura",
+                companion_name="Robo-Drone Vector"
+            )
+        elif "shrimp" in topic_low:
             char_name = "Perry the Pistol Shrimp & Leo"
             char_spec = CharacterSpec(
                 name="Perry the Pistol Shrimp",
@@ -1185,6 +1448,7 @@ class ScriptEngine:
             "winner_id": winner["candidate_id"],
             "winner_title": winner["title"],
             "winner_score": winner["total_score"],
+            "tier": tier,
             "candidates_evaluated": len(scored_candidates),
             "leaderboard": [
                 {
@@ -1200,7 +1464,8 @@ class ScriptEngine:
         return ShortScript(
             title=winner["title"],
             topic=winner["topic"],
-            target_audience="family_co_viewing",
+            tier=tier,
+            target_audience="preschool" if tier == "preschool" else ("older_kids" if tier == "older" else "family_co_viewing"),
             character_spec=char_spec,
             description=winner["description"],
             tags=winner["tags"],

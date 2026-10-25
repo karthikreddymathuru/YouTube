@@ -28,7 +28,7 @@ class PolicyChecker:
 
     PROHIBITED_KIDS_TERMS = [
         "weapon", "knife", "gun", "kill", "die", "death", "gore", "bleeding",
-        "scary", "monster", "demon", "choke", "poison", "fire",
+        "scary", "monster", "demon", "choke", "poison", "set on fire",
         "dangerous", "dare", "prank", "steal", "fake news"
     ]
 
