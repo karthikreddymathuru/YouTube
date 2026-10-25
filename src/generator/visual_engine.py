@@ -10,6 +10,7 @@ import json
 import base64
 import random
 import urllib.request
+import urllib.parse
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Any, List, Optional, Tuple
@@ -31,12 +32,15 @@ class VisualEngine:
         output_dir: str = "data/output/visuals",
         width: int = 1080,
         height: int = 1920,
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        hf_token: Optional[str] = None
     ):
         self.output_dir = output_dir
         self.width = width
         self.height = height
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        self.hf_token = hf_token or os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN")
+        self.hf_model = os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell")
         os.makedirs(self.output_dir, exist_ok=True)
         self.reference_sheet_path = os.path.join(self.output_dir, "master_character_sheet.png")
         self._ensure_master_character_sheet()
@@ -128,7 +132,24 @@ class VisualEngine:
             badge_text = getattr(scene, "visual_badge_text", "FUN FACT!")
             narration = getattr(scene, "narration", "")
 
-        # 1. Try Google AI Studio Multimodal Reference-Conditioned Image Generation
+        tier = kwargs.get("tier") or getattr(scene, "tier", None)
+
+        # 1. Try Hugging Face Free Serverless Inference Models (FLUX.1-schnell / SDXL / OpenJourney)
+        hf_ok = self._generate_via_huggingface(
+            scene_id=scene_id,
+            prompt=prompt,
+            expression=expression,
+            color_state=color_state,
+            visual_prop=visual_prop,
+            badge_text=badge_text,
+            output_path=output_path,
+            tier=tier,
+            narration=narration
+        )
+        if hf_ok and os.path.exists(output_path):
+            return output_path
+
+        # 2. Try Google AI Studio Multimodal Reference-Conditioned Image Generation
         if self.api_key:
             ai_studio_ok = self._generate_via_ai_studio_multimodal(
                 scene_id=scene_id,
@@ -142,9 +163,7 @@ class VisualEngine:
             if ai_studio_ok and os.path.exists(output_path):
                 return output_path
 
-        tier = kwargs.get("tier") or getattr(scene, "tier", None)
-
-        # 2. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer
+        # 3. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer (Safety fallback)
         return self._render_consistent_character_scene(
             scene_id=scene_id,
             expression=expression,
@@ -177,7 +196,141 @@ class VisualEngine:
             if results[i] is None:
                 results[i] = self.generate_scene_image(scene=scenes[i], filename_prefix=filename_prefix)
 
-        return results
+    def _generate_via_huggingface(
+        self,
+        scene_id: int,
+        prompt: str,
+        expression: str,
+        color_state: str,
+        visual_prop: str,
+        badge_text: str,
+        output_path: str,
+        tier: str = "younger",
+        narration: str = ""
+    ) -> bool:
+        """
+        Generates a realistic 3D Pixar scene using Hugging Face free models (FLUX.1-schnell / SDXL / OpenJourney),
+        crops/scales to 1080x1920 9:16 vertical shorts aspect ratio, and composites
+        the clean fitted top fact badge and realistic age-appropriate child avatar.
+        """
+        tier = (tier or "younger").lower()
+        if tier == "preschool":
+            style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, cute soft rounded shapes, glowing warm sunlight, sweet cheerful atmosphere"
+        elif tier == "older":
+            style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution"
+        else:
+            style_context = "vibrant 3D Pixar adventure scene, lush tropical nature, bright saturated colors, 8k cinematic lighting, master character art"
+
+        clean_prompt = prompt or f"{visual_prop} with {expression} expression"
+        full_prompt = (
+            f"{style_context}, {clean_prompt}. "
+            "Masterpiece, ultra high quality, Disney Pixar style, 3D render, Unreal Engine 5, smooth textures, sharp focus, family friendly, zero text, zero watermark."
+        )
+
+        image_bytes = None
+
+        # 1. Try Hugging Face Serverless Router if HF_TOKEN is provided
+        if self.hf_token:
+            hf_models = [
+                self.hf_model,
+                "black-forest-labs/FLUX.1-schnell",
+                "stabilityai/stable-diffusion-xl-base-1.0",
+                "prompthero/openjourney"
+            ]
+            for model_id in hf_models:
+                try:
+                    url = f"https://router.huggingface.co/hf-inference/models/{model_id}"
+                    payload = json.dumps({
+                        "inputs": full_prompt,
+                        "parameters": {
+                            "width": 768,
+                            "height": 1024,
+                            "num_inference_steps": 4 if "schnell" in model_id else 25
+                        }
+                    }).encode("utf-8")
+                    req = urllib.request.Request(
+                        url,
+                        data=payload,
+                        headers={
+                            "Authorization": f"Bearer {self.hf_token}",
+                            "Content-Type": "application/json",
+                            "User-Agent": "KuriousKidsShortsGenerator/2.0"
+                        },
+                        method="POST"
+                    )
+                    with urllib.request.urlopen(req, timeout=35) as resp:
+                        if resp.status == 200:
+                            content_type = resp.headers.get("Content-Type", "")
+                            if "image" in content_type:
+                                image_bytes = resp.read()
+                                logger.info(f"Hugging Face Inference API ({model_id}) generated realistic scene {scene_id} ({len(image_bytes)} bytes).")
+                                break
+                except Exception as e:
+                    logger.debug(f"HF model {model_id} note: {e}")
+
+        # 2. Try Pollinations open Hugging Face FLUX router (zero-auth free model)
+        if not image_bytes:
+            try:
+                enc = urllib.parse.quote(full_prompt)
+                poll_url = f"https://image.pollinations.ai/prompt/{enc}?width=576&height=1024&nologo=true&seed={scene_id * 17 + 42}"
+                req = urllib.request.Request(poll_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    if resp.status == 200:
+                        image_bytes = resp.read()
+                        logger.info(f"Pollinations FLUX generated realistic scene {scene_id} ({len(image_bytes)} bytes).")
+            except Exception as e:
+                logger.debug(f"Pollinations FLUX note: {e}")
+
+        if not image_bytes:
+            return False
+
+        # Format, crop, upscale to 1080x1920 and composite fitted top badge and child avatar
+        try:
+            with Image.open(io.BytesIO(image_bytes)) as raw_im:
+                im = raw_im.convert("RGB")
+                w, h = im.size
+                # Trim any tiny bottom watermark band
+                if h > 100:
+                    im = im.crop((0, 0, w, h - int(h * 0.035)))
+                    w, h = im.size
+
+                target_ratio = self.width / float(self.height)
+                curr_ratio = w / float(h)
+                if curr_ratio > target_ratio:
+                    new_w = int(h * target_ratio)
+                    left = (w - new_w) // 2
+                    im = im.crop((left, 0, left + new_w, h))
+                else:
+                    new_h = int(w / target_ratio)
+                    top = (h - new_h) // 2
+                    im = im.crop((0, top, w, top + new_h))
+
+                final_img = im.resize((self.width, self.height), Image.Resampling.LANCZOS)
+                draw = ImageDraw.Draw(final_img, "RGBA")
+
+                # Store active tier on self for avatar routing
+                self.current_tier = tier
+
+                # Composite clean top story fact badge (no progress pills, fitted text)
+                self._draw_top_story_banner(draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
+
+                # Composite realistic age-appropriate child reaction avatar at bottom
+                reaction_label = (badge_text.split(":")[-1] if ":" in badge_text else badge_text).strip()[:18]
+                self._draw_leo_reaction_corner(
+                    draw=draw,
+                    cx=220,
+                    cy=1480,
+                    expression=expression,
+                    label=reaction_label or "WOW!",
+                    tier=tier
+                )
+
+                final_img.save(output_path, "PNG", quality=95)
+                logger.info(f"Composited realistic 3D Pixar frame {output_path} (1080x1920, Tier: {tier}).")
+                return True
+        except Exception as e:
+            logger.warning(f"Error compositing realistic frame for scene {scene_id}: {e}")
+            return False
 
     def _generate_via_ai_studio_multimodal(
         self,
