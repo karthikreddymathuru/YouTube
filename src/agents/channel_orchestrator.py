@@ -226,10 +226,11 @@ class StudioProductionAgent:
         )
         total_duration = round(sum(scene_durations), 2)
 
-        # 2. Consistent character visual scene generation (Pip the Flamingo + Leo the Explorer Kid)
+        # 2. Photorealistic wildlife scene generation using Apple M4 GPU
         scene_images = self.visual_engine.generate_all_scenes_parallel(
             scenes=script.scenes,
-            filename_prefix=f"short_{run_id}"
+            filename_prefix=f"short_{run_id}",
+            topic=script.topic
         )
         scene_sfx = [s.sfx_cue for s in script.scenes]
 

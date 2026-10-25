@@ -136,7 +136,23 @@ class VisualEngine:
 
         tier = kwargs.get("tier") or getattr(scene, "tier", None)
 
-        # 1. Try Hugging Face Free Serverless Inference Models (FLUX.1-schnell / SDXL / OpenJourney)
+        # 1. Try Local Apple Silicon Mac Hardware Diffusion (100% Free, Offline, Zero-Quota, ~2s on M4 GPU)
+        local_ok = self._generate_via_local_diffusion(
+            scene_id=scene_id,
+            prompt=prompt,
+            expression=expression,
+            color_state=color_state,
+            visual_prop=visual_prop,
+            badge_text=badge_text,
+            output_path=output_path,
+            tier=tier,
+            narration=narration,
+            topic=kwargs.get("topic") or getattr(self, "current_topic", "")
+        )
+        if local_ok and os.path.exists(output_path):
+            return output_path
+
+        # 2. Try Hugging Face Free Serverless Inference Models (FLUX.1-schnell / SDXL / OpenJourney)
         hf_ok = self._generate_via_huggingface(
             scene_id=scene_id,
             prompt=prompt,
@@ -146,12 +162,13 @@ class VisualEngine:
             badge_text=badge_text,
             output_path=output_path,
             tier=tier,
-            narration=narration
+            narration=narration,
+            topic=kwargs.get("topic") or getattr(self, "current_topic", "")
         )
         if hf_ok and os.path.exists(output_path):
             return output_path
 
-        # 2. Try Google AI Studio Multimodal Reference-Conditioned Image Generation
+        # 3. Try Google AI Studio Multimodal Reference-Conditioned Image Generation
         if self.api_key:
             ai_studio_ok = self._generate_via_ai_studio_multimodal(
                 scene_id=scene_id,
@@ -165,21 +182,6 @@ class VisualEngine:
             if ai_studio_ok and os.path.exists(output_path):
                 return output_path
 
-        # 3. Try Local Apple Silicon Mac Hardware Diffusion (100% Free, Offline, Zero-Quota)
-        local_ok = self._generate_via_local_diffusion(
-            scene_id=scene_id,
-            prompt=prompt,
-            expression=expression,
-            color_state=color_state,
-            visual_prop=visual_prop,
-            badge_text=badge_text,
-            output_path=output_path,
-            tier=tier,
-            narration=narration
-        )
-        if local_ok and os.path.exists(output_path):
-            return output_path
-
         # 4. Deterministic Character-Consistent 3D-Shaded Rig & Storyboard Renderer (Safety fallback)
         return self._render_consistent_character_scene(
             scene_id=scene_id,
@@ -192,36 +194,38 @@ class VisualEngine:
             tier=tier
         )
 
-    def generate_all_scenes_parallel(self, scenes: List[Any], filename_prefix: str = "scene") -> List[str]:
+    def generate_all_scenes_parallel(self, scenes: List[Any], filename_prefix: str = "scene", topic: str = "") -> List[str]:
         """
         Generates all scene illustrations sequentially with deliberate network pacing to prevent rate-limiting,
-        and enforces 100% 3D Pixar visual style consistency across all frames.
+        and enforces 100% photorealistic wildlife/nature photography consistency across all frames.
         """
         import time
         import shutil
+        if topic:
+            self.current_topic = topic
         results = [None] * len(scenes)
 
         for i, s in enumerate(scenes):
             try:
-                path = self.generate_scene_image(scene=s, filename_prefix=filename_prefix)
+                path = self.generate_scene_image(scene=s, filename_prefix=filename_prefix, topic=topic)
                 results[i] = path
             except Exception as e:
                 logger.error(f"Error generating scene image {i}: {e}")
-            time.sleep(1.0)
+            time.sleep(0.5)
 
         # Style Consistency Enforcement Guard:
-        # Check that no frame drops to low-res 2D vector clipart (< 200KB) while other frames are 3D Pixar (>= 500KB)
-        pixar_3d_frames = []
+        # Check that no frame drops to low-res 2D vector clipart (< 200KB) while other frames are photorealistic (>= 300KB)
+        photo_frames = []
         for p in results:
-            if p and os.path.exists(p) and os.path.getsize(p) >= 400000:
-                pixar_3d_frames.append(p)
+            if p and os.path.exists(p) and os.path.getsize(p) >= 300000:
+                photo_frames.append(p)
 
-        if pixar_3d_frames:
+        if photo_frames:
             for idx, p in enumerate(results):
                 if not p or not os.path.exists(p) or os.path.getsize(p) < 250000:
-                    donor_path = pixar_3d_frames[idx % len(pixar_3d_frames)]
+                    donor_path = photo_frames[idx % len(photo_frames)]
                     target_path = os.path.join(self.output_dir, f"{filename_prefix}_{idx+1}.png")
-                    logger.info(f"Visual Consistency Guard: Upgrading 2D fallback frame {idx+1} to 100% 3D Pixar using donor frame {donor_path}.")
+                    logger.info(f"Visual Consistency Guard: Upgrading 2D fallback frame {idx+1} to photorealistic photography using donor frame {donor_path}.")
                     try:
                         with Image.open(donor_path) as donor_im:
                             re_frame = donor_im.copy()
@@ -249,6 +253,119 @@ class VisualEngine:
 
         return results
 
+    def _build_realistic_wildlife_prompt(
+        self,
+        scene_id: int,
+        prompt: str = "",
+        narration: str = "",
+        visual_prop: str = "",
+        badge_text: str = "",
+        tier: str = "younger",
+        topic: str = ""
+    ) -> str:
+        """
+        Builds a 100% photorealistic wildlife/nature photography prompt.
+        Strictly enforces National Geographic documentary style and completely bans
+        cartoon, 3D Pixar, Disney, and CGI visual artifacts.
+        """
+        cleaned_prompt = prompt or ""
+        for ban in ["3D Pixar animation of", "3D Pixar digital illustration", "3D Pixar", "Disney Pixar", "Disney", "Pixar", "CGI animation style", "cartoon"]:
+            cleaned_prompt = cleaned_prompt.replace(ban, "").strip()
+
+        # Extract or detect subject
+        topic_str = topic or getattr(self, "current_topic", "")
+        text_corpus = f"{cleaned_prompt} {narration} {visual_prop} {badge_text} {topic_str}".lower()
+
+        if "electric eel" in text_corpus or "eel" in text_corpus or "knifefish" in text_corpus:
+            subject = "electric eel"
+            habitats = [
+                "swimming gracefully in the clear waters of the Amazon River, natural sunlight filtering underwater",
+                "showing its long muscular body and sleek textured skin swimming past freshwater river plants",
+                "releasing a brilliant defensive flash of electrical bioluminescence in dark Amazon river water with illuminated water bubbles",
+                "gliding low along a natural sandy riverbed with submerged tree branches and river rocks",
+                "curling its long flexible body in deep clear river water, surrounded by freshwater aquatic flora",
+                "close-up macro view of its sleek head and textured insulated skin in crystal clear freshwater river",
+                "swimming defensively near a caiman alligator near the riverbank in the Amazon rainforest river",
+                "magnificent view swimming toward sunlit ripples at the river surface with lush Amazon riverbank in background"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "duck" in text_corpus or "duckling" in text_corpus:
+            subject = "adorable fluffy bright yellow baby ducklings"
+            habitats = [
+                "swimming happily on crystal-clear sunlit pond water with gentle ripples",
+                "close-up on crystal clear pond with green water lily pads and soft downy yellow feathers",
+                "diving playfully beneath clean turquoise water",
+                "preening soft feathers on a smooth mossy river stone in warm morning sunlight",
+                "waddling along the lush green pond edge near wildflowers",
+                "resting together warmly by the sunny water bank",
+                "splashing with tiny water droplets glistening in the sun",
+                "swimming in a peaceful row across a sunlit pond surrounded by nature"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "flamingo" in text_corpus:
+            subject = "flamingos in nature"
+            habitats = [
+                "drinking from a shallow volcanic salt lagoon in warm natural light",
+                "close-up of vibrant pink curved beak dipping into clear water",
+                "fluffy gray baby flamingo chick resting beside parent in salt flat",
+                "wading through blue water scooping up pink brine shrimp",
+                "flock of bright pink flamingos preening feathers in sunlight",
+                "standing peacefully balanced on one leg in calm mountain lagoon",
+                "close-up of long slender leg and webbed foot in water",
+                "majestic flamingo spreading wings across clear Andean lagoon"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "octopus" in text_corpus:
+            subject = "common octopus in the ocean"
+            habitats = [
+                "moving across a natural coral reef in crystal clear turquoise ocean water",
+                "close-up showing translucent tentacles and breathing gills",
+                "tiny rice-sized baby octopus hatching in clear sea water",
+                "hunting for crabs on rocky seabed with coral branches",
+                "blending seamlessly into textured ocean rocks with rapid camouflage",
+                "gliding through blue ocean water with waving tentacles",
+                "curled on sandy ocean floor watching small reef fish",
+                "swimming toward the sunlit ocean surface over colorful coral"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "axolotl" in text_corpus:
+            subject = "pink axolotl"
+            habitats = [
+                "swimming in crystal clear freshwater lake with lush underwater plants",
+                "close-up portrait showing delicate pink feathery external gills and gentle smile",
+                "resting peacefully on smooth river stones under filtered sunlight",
+                "swimming gracefully through underwater freshwater grasses",
+                "floating near water surface among lotus leaves",
+                "detailed macro view of translucent gills and tiny webbed feet",
+                "swimming among small freshwater fish in pristine lake",
+                "majestic close-up in clear lake Xochimilco habitat"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "chameleon" in text_corpus:
+            subject = "veiled chameleon"
+            habitats = [
+                "perched on a leafy rainforest branch with vibrant emerald green scales",
+                "close-up of rotating 360-degree turret eye focusing on leaves",
+                "shifting skin color from bright lime green to rich turquoise and yellow",
+                "grasping a jungle vine with pincer feet in natural sunlight",
+                "rapidly catching an insect with long elastic tongue in tropical forest",
+                "curling prehensile tail tightly around a mossy tree twig",
+                "resting under warm sun on broad jungle leaves",
+                "walking deliberately along a flowering branch in the rainforest canopy"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        else:
+            subject = topic_str or "wild animal in nature"
+            action = cleaned_prompt or narration or visual_prop or "in its authentic wild habitat"
+
+        final_prompt = (
+            f"Stunning photorealistic photograph of {subject}, {action}. "
+            "National Geographic wildlife photography, 8k resolution, authentic nature documentary shot, "
+            "natural cinematic lighting, crystal clear pin-sharp focus, highly detailed skin texture, "
+            "realistic natural habitat, zero cartoon, zero animation, zero CGI, zero 3D render, no blur."
+        )
+        return final_prompt
+
     def _generate_via_local_diffusion(
         self,
         scene_id: int,
@@ -259,10 +376,11 @@ class VisualEngine:
         badge_text: str,
         output_path: str,
         tier: str = "younger",
-        narration: str = ""
+        narration: str = "",
+        topic: str = ""
     ) -> bool:
         """
-        Generates a realistic 3D Pixar scene locally on MacBook Air (Apple M4 Silicon) using
+        Generates a 100% photorealistic wildlife/nature scene locally on MacBook Air (Apple M4 Silicon) using
         hardware-accelerated Metal Performance Shaders (MPS) with stabilityai/sd-turbo.
         100% free, offline, zero-quota, and permanent fallback.
         """
@@ -272,17 +390,14 @@ class VisualEngine:
             from PIL import Image, ImageDraw
 
             tier = (tier or "younger").lower()
-            if tier == "preschool":
-                style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, crystal clear cheerful characters, glowing warm sunlight, sparkling clean atmosphere, deep focus, sharp details, zero blur"
-            elif tier == "older":
-                style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution, pin-sharp details, deep focus"
-            else:
-                style_context = "vibrant 3D Pixar adventure scene, lush colorful nature, bright saturated colors, 8k cinematic lighting, master character art, pin-sharp focus on characters, zero blur"
-
-            clean_prompt = prompt or f"{visual_prop} with {expression} expression"
-            full_prompt = (
-                f"{style_context}, {clean_prompt}. "
-                "Masterpiece, ultra high quality, Disney Pixar 3D CGI animation style, sharp focus, clear detailed faces, family friendly, zero text, zero watermark."
+            full_prompt = self._build_realistic_wildlife_prompt(
+                scene_id=scene_id,
+                prompt=prompt,
+                narration=narration,
+                visual_prop=visual_prop,
+                badge_text=badge_text,
+                tier=tier,
+                topic=topic or getattr(self, "current_topic", "")
             )
 
             # Lazy-load pipeline singleton on Apple Silicon MPS
@@ -314,8 +429,8 @@ class VisualEngine:
                 ).images[0]
             except Exception as gen_err:
                 if getattr(self, "_local_device", "") == "mps":
-                    logger.info("MPS compiler restricted; seamlessly executing on CPU fallback...")
-                    self._local_pipeline.to("cpu")
+                    logger.info("MPS compiler restricted; cleanly switching to float32 on CPU fallback...")
+                    self._local_pipeline.to(torch.float32).to("cpu")
                     self._local_device = "cpu"
                     raw_img = self._local_pipeline(
                         prompt=full_prompt,
@@ -356,7 +471,7 @@ class VisualEngine:
             )
 
             final_img.save(output_path, "PNG", quality=95)
-            logger.info(f"Local M4 Apple Silicon diffusion generated 3D Pixar frame {output_path} (1080x1920, Tier: {tier}).")
+            logger.info(f"Local M4 Apple Silicon diffusion generated photorealistic frame {output_path} (1080x1920, Tier: {tier}).")
             return True
         except Exception as e:
             logger.warning(f"Local offline diffusion generation note for scene {scene_id}: {e}")
@@ -372,25 +487,23 @@ class VisualEngine:
         badge_text: str,
         output_path: str,
         tier: str = "younger",
-        narration: str = ""
+        narration: str = "",
+        topic: str = ""
     ) -> bool:
         """
-        Generates a realistic 3D Pixar scene using Hugging Face free models (FLUX.1-schnell / SDXL / OpenJourney),
+        Generates a photorealistic wildlife/nature scene using Hugging Face free models (FLUX.1-schnell / SDXL / OpenJourney),
         crops/scales to 1080x1920 9:16 vertical shorts aspect ratio, and composites
         the clean fitted top fact badge and realistic age-appropriate child avatar.
         """
         tier = (tier or "younger").lower()
-        if tier == "preschool":
-            style_context = "adorable vibrant 3D Pixar digital illustration for preschoolers, crystal clear cheerful characters, glowing warm sunlight, sparkling clean atmosphere, deep focus, f/8 aperture, entire frame in sharp focus, zero blur, zero bokeh"
-        elif tier == "older":
-            style_context = "epic cinematic 3D digital illustration for pre-teens, futuristic science laboratory, glowing volumetric particles, dramatic lighting, 8k resolution, pin-sharp details, zero blur, deep focus"
-        else:
-            style_context = "vibrant 3D Pixar adventure scene, lush tropical nature, bright saturated colors, 8k cinematic lighting, master character art, pin-sharp focus on all characters, zero blur"
-
-        clean_prompt = prompt or f"{visual_prop} with {expression} expression"
-        full_prompt = (
-            f"{style_context}, {clean_prompt}. "
-            "Masterpiece, ultra high quality, Disney Pixar 3D CGI animation style, sharp focus, clear detailed faces and eyes, family friendly, zero text, zero watermark, no depth of field blur, no bokeh."
+        full_prompt = self._build_realistic_wildlife_prompt(
+            scene_id=scene_id,
+            prompt=prompt,
+            narration=narration,
+            visual_prop=visual_prop,
+            badge_text=badge_text,
+            tier=tier,
+            topic=topic or getattr(self, "current_topic", "")
         )
 
         image_bytes = None

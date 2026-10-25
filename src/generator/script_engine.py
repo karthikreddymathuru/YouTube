@@ -1701,6 +1701,25 @@ class ScriptEngine:
                 companion_name="Curious Squad"
             )
 
+        # Determine real animal/subject for 100% photorealistic wildlife visual prompt
+        species = char_spec.species_or_role.lower()
+        if species == "eel" or "eel" in topic_low:
+            real_subject = "electric eel"
+        elif species == "duckling" or "duck" in topic_low:
+            real_subject = "baby duckling"
+        elif species == "flamingo" or "flamingo" in topic_low:
+            real_subject = "flamingo"
+        elif species == "octopus" or "octopus" in topic_low:
+            real_subject = "octopus"
+        elif species == "axolotl" or "axolotl" in topic_low:
+            real_subject = "axolotl"
+        elif species == "chameleon" or "chameleon" in topic_low:
+            real_subject = "chameleon"
+        elif species == "shrimp" or "shrimp" in topic_low:
+            real_subject = "mantis shrimp"
+        else:
+            real_subject = species or topic_low
+
         scenes = []
         for idx, bp in enumerate(winner_bp):
             narr = winner["scene_narrations"][idx]
@@ -1709,7 +1728,7 @@ class ScriptEngine:
                     scene_id=bp["scene_id"],
                     duration_sec=3.2,
                     narration=narr,
-                    visual_prompt=f"Vertical 9:16 3D Pixar animation of {char_name}: {bp['topic_beat']}",
+                    visual_prompt=f"Stunning photorealistic photograph of real {real_subject}, {bp['topic_beat']}. National Geographic wildlife photography, 8k resolution, authentic nature documentary shot, natural lighting, crystal clear pin-sharp focus, detailed skin texture, realistic natural habitat, zero cartoon, zero animation, zero CGI, zero 3D render.",
                     character_expression=bp["character_expression"],
                     character_color_state=bp["character_color_state"],
                     visual_prop=bp["visual_prop"],

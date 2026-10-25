@@ -5,6 +5,7 @@
     "chameleon",
     "cloud",
     "duckling",
+    "eel",
     "flamingo",
     "nitrogen",
     "octopus",
@@ -107,12 +108,21 @@
       "topic": "The Animal That Can Regrow Its Entire Brain! \ud83e\udd8e\u2728 #shorts",
       "title": "The Animal That Can Regrow Its Entire Brain! \ud83e\udd8e\u2728 #shorts",
       "key_facts": []
+    },
+    {
+      "episode_number": 10,
+      "tier": "younger",
+      "core_entity": "eel",
+      "topic": "Why Electric Eels Are LIVING Batteries! \u26a1\ud83d\udd0b #shorts",
+      "title": "Why Electric Eels Are LIVING Batteries! \u26a1\ud83d\udd0b #shorts",
+      "key_facts": []
     }
   ],
   "used_entities_by_tier": {
     "younger": [
       "chameleon",
       "cloud",
+      "eel",
       "flamingo",
       "octopus",
       "shrimp",
