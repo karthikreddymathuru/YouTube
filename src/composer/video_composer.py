@@ -142,9 +142,10 @@ class VideoComposer:
         output_audio_path: str
     ):
         """Mixes narration, ducked BGM, and transition SFX into a single master audio track."""
-        # Balanced mixing: BGM at 40% (melodic & lively), Voice at 80% so music is prominent and harmonized
-        bgm_vol = 0.40
-        voice_vol = 0.80
+        # Balanced high-presence mixing: Voice at 135% (crisp, loud, crystal-clear), BGM at 22%
+        # normalize=0 prevents amix from automatically halving the volume of the inputs
+        voice_vol = 1.35
+        bgm_vol = 0.22
 
         cmd = [
             self.ffmpeg_exe,
@@ -152,7 +153,7 @@ class VideoComposer:
             "-i", narration_audio_path,
             "-stream_loop", "-1", "-i", bgm_audio_path,
             "-filter_complex",
-            f"[1:a]volume={bgm_vol}[bgm];[0:a]volume={voice_vol}[voice];[voice][bgm]amix=inputs=2:duration=first:dropout_transition=2[outa]",
+            f"[0:a]volume={voice_vol}[voice];[1:a]volume={bgm_vol}[bgm];[voice][bgm]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[outa]",
             "-map", "[outa]",
             "-t", str(total_duration),
             output_audio_path

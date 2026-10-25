@@ -972,14 +972,14 @@ EPISODE_LIBRARY: Dict[str, Dict[str, Any]] = {
                 "description": "Count 1 to 5 with five cute fluffy baby ducklings splashing in the pond! Fun singalong for toddlers and preschoolers. #shorts #kids #preschool #ducklings #nurseryrhymes",
                 "tags": ["shorts", "preschool", "toddlers", "nurseryrhymes", "counting", "ducklings", "kidslearning"],
                 "scene_narrations": [
-                    "Look! One little fluffy yellow duckling waddles down to the pond!",
-                    "Now two happy ducklings splash and kick in the cool water!",
-                    "Three little ducklings open their beaks and sing: quack, quack, quack!",
-                    "Four fluffy ducklings shake and wiggle their soft little feather tails!",
-                    "Five little ducklings paddle in a line under the warm sunshine!",
-                    "Mama duck calls them over to munch on yummy green snacks!",
-                    "Now all five ducklings cuddle up together for a cozy nap!",
-                    "Which do you love best: splashing in water or saying quack quack?"
+                    "One little duckling... yellow and bright!\nWaddling along... in the warm sunlight!",
+                    "Two little ducklings... splash and play!\nKicking their feet... in the pond all day!",
+                    "Three little ducklings... in a neat row!\nQuack, quack, quack... off they go!",
+                    "Four little ducklings... shake their tails!\nWiggle and waggle... like little sails!",
+                    "Five little ducklings... swim with pride!\nGliding along... side by side!",
+                    "Mama Duck calls them... quack, quack, quack!\nCome eat your yummy... leafy snack!",
+                    "Five little ducklings... time for bed!\nTuck in your feathers... rest your head!",
+                    "Which do you love... when ducklings play?\nSplashing in water... or quacking all day?"
                 ]
             }
         ]
