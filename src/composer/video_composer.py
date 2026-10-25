@@ -75,55 +75,102 @@ class VideoComposer:
         return final_mp4_path
 
     def _render_visual_sequence(self, images: List[str], durations: List[float], output_video: str):
-        """Creates video clips with smooth Ken Burns zoom-in motions for each scene."""
-        import moviepy.video.io.ImageSequenceClip as isc
+        """
+        Renders dynamic cinematic video clips with buttery-smooth subpixel Pan In and Pan Out
+        for each scene, keeping the top headline banner and reaction webcam rock-solid stable.
+        """
+        import subprocess
         from PIL import Image
-
-        # Ensure all images are RGB and exactly 1080x1920
-        prepared_images = []
-        for img_path in images:
-            with Image.open(img_path) as im:
-                if im.size != (self.width, self.height) or im.mode != "RGB":
-                    resized = im.convert("RGB").resize((self.width, self.height), Image.Resampling.LANCZOS)
-                    fixed_path = img_path.replace(".png", "_fixed.png")
-                    resized.save(fixed_path)
-                    prepared_images.append(fixed_path)
-                else:
-                    prepared_images.append(img_path)
-
-        # Build clean, rock-solid FFmpeg sequence without integer zoompan jitter
-        inputs = []
-        filter_parts = []
-        for i, (img_path, dur) in enumerate(zip(prepared_images, durations)):
-            inputs.extend(["-loop", "1", "-t", f"{dur:.3f}", "-i", img_path])
-            filter_parts.append(
-                f"[{i}:v]scale={self.width}:{self.height}:force_original_aspect_ratio=decrease,"
-                f"pad={self.width}:{self.height}:(ow-iw)/2:(oh-ih)/2,setsar=1[v{i}];"
-            )
-
-        concat_inputs = "".join(f"[v{i}]" for i in range(len(prepared_images)))
-        filter_complex = "".join(filter_parts) + f"{concat_inputs}concat=n={len(prepared_images)}:v=1:a=0[outv]"
 
         cmd = [
             self.ffmpeg_exe,
             "-y",
-            *inputs,
-            "-filter_complex", filter_complex,
-            "-map", "[outv]",
+            "-f", "rawvideo",
+            "-pix_fmt", "rgb24",
+            "-s", f"{self.width}x{self.height}",
+            "-r", str(self.fps),
+            "-i", "-",
             "-c:v", "libx264",
             "-preset", "ultrafast",
             "-crf", "20",
             "-pix_fmt", "yuv420p",
-            "-r", str(self.fps),
             output_video
         ]
 
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+
         try:
-            subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            for i, (img_path, dur) in enumerate(zip(images, durations)):
+                raw_path = img_path.replace(".png", "_raw.png")
+                overlay_path = img_path.replace(".png", "_overlay.png")
+
+                # If raw background exists, pan/zoom it while keeping overlay steady.
+                # Otherwise, pan the composited image smoothly.
+                if os.path.exists(raw_path):
+                    base_im = Image.open(raw_path).convert("RGB")
+                    overlay_im = Image.open(overlay_path).convert("RGBA") if os.path.exists(overlay_path) else None
+                else:
+                    base_im = Image.open(img_path).convert("RGB")
+                    overlay_im = None
+
+                if base_im.size != (self.width, self.height):
+                    base_im = base_im.resize((self.width, self.height), Image.Resampling.LANCZOS)
+
+                frames = max(int(round(dur * self.fps)), 1)
+
+                # Alternating dynamic cinematic camera motions based on scene flow:
+                # Scene 0 (1st scene): Smooth Pan In (Zoom In) towards animal: 1.00x -> 1.15x
+                # Scene 1 (2nd scene): Smooth Pan Out (Zoom Out) revealing habitat: 1.15x -> 1.00x
+                # Scene 2 (3rd scene): Smooth Pan In towards superpower/shock: 1.00x -> 1.15x
+                # Scene 3 (4th scene): Smooth Pan Out / Wide reveal: 1.15x -> 1.00x
+                motion_type = i % 2  # 0: Pan In, 1: Pan Out
+
+                for f in range(frames):
+                    # Cubic smoothstep easing: zero jerk, perfectly soft acceleration & deceleration
+                    t = f / float(max(frames - 1, 1))
+                    progress = t * t * (3.0 - 2.0 * t)
+
+                    if motion_type == 0:
+                        # Pan In: zoom from 1.00 to 1.15
+                        zoom = max(1.0, 1.0 + 0.15 * progress)
+                    else:
+                        # Pan Out: zoom from 1.15 down to 1.00
+                        zoom = max(1.0, 1.15 - 0.15 * progress)
+
+                    cw = float(self.width) / zoom
+                    ch = float(self.height) / zoom
+                    cx = max(0.0, (float(self.width) - cw) / 2.0)
+                    cy = max(0.0, (float(self.height) - ch) / 2.0)
+                    x2 = min(float(self.width), cx + cw)
+                    y2 = min(float(self.height), cy + ch)
+
+                    # Subpixel float resampling: zero integer truncation, zero shaking!
+                    frame_im = base_im.resize(
+                        (self.width, self.height),
+                        resample=Image.Resampling.BILINEAR,
+                        box=(cx, cy, x2, y2)
+                    )
+
+                    if overlay_im is not None:
+                        frame_rgba = frame_im.convert("RGBA")
+                        frame_rgba.alpha_composite(overlay_im)
+                        frame_im = frame_rgba.convert("RGB")
+
+                    proc.stdin.write(frame_im.tobytes())
+
+            proc.stdin.close()
+            proc.wait()
         except Exception as e:
-            logger.warning(f"Standard FFmpeg concat failed: {e}. Falling back to image sequence clip.")
+            if proc and proc.stdin:
+                try:
+                    proc.stdin.close()
+                except Exception:
+                    pass
+            if proc:
+                proc.kill()
+            logger.warning(f"Subpixel pan/zoom rendering failed: {e}. Falling back to standard image slideshow.")
             import moviepy.video.io.ImageSequenceClip as isc
-            clip = isc.ImageSequenceClip(prepared_images, durations=durations)
+            clip = isc.ImageSequenceClip(images, durations=durations)
             clip.write_videofile(output_video, fps=self.fps, codec="libx264", audio=False, logger=None)
 
     def _mix_audio(

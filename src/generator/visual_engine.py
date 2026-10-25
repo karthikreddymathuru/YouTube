@@ -366,6 +366,46 @@ class VisualEngine:
         )
         return final_prompt
 
+    def _save_scene_with_overlay(
+        self,
+        final_img: Any,
+        output_path: str,
+        scene_id: int,
+        badge_text: str,
+        expression: str,
+        tier: str
+    ):
+        """
+        Saves:
+        1. Clean raw 1080x1920 animal photograph (`_raw.png`) for subpixel pan-in/pan-out in video composer.
+        2. Clean UI overlay (`_overlay.png`) containing fixed top fact badge and reaction webcam.
+        3. Full composited frame (`.png`) for backward-compatible full previews and quality gates.
+        """
+        from PIL import Image, ImageDraw
+        raw_bg_path = output_path.replace(".png", "_raw.png")
+        final_img.save(raw_bg_path, "PNG", quality=95)
+
+        overlay = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
+        overlay_draw = ImageDraw.Draw(overlay, "RGBA")
+        self.current_tier = tier
+        self._draw_top_story_banner(overlay_draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
+
+        reaction_label = (badge_text.split(":")[-1] if ":" in badge_text else badge_text).strip()[:18]
+        self._draw_leo_reaction_corner(
+            draw=overlay_draw,
+            cx=220,
+            cy=1480,
+            expression=expression,
+            label=reaction_label or "WOW!",
+            tier=tier
+        )
+        overlay_path = output_path.replace(".png", "_overlay.png")
+        overlay.save(overlay_path, "PNG")
+
+        composited = final_img.convert("RGBA")
+        composited.alpha_composite(overlay)
+        composited.convert("RGB").save(output_path, "PNG", quality=95)
+
     def _generate_via_local_diffusion(
         self,
         scene_id: int,
@@ -455,22 +495,14 @@ class VisualEngine:
                 im = im.crop((0, top, w, top + new_h))
 
             final_img = im.resize((self.width, self.height), Image.Resampling.LANCZOS)
-            draw = ImageDraw.Draw(final_img, "RGBA")
-
-            self.current_tier = tier
-            self._draw_top_story_banner(draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
-
-            reaction_label = (badge_text.split(":")[-1] if ":" in badge_text else badge_text).strip()[:18]
-            self._draw_leo_reaction_corner(
-                draw=draw,
-                cx=220,
-                cy=1480,
+            self._save_scene_with_overlay(
+                final_img=final_img,
+                output_path=output_path,
+                scene_id=scene_id,
+                badge_text=badge_text,
                 expression=expression,
-                label=reaction_label or "WOW!",
                 tier=tier
             )
-
-            final_img.save(output_path, "PNG", quality=95)
             logger.info(f"Local M4 Apple Silicon diffusion generated photorealistic frame {output_path} (1080x1920, Tier: {tier}).")
             return True
         except Exception as e:
@@ -595,27 +627,16 @@ class VisualEngine:
                     im = im.crop((0, top, w, top + new_h))
 
                 final_img = im.resize((self.width, self.height), Image.Resampling.LANCZOS)
-                draw = ImageDraw.Draw(final_img, "RGBA")
-
-                # Store active tier on self for avatar routing
-                self.current_tier = tier
-
-                # Composite clean top story fact badge (no progress pills, fitted text)
-                self._draw_top_story_banner(draw, scene_id=scene_id, total_scenes=8, badge_text=badge_text)
-
-                # Composite realistic age-appropriate child reaction avatar at bottom
-                reaction_label = (badge_text.split(":")[-1] if ":" in badge_text else badge_text).strip()[:18]
-                self._draw_leo_reaction_corner(
-                    draw=draw,
-                    cx=220,
-                    cy=1480,
+                self._save_scene_with_overlay(
+                    final_img=final_img,
+                    output_path=output_path,
+                    scene_id=scene_id,
+                    badge_text=badge_text,
                     expression=expression,
-                    label=reaction_label or "WOW!",
                     tier=tier
                 )
-
-                final_img.save(output_path, "PNG", quality=95)
-                logger.info(f"Composited realistic 3D Pixar frame {output_path} (1080x1920, Tier: {tier}).")
+                logger.info(f"Composited photorealistic frame {output_path} (1080x1920, Tier: {tier}).")
+                return True
                 return True
         except Exception as e:
             logger.warning(f"Error compositing realistic frame for scene {scene_id}: {e}")
