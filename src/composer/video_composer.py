@@ -91,20 +91,37 @@ class VideoComposer:
                 else:
                     prepared_images.append(img_path)
 
-        # Build FFmpeg complex filter for smooth zoompan transitions
+        # Build FFmpeg complex filter for smooth dynamic camera motions (Ken Burns)
         inputs = []
         filter_parts = []
         for i, (img_path, dur) in enumerate(zip(prepared_images, durations)):
             inputs.extend(["-i", img_path])
-            # Alternating zoom in and zoom out for dynamic variety
             frames = max(int(round(dur * self.fps)), 1)
-            if i % 2 == 0:
-                zoom_expr = f"min(zoom+0.0015,1.15)"
+            # Cycle through 4 lively cinematic camera motions to bring characters to life:
+            # 0: Smooth zoom-in toward character
+            # 1: Smooth zoom-out revealing the full environment
+            # 2: Gentle camera glide from left to center
+            # 3: Gentle camera glide from right to center
+            motion_type = i % 4
+            if motion_type == 0:
+                zoom_expr = f"1.0+0.15*(on/{frames})"
+                x_expr = "iw/2-(iw/zoom/2)"
+                y_expr = "ih/2-(ih/zoom/2)"
+            elif motion_type == 1:
+                zoom_expr = f"1.15-0.15*(on/{frames})"
+                x_expr = "iw/2-(iw/zoom/2)"
+                y_expr = "ih/2-(ih/zoom/2)"
+            elif motion_type == 2:
+                zoom_expr = "1.12"
+                x_expr = f"(iw-iw/zoom)*(1.0-on/{frames})"
+                y_expr = "ih/2-(ih/zoom/2)"
             else:
-                zoom_expr = f"if(eq(on,1),1.15,max(1.0,zoom-0.0015))"
+                zoom_expr = "1.12"
+                x_expr = f"(iw-iw/zoom)*(on/{frames})"
+                y_expr = "ih/2-(ih/zoom/2)"
 
             filter_parts.append(
-                f"[{i}:v]scale={self.width}x{self.height},zoompan=z='{zoom_expr}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={self.width}x{self.height}:fps={self.fps}[v{i}];"
+                f"[{i}:v]scale={self.width}x{self.height},zoompan=z='{zoom_expr}':x='{x_expr}':y='{y_expr}':d={frames}:s={self.width}x{self.height}:fps={self.fps}[v{i}];"
             )
 
         concat_inputs = "".join(f"[v{i}]" for i in range(len(images)))
