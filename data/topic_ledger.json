@@ -8,7 +8,8 @@
     "flamingo",
     "nitrogen",
     "octopus",
-    "shrimp"
+    "shrimp",
+    "unknown"
   ],
   "history": [
     {
@@ -90,6 +91,14 @@
       "topic": "Liquid Nitrogen (-320\u00b0F) VS 2,000\u00b0F Fire! \u2744\ufe0f\ud83d\udd25 #shorts",
       "title": "Liquid Nitrogen (-320\u00b0F) VS 2,000\u00b0F Fire! \u2744\ufe0f\ud83d\udd25 #shorts",
       "key_facts": []
+    },
+    {
+      "episode_number": 8,
+      "tier": "older",
+      "core_entity": "unknown",
+      "topic": "What Happens If You Fall Into a Black Hole? \ud83d\udd73\ufe0f\u2b50 #shorts",
+      "title": "What Happens If You Fall Into a Black Hole? \ud83d\udd73\ufe0f\u2b50 #shorts",
+      "key_facts": []
     }
   ],
   "used_entities_by_tier": {
@@ -104,7 +113,8 @@
       "duckling"
     ],
     "older": [
-      "nitrogen"
+      "nitrogen",
+      "unknown"
     ]
   }
 }
