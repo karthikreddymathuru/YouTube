@@ -91,41 +91,18 @@ class VideoComposer:
                 else:
                     prepared_images.append(img_path)
 
-        # Build FFmpeg complex filter for smooth dynamic camera motions (Ken Burns)
+        # Build clean, rock-solid FFmpeg sequence without integer zoompan jitter
         inputs = []
         filter_parts = []
         for i, (img_path, dur) in enumerate(zip(prepared_images, durations)):
-            inputs.extend(["-i", img_path])
-            frames = max(int(round(dur * self.fps)), 1)
-            # Cycle through 4 lively cinematic camera motions to bring characters to life:
-            # 0: Smooth zoom-in toward character
-            # 1: Smooth zoom-out revealing the full environment
-            # 2: Gentle camera glide from left to center
-            # 3: Gentle camera glide from right to center
-            motion_type = i % 4
-            if motion_type == 0:
-                zoom_expr = f"1.0+0.15*(on/{frames})"
-                x_expr = "iw/2-(iw/zoom/2)"
-                y_expr = "ih/2-(ih/zoom/2)"
-            elif motion_type == 1:
-                zoom_expr = f"1.15-0.15*(on/{frames})"
-                x_expr = "iw/2-(iw/zoom/2)"
-                y_expr = "ih/2-(ih/zoom/2)"
-            elif motion_type == 2:
-                zoom_expr = "1.12"
-                x_expr = f"(iw-iw/zoom)*(1.0-on/{frames})"
-                y_expr = "ih/2-(ih/zoom/2)"
-            else:
-                zoom_expr = "1.12"
-                x_expr = f"(iw-iw/zoom)*(on/{frames})"
-                y_expr = "ih/2-(ih/zoom/2)"
-
+            inputs.extend(["-loop", "1", "-t", f"{dur:.3f}", "-i", img_path])
             filter_parts.append(
-                f"[{i}:v]scale={self.width}x{self.height},zoompan=z='{zoom_expr}':x='{x_expr}':y='{y_expr}':d={frames}:s={self.width}x{self.height}:fps={self.fps}[v{i}];"
+                f"[{i}:v]scale={self.width}:{self.height}:force_original_aspect_ratio=decrease,"
+                f"pad={self.width}:{self.height}:(ow-iw)/2:(oh-ih)/2,setsar=1[v{i}];"
             )
 
-        concat_inputs = "".join(f"[v{i}]" for i in range(len(images)))
-        filter_complex = "".join(filter_parts) + f"{concat_inputs}concat=n={len(images)}:v=1:a=0[outv]"
+        concat_inputs = "".join(f"[v{i}]" for i in range(len(prepared_images)))
+        filter_complex = "".join(filter_parts) + f"{concat_inputs}concat=n={len(prepared_images)}:v=1:a=0[outv]"
 
         cmd = [
             self.ffmpeg_exe,
@@ -135,7 +112,7 @@ class VideoComposer:
             "-map", "[outv]",
             "-c:v", "libx264",
             "-preset", "ultrafast",
-            "-crf", "23",
+            "-crf", "20",
             "-pix_fmt", "yuv420p",
             "-r", str(self.fps),
             output_video
@@ -144,8 +121,8 @@ class VideoComposer:
         try:
             subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         except Exception as e:
-            logger.warning(f"Complex zoompan failed: {e}. Falling back to standard image sequence.")
-            # Fallback standard image slideshow with precise scene durations
+            logger.warning(f"Standard FFmpeg concat failed: {e}. Falling back to image sequence clip.")
+            import moviepy.video.io.ImageSequenceClip as isc
             clip = isc.ImageSequenceClip(prepared_images, durations=durations)
             clip.write_videofile(output_video, fps=self.fps, codec="libx264", audio=False, logger=None)
 
