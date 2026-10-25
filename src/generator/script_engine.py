@@ -1717,6 +1717,12 @@ class ScriptEngine:
             real_subject = "chameleon"
         elif species == "shrimp" or "shrimp" in topic_low:
             real_subject = "mantis shrimp"
+        elif "soda" in topic_low or "mentos" in topic_low:
+            real_subject = "backyard soda bottle eruption science experiment"
+        elif "ice cream" in topic_low or "brain freeze" in topic_low:
+            real_subject = "ice cream and cold sensation science"
+        elif "nitrogen" in topic_low:
+            real_subject = "cryogenic liquid nitrogen laboratory experiment"
         else:
             real_subject = species or topic_low
 

@@ -127,6 +127,22 @@ class TrendScout:
                     "estimated_score": 93,
                     "retention_driver": "Visual disbelief in natural phenomena"
                 }
+            ],
+            "mindblown_experiments": [
+                {
+                    "title": "Why Does Soda Explode With Mentos?",
+                    "hook": "Drop a single candy into soda and boom! Why does it blast ten feet into the air?",
+                    "topic": "Why Does Soda Explode With Mentos?",
+                    "estimated_score": 99,
+                    "retention_driver": "Spectacular backyard science explosion"
+                },
+                {
+                    "title": "What Actually Causes Brain Freeze?",
+                    "hook": "Why does eating ice cream too fast give you a crazy frozen headache?",
+                    "topic": "What Actually Causes Brain Freeze?",
+                    "estimated_score": 96,
+                    "retention_driver": "Everyday body mystery explained"
+                }
             ]
         }
         return seeds.get(niche, seeds["animal_secrets"])

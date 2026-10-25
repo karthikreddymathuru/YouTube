@@ -36,10 +36,10 @@ class ChannelDirectorAgent:
         0: "animal_secrets",        # Monday
         1: "science_curiosities",   # Tuesday
         2: "interactive_riddles",   # Wednesday
-        3: "dinosaur_and_nature",   # Thursday
+        3: "mindblown_experiments", # Thursday (Older Kids)
         4: "animal_secrets",        # Friday
         5: "science_curiosities",   # Saturday
-        6: "interactive_riddles",   # Sunday
+        6: "mindblown_experiments", # Sunday (Older Kids)
     }
 
     def __init__(self, ledger_path: str, age_tiers_path: str = "data/age_tiers.json"):

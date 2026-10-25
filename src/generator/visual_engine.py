@@ -354,15 +354,54 @@ class VisualEngine:
                 "walking deliberately along a flowering branch in the rainforest canopy"
             ]
             action = habitats[(scene_id - 1) % len(habitats)]
+        elif "soda" in text_corpus or "mentos" in text_corpus:
+            subject = "backyard soda bottle eruption science experiment"
+            habitats = [
+                "a 2-liter bottle of dark brown soda standing outside on green grass in bright daylight with white mint candies dropping in",
+                "extreme close-up macro view of the white rough textured surface of a mint candy showing thousands of microscopic pits",
+                "underwater view inside clear soda bottle showing billions of tiny carbon dioxide gas bubbles nucleating rapidly",
+                "fizzy white foam erupting violently inside bottle neck with rising pressure and swirling gas bubbles",
+                "spectacular ten-foot tall vertical geyser blast of brown foaming soda spraying into the bright sunny blue sky",
+                "dramatic slow-motion high-speed splash of foaming soda droplets flying through sunlight outdoors",
+                "two soda bottles launching twin high-pressure foam fountain geysers on grass",
+                "exhilarating outdoor science demonstration with tall foaming soda fountain spray and golden sun flare"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "ice cream" in text_corpus or "brain freeze" in text_corpus:
+            subject = "ice cream and cold sensation science"
+            habitats = [
+                "delicious rich scoops of gourmet ice cream in a chilled glass bowl with frost mist under warm sunlight",
+                "macro high-speed view of an icy cold spoon scooping into rich creamy frozen ice cream with glistening ice crystals",
+                "colourful frosty fruit slushy beverage with a straw in condensation-covered glass under sun",
+                "close-up view of delicate frost crystals and cold vapor rising from icy fruit treat",
+                "clean educational scientific anatomical illustration of the human palate and facial trigeminal nerve pathway",
+                "warm glass of clean water sitting next to a frosty dessert bowl in a modern bright kitchen",
+                "glistening frozen dessert melting gently into creamy swirls on a rustic wooden table",
+                "refreshing double scoop ice cream cone held against bright blue sunny sky"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
+        elif "nitrogen" in text_corpus:
+            subject = "cryogenic liquid nitrogen laboratory experiment"
+            habitats = [
+                "dense billowing white cryogenic nitrogen vapor fog rolling over modern stainless steel lab table",
+                "freeze-shattered fresh rose snapping like delicate glass under cold cryogenic vapor",
+                "liquid nitrogen droplets gliding across polished smooth surface via Leidenfrost vapor cushion",
+                "steaming clear cryogenic beaker surrounded by blue LED science lab lighting",
+                "billowing cold nitrogen vapor blanket displacing oxygen and extinguishing an orange flame",
+                "frosted metal laboratory tongs holding frozen specimen with thick boiling white vapor",
+                "cold temperature digital thermometer gauge displaying minus 320 degrees Fahrenheit in lab",
+                "clean modern educational physics laboratory bench with steaming scientific glassware"
+            ]
+            action = habitats[(scene_id - 1) % len(habitats)]
         else:
-            subject = topic_str or "wild animal in nature"
-            action = cleaned_prompt or narration or visual_prop or "in its authentic wild habitat"
+            subject = topic_str or "real world science phenomenon"
+            action = cleaned_prompt or narration or visual_prop or "captured in authentic high-speed documentary detail"
 
         final_prompt = (
             f"Stunning photorealistic photograph of {subject}, {action}. "
-            "National Geographic wildlife photography, 8k resolution, authentic nature documentary shot, "
-            "natural cinematic lighting, crystal clear pin-sharp focus, highly detailed skin texture, "
-            "realistic natural habitat, zero cartoon, zero animation, zero CGI, zero 3D render, no blur."
+            "National Geographic Discovery documentary style, 8k resolution, authentic real-world photography, "
+            "natural cinematic lighting, crystal clear pin-sharp focus, highly detailed texture, "
+            "zero cartoon, zero animation, zero CGI, zero 3D render, no blur."
         )
         return final_prompt
 
