@@ -41,6 +41,8 @@ def cmd_generate(args):
 
 def cmd_agent_run(args):
     """Executes the 6-Agent Autonomous Kids Channel Crew for today's scheduled episode."""
+    import os
+    os.environ["HF_HUB_OFFLINE"] = "1"
     orchestrator = ChannelOrchestrator()
     res = orchestrator.run_autonomous_daily_cycle(
         niche=args.niche,
@@ -70,7 +72,9 @@ def cmd_agent_run(args):
 
 def cmd_schedule_daemon(args):
     """Starts the continuous daily scheduler daemon that runs the 6-Agent Crew at the configured time."""
+    import os
     import schedule
+    os.environ["HF_HUB_OFFLINE"] = "1"
     target_time = args.time or "17:00"
     orchestrator = ChannelOrchestrator()
 

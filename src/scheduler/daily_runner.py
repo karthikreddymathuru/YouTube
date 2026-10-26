@@ -36,9 +36,10 @@ class DailyRunner:
         audio_cfg = self.config.get("audio", {})
         self.voice_engine = VoiceEngine(
             voice=audio_cfg.get("primary_voice", "en-US-AnaNeural"),
-            ai_studio_voice=audio_cfg.get("ai_studio_voice", "Puck"),
+            ai_studio_voice=audio_cfg.get("ai_studio_voice", "Aoede"),
             rate=audio_cfg.get("speech_rate", "+5%"),
-            pitch=audio_cfg.get("speech_pitch", "+3Hz")
+            pitch=audio_cfg.get("speech_pitch", "+3Hz"),
+            voice_gender=audio_cfg.get("voice_gender", "female")
         )
 
         self.visual_engine = VisualEngine(
