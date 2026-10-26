@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 def sanitize_spoken_only(text: str) -> str:
     """
     Guarantees that ONLY pure story narration is ever passed to TTS.
-    Strips any stage directions, labels, or prompt instructions.
+    Strips any stage directions, labels, or prompt instructions while preserving
+    expressive punctuation (ellipses '...', questions '?', exclamations '!').
     """
     text = text.strip()
     text = re.sub(r"\[.*?\]|\(.*?\)", "", text)
@@ -38,11 +39,62 @@ def sanitize_spoken_only(text: str) -> str:
         flags=re.IGNORECASE,
     )
     text = re.sub(r"^read the following.*?[:\n]+", "", text, flags=re.IGNORECASE | re.DOTALL)
-    return " ".join(text.split())
+    # Normalize internal spaces while preserving rhetorical line breaks and punctuation
+    lines = [re.sub(r"[ \t]+", " ", l).strip() for l in text.splitlines()]
+    return "\n".join(l for l in lines if l)
 
 
 class VoiceEngine:
-    """Generates studio narration locked 1:1 per scene with zero prompt read-aloud and exact sample-level timing."""
+    """Generates studio narration locked 1:1 per scene with excited delivery, emotional inflections, and exact sample-level timing."""
+
+    @classmethod
+    def format_expressive_speech(cls, text: str, tier: str = "younger") -> Tuple[str, str]:
+        """
+        Transforms flat narration text into excited, emotionally-inflected speech markup:
+        - Inquisitive rising pitch on questions (?) followed by a suspenseful curiosity pause.
+        - Emphatic punch and pitch lift on explanations/revelations (!) and punchy keywords.
+        - Natural rhetorical pauses on '...' and linebreaks.
+        Returns:
+          (spoken_markup_with_cues, clean_display_text_for_captions)
+        """
+        tier = (tier or "younger").lower()
+        # Clean display text for captions (zero embedded speech markup)
+        clean_text = " ".join(text.split())
+        clean_text = re.sub(r"\[\[.*?\]\]", "", clean_text).strip()
+
+        s = text.strip()
+
+        # 1. Normalize question and explanation reveals (e.g. '? ... Nope, it\'s physical science!')
+        s = re.sub(r'\?\s*\.\.\.\s*', '? ', s)
+
+        # 2. Suspense ellipsis to dramatic curiosity pause
+        s = re.sub(r'\.\.\.+', ' [[slnc 260]] ', s)
+        s = re.sub(r'—|–', ' [[slnc 200]] ', s)
+        s = re.sub(r'\n+', ' [[slnc 180]] ', s)
+
+        # 3. Question clauses: add pitch modulation and inquisitive curiosity pause
+        s = re.sub(r'([^.!?\n]+(?:\?))', lambda m: '[[pmod +22]]' + m.group(1).strip() + ' [[slnc 320]] ', s)
+
+        # 4. Answers & Explanations: 'Nope', 'No', 'Yes', 'Look', 'Watch', 'Because'
+        s = re.sub(r'\b(Nope|No|Yes|Look|Watch)\b[,\s]*', r'[[emph +]][[pbas +14]]\1! [[pbas +6]][[slnc 200]] ', s, flags=re.IGNORECASE)
+
+        # 5. Emphatic action / discovery trigger words
+        trigger_pattern = r'\b(boom|blast|massive|giant|exploded|explodes|erupts|geyser|zap|hundred volts|shock|shatters|lightning|super|billions|microscopic|freeze|secret|discovery|ouch)\b'
+        s = re.sub(trigger_pattern, r'[[emph +]]\1', s, flags=re.IGNORECASE)
+
+        # 6. Exclamations: add energetic cadence
+        s = re.sub(r'!\s*', r'! [[slnc 200]] ', s)
+
+        # 7. Deduplicate adjacent pauses or pitch tags
+        s = re.sub(r'(\[\[slnc \d+\]\]\s*)+', lambda m: m.group(1), s)
+        s = re.sub(r'(\[\[pbas \+\d+\]\]\s*)+', lambda m: m.group(1), s)
+
+        # Base setup: higher energy baseline pitch and lively modulation
+        base_intro = '[[pbas +6]][[pmod +18]] '
+        spoken_markup = base_intro + s
+        spoken_markup = ' '.join(spoken_markup.split())
+
+        return spoken_markup, clean_text
 
     def __init__(
         self,
@@ -349,10 +401,53 @@ class VoiceEngine:
         self,
         words: List[str],
         start_offset: float,
-        duration: float
+        duration: float,
+        raw_text: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         if not words:
             return []
+
+        # Pause-aware clause alignment for expressive questions, explanations, and ellipses
+        if raw_text and ("?" in raw_text or "!" in raw_text or "..." in raw_text or "\n" in raw_text):
+            raw_clauses = re.split(r"(\?|\!|\.\.\.|\n)", raw_text)
+            clauses = []
+            i = 0
+            while i < len(raw_clauses):
+                part = raw_clauses[i].strip()
+                punct = raw_clauses[i + 1] if i + 1 < len(raw_clauses) else ""
+                full_clause = (part + punct).strip()
+                if full_clause:
+                    w_list = [re.sub(r"\[\[.*?\]\]", "", w).strip() for w in full_clause.split()]
+                    w_list = [w for w in w_list if w and not re.match(r"^[^\w]+$", w)]
+                    if w_list:
+                        pause_sec = 0.32 if "?" in punct else (0.24 if "..." in punct or "!" in punct else 0.15)
+                        clauses.append((w_list, pause_sec))
+                i += 2
+
+            flat_clause_words = [w for c in clauses for w in c[0]]
+            if flat_clause_words:
+                total_pause = sum(c[1] for c in clauses[:-1])
+                active_dur = max(0.5, duration - total_pause)
+                char_lengths = [max(len(w), 2) for w in flat_clause_words]
+                total_chars = max(1, sum(char_lengths))
+
+                result = []
+                curr = start_offset
+                w_idx = 0
+                for w_list, pause in clauses:
+                    for w in w_list:
+                        w_dur = active_dur * (char_lengths[w_idx] / float(total_chars))
+                        result.append({
+                            "word": w,
+                            "start": round(curr, 3),
+                            "end": round(curr + w_dur, 3)
+                        })
+                        curr += w_dur
+                        w_idx += 1
+                    curr += pause
+                return result
+
+        # Standard fallback distribution
         char_lengths = [max(len(w), 2) for w in words]
         total_chars = sum(char_lengths)
         result = []
@@ -388,20 +483,20 @@ class VoiceEngine:
             scene_mp3 = output_path.replace(".wav", f"_scene_{idx+1}.mp3")
             scene_wav = output_path.replace(".wav", f"_scene_{idx+1}.wav")
 
-            # Tier-adaptive melodic voice profiles
+            # Tier-adaptive melodic voice profiles (energetic, excited delivery)
             tier = str(getattr(scene, "tier", "")).lower()
             if "preschool" in tier:
                 v_name = "en-US-AnaNeural"
-                v_rate = "-4%"
-                v_pitch = "+9Hz"
+                v_rate = "+2%"
+                v_pitch = "+10Hz"
             elif "older" in tier:
                 v_name = "en-US-ChristopherNeural"
-                v_rate = "+0%"
-                v_pitch = "+0Hz"
+                v_rate = "+6%"
+                v_pitch = "+4Hz"
             else:  # younger / default
                 v_name = "en-US-AnaNeural"
-                v_rate = "-2%"
-                v_pitch = "+4Hz"
+                v_rate = "+5%"
+                v_pitch = "+6Hz"
 
             communicate = edge_tts.Communicate(
                 text=scene_text,
@@ -453,7 +548,7 @@ class VoiceEngine:
                         "end": round(curr_offset + min(w_off + w_dur, exact_dur), 3)
                     })
             else:
-                all_words.extend(self._distribute_words_over_duration(scene_text.split(), curr_offset, exact_dur - 0.1))
+                all_words.extend(self._distribute_words_over_duration(scene_text.split(), curr_offset, exact_dur - 0.1, raw_text=scene_text))
 
             all_pcm.extend(pcm_bytes)
             scene_durations.append(exact_dur)
@@ -474,6 +569,27 @@ class VoiceEngine:
 
         return output_path, all_words, scene_durations
 
+    def _get_best_macos_voice(self, tier: str = "younger", default_voice: str = "Samantha") -> str:
+        """Finds the most energetic, expressive natural voice installed on macOS for the target age group."""
+        tier = (tier or "younger").lower()
+        priority_map = {
+            "older": ["Eddy (English (US))", "Rocko (English (US))", "Reed (English (US))", "Junior", "Samantha"],
+            "younger": ["Eddy (English (US))", "Sandy (English (US))", "Junior", "Samantha"],
+            "preschool": ["Junior", "Flo (English (US))", "Eddy (English (US))", "Samantha"],
+        }
+        candidates = priority_map.get(tier, priority_map["younger"])
+        if not hasattr(self, "_available_macos_voices"):
+            try:
+                res = subprocess.run(["/usr/bin/say", "-v", "?"], stdout=subprocess.PIPE, text=True)
+                self._available_macos_voices = set(line.split()[0] for line in res.stdout.splitlines() if line.strip())
+            except Exception:
+                self._available_macos_voices = {"Samantha", "Junior"}
+        for c in candidates:
+            c_base = c.split()[0]
+            if c_base in self._available_macos_voices:
+                return c
+        return default_voice
+
     def _synthesize_scenes_macos_say(
         self,
         scenes: List[Any],
@@ -481,9 +597,11 @@ class VoiceEngine:
         voice_name: str = "Samantha"
     ) -> Tuple[str, List[Dict[str, Any]], List[float]]:
         """
-        Synthesizes each scene individually using macOS native `/usr/bin/say`,
-        converting to 24kHz 16-bit mono WAV, aligning to 30fps frames,
-        and concatenating with 0ms drift.
+        Synthesizes each scene individually using macOS native `/usr/bin/say` with:
+        - Excited, energetic narration pacing (176-180 wpm).
+        - Inquisitive rising pitch on questions (?) followed by dramatic curiosity pauses.
+        - Emphatic punch and pitch lifts on explanations and reveals (!).
+        - Broadcast audio mastering (high-pass 80Hz, presence boost, compression; zero metallic room echo).
         """
         all_pcm = bytearray()
         scene_durations: List[float] = []
@@ -499,22 +617,24 @@ class VoiceEngine:
             scene_wav = output_path.replace(".wav", f"_scene_{idx+1}.wav")
 
             tier = (getattr(scene, "tier", "younger") or "younger").lower()
-            v_name = voice_name
-            if tier == "preschool":
-                v_name = "Junior"  # Playful energetic kid voice
-            elif tier == "older":
-                v_name = "Reed" if os.path.exists("/usr/bin/say") else voice_name
-            else:
-                v_name = "Sandy"
+            spoken_markup, clean_display_text = self.format_expressive_speech(scene_text, tier=tier)
+            v_name = self._get_best_macos_voice(tier=tier, default_voice=voice_name)
+            rate_wpm = "176" if tier == "preschool" else "180"
 
-            cmd_say = ["/usr/bin/say", "-v", v_name, "-r", "160", "-o", scene_aiff, scene_text]
+            cmd_say = ["/usr/bin/say", "-v", v_name, "-r", rate_wpm, "-o", scene_aiff, spoken_markup]
             res = subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if res.returncode != 0:
-                cmd_say = ["/usr/bin/say", "-v", "Samantha", "-r", "160", "-o", scene_aiff, scene_text]
+                cmd_say = ["/usr/bin/say", "-v", "Samantha", "-r", rate_wpm, "-o", scene_aiff, clean_display_text]
                 subprocess.run(cmd_say, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
 
-            # Convert AIFF to 24kHz 16-bit mono WAV with melodic acoustic warmth and gentle presence
-            audio_filter = "equalizer=f=3200:t=q:w=1:g=2,aecho=0.8:0.25:18:0.12"
+            # Convert AIFF to 24kHz 16-bit mono WAV with broadcast vocal warmth, clarity and presence (no metallic echo)
+            audio_filter = (
+                "highpass=f=80,"
+                "equalizer=f=200:t=q:w=1.2:g=1.5,"
+                "equalizer=f=3500:t=q:w=1.0:g=3.0,"
+                "equalizer=f=8000:t=q:w=0.8:g=2.0,"
+                "compand=attacks=0.02:decays=0.1:points=-60/-60|-24/-12|0/-2:soft-knee=6"
+            )
             subprocess.run(
                 [self.ffmpeg_exe, "-y", "-i", scene_aiff, "-af", audio_filter, "-ar", str(self.sample_rate), "-ac", "1", scene_wav],
                 stdout=subprocess.PIPE,
@@ -537,9 +657,9 @@ class VoiceEngine:
 
             exact_dur = round((len(pcm_bytes) // 2) / float(self.sample_rate), 4)
 
-            # Distribute words over active speech window
-            words = scene_text.split()
-            all_words.extend(self._distribute_words_over_duration(words, curr_offset, exact_dur - 0.15))
+            # Distribute words over active speech window with pause awareness
+            words = clean_display_text.split()
+            all_words.extend(self._distribute_words_over_duration(words, curr_offset, exact_dur - 0.15, raw_text=scene_text))
 
             all_pcm.extend(pcm_bytes)
             scene_durations.append(exact_dur)

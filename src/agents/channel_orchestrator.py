@@ -524,6 +524,7 @@ class ChannelOrchestrator:
         self,
         niche: Optional[str] = None,
         age_group: Optional[str] = None,
+        topic_override: Optional[str] = None,
         top_k: int = 3,
         auto_upload: bool = False,
         max_retries: int = 2,
@@ -553,6 +554,7 @@ class ChannelOrchestrator:
 
         # Agent 2: Trend & Competitor Intelligence
         research_res = self.research_agent.research_daily_trends(niche=assigned_niche, top_k=top_k)
+        today_topic = topic_override or research_res["today_topic"]
         logger.info(
             f"[2/6 {self.research_agent.ROLE}] Analyzed {research_res['videos_analyzed']} viral Shorts | "
             f"Top Hook: {research_res['winning_hook_archetype']}"
@@ -563,7 +565,7 @@ class ChannelOrchestrator:
             attempt += 1
             # Agent 3: Showrunner & Script Tournament
             showrunner_res = self.showrunner_agent.run_daily_script_tournament(
-                topic=research_res["today_topic"],
+                topic=today_topic,
                 winning_formula=research_res["winning_formula"],
                 niche=assigned_niche,
                 tier=assigned_tier,
