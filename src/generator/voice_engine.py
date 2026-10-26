@@ -99,16 +99,18 @@ class VoiceEngine:
     def __init__(
         self,
         voice: str = "en-US-AnaNeural",
-        ai_studio_voice: str = "Puck",
+        ai_studio_voice: str = "Aoede",
         rate: str = "+5%",
         pitch: str = "+3Hz",
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        voice_gender: str = "female"
     ):
         self.voice = voice
         self.ai_studio_voice = ai_studio_voice
         self.rate = rate
         self.pitch = pitch
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        self.voice_gender = voice_gender
         self.ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
         self.sample_rate = 24000
 
@@ -613,11 +615,18 @@ class VoiceEngine:
                 logger.warning(f"Failed to initialize Kokoro pipeline: {e}")
                 return False, [], []
 
-        voice_map = {
+        voice_map_female = {
+            "older": "af_bella",
+            "younger": "af_sky",
+            "preschool": "af_heart"
+        }
+        voice_map_male = {
             "older": "am_michael",
             "younger": "am_puck",
             "preschool": "af_heart"
         }
+        use_female = getattr(self, "voice_gender", "female").lower() == "female"
+        voice_map = voice_map_female if use_female else voice_map_male
 
         all_pcm = bytearray()
         scene_durations: List[float] = []
@@ -630,8 +639,9 @@ class VoiceEngine:
                 scene_text = "Look at this amazing discovery!"
 
             tier = (getattr(scene, "tier", "younger") or "younger").lower()
-            voice_id = voice_map.get(tier, "am_michael")
-            speed = 1.12 if tier == "older" else (1.08 if tier == "younger" else 1.0)
+            default_voice = "af_bella" if use_female else "am_michael"
+            voice_id = voice_map.get(tier, default_voice)
+            speed = 1.10 if tier == "older" else (1.08 if tier == "younger" else 1.0)
 
             try:
                 generator = self._kokoro_pipeline(scene_text, voice=voice_id, speed=speed)

@@ -22,9 +22,12 @@ niches:
 
 # Voice & Audio Settings
 audio:
+  voice_gender: "female"
   # Edge-TTS voices: 'en-US-AnaNeural' (child-friendly, energetic), 'en-US-JennyNeural' (storyteller)
   primary_voice: "en-US-AnaNeural"
   backup_voice: "en-US-JennyNeural"
+  kokoro_voice: "af_bella"
+  ai_studio_voice: "Aoede"
   speech_rate: "+5%"
   speech_pitch: "+3Hz"
   # Audio ducking: percentage of original music volume when speech is active
