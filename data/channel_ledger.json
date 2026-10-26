@@ -235,7 +235,27 @@
       "made_for_kids": true,
       "upload_status": "staged_local_package",
       "youtube_video_id": "staged_local"
+    },
+    {
+      "episode_number": 13,
+      "timestamp": "2026-10-26T18:20:17.591301",
+      "date": "2026-10-26",
+      "niche": "mindblown_experiments",
+      "tier": "older",
+      "title": "Why Does Soda Explode With Mentos? \ud83e\udd64\ud83d\udca5 #shorts",
+      "package_dir": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261026_182017",
+      "video_file": "/Users/karthik/Desktop/Projects/YouTube/data/ready_for_upload/package_20261026_182017/short_20261026_181819.mp4",
+      "duration_sec": 61.03,
+      "av_drift_sec": 0.0,
+      "tournament_score": 100.0,
+      "winning_archetype": "curiosity_mystery",
+      "silent_comprehension_score": 98.0,
+      "character_face_consistency_score": 100.0,
+      "all_gates_passed": true,
+      "made_for_kids": true,
+      "upload_status": "staged_local_package",
+      "youtube_video_id": "staged_local"
     }
   ],
-  "last_updated": "2026-10-25T23:54:49.889888"
+  "last_updated": "2026-10-26T18:20:17.592830"
 }

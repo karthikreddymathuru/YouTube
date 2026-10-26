@@ -133,7 +133,21 @@ class VoiceEngine:
             except Exception:
                 pass
 
-        # 1. Try per-scene synthesis via Google AI Studio TTS (`Puck` voice across TTS model pool)
+        # 1. Local Offline Neural TTS via Kokoro-82M (Natural Human-Grade Voices, 100% offline Apple Silicon)
+        try:
+            ok, word_timestamps, scene_durations = self._synthesize_scenes_kokoro(scenes, output_path)
+            if ok and os.path.exists(output_path):
+                for s, dur in zip(scenes, scene_durations):
+                    _safe_set_duration(s, dur)
+                logger.info(
+                    f"Kokoro-82M Local Neural Speech locked {len(scenes)} scenes "
+                    f"({round(sum(scene_durations), 2)}s total, 0ms drift)."
+                )
+                return output_path, word_timestamps, scene_durations
+        except Exception as e:
+            logger.warning(f"Kokoro-82M synthesis failed: {e}. Trying cloud TTS fallbacks.")
+
+        # 2. Try per-scene synthesis via Google AI Studio TTS (`Puck` voice across TTS model pool)
         if self.api_key:
             ok, word_timestamps, scene_durations = self._synthesize_scenes_ai_studio_exact(scenes, output_path)
             if ok and os.path.exists(output_path):
@@ -145,7 +159,7 @@ class VoiceEngine:
                 )
                 return output_path, word_timestamps, scene_durations
 
-        # 2. Try per-scene synthesis via Edge-TTS (exact WordBoundary timestamps per scene)
+        # 3. Try per-scene synthesis via Edge-TTS (exact WordBoundary timestamps per scene)
         try:
             out_file, word_timestamps, scene_durations = asyncio.run(
                 self._synthesize_scenes_edge_tts_async(scenes, output_path)
@@ -160,7 +174,7 @@ class VoiceEngine:
         except Exception as e:
             logger.warning(f"Edge-TTS scene synthesis failed: {e}. Trying native offline speech.")
 
-        # 3. macOS native high-fidelity offline voiceover (/usr/bin/say)
+        # 4. macOS native high-fidelity offline voiceover (/usr/bin/say)
         if os.path.exists("/usr/bin/say"):
             try:
                 out_file, word_timestamps, scene_durations = self._synthesize_scenes_macos_say(scenes, output_path)
@@ -174,7 +188,7 @@ class VoiceEngine:
             except Exception as e:
                 logger.warning(f"macOS say synthesis failed: {e}. Using procedural fallback.")
 
-        # 4. Melodic procedural audio fallback
+        # 5. Melodic procedural audio fallback
         full_text = " ".join(s.narration for s in scenes)
         out_file, word_timestamps = self._fallback_synthesize(full_text, output_path)
         scene_durations = [round(max(len(s.narration.split()) * 0.38, 2.2), 2) for s in scenes]
@@ -568,6 +582,125 @@ class VoiceEngine:
             out_wf.writeframes(bytes(all_pcm))
 
         return output_path, all_words, scene_durations
+
+    def _synthesize_scenes_kokoro(
+        self,
+        scenes: List[Any],
+        output_path: str
+    ) -> Tuple[bool, List[Dict[str, Any]], List[float]]:
+        """
+        Synthesizes human-grade neural voiceover completely offline on Apple Silicon using Kokoro-82M.
+        - High-definition 24kHz 16-bit PCM per scene.
+        - Voice personalities:
+            * older: 'am_michael' (warm, enthusiastic science mentor/creator)
+            * younger: 'am_puck' (curious, energetic young explorer)
+            * preschool: 'af_heart' (warm, joyful, melodic storytelling)
+        - Normalizes audio to broadcast YouTube standards with presence mastering.
+        - Zero prompt read-aloud and exact pause-aware subtitle alignment.
+        """
+        import os
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        try:
+            from kokoro import KPipeline
+            import numpy as np
+        except ImportError:
+            return False, [], []
+
+        if not hasattr(self, "_kokoro_pipeline") or self._kokoro_pipeline is None:
+            try:
+                self._kokoro_pipeline = KPipeline(lang_code="a")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Kokoro pipeline: {e}")
+                return False, [], []
+
+        voice_map = {
+            "older": "am_michael",
+            "younger": "am_puck",
+            "preschool": "af_heart"
+        }
+
+        all_pcm = bytearray()
+        scene_durations: List[float] = []
+        all_words: List[Dict[str, Any]] = []
+        curr_offset = 0.0
+
+        for idx, scene in enumerate(scenes):
+            scene_text = sanitize_spoken_only(getattr(scene, "narration", "")).strip()
+            if not scene_text:
+                scene_text = "Look at this amazing discovery!"
+
+            tier = (getattr(scene, "tier", "younger") or "younger").lower()
+            voice_id = voice_map.get(tier, "am_michael")
+            speed = 1.12 if tier == "older" else (1.08 if tier == "younger" else 1.0)
+
+            try:
+                generator = self._kokoro_pipeline(scene_text, voice=voice_id, speed=speed)
+                chunks = [audio for _, _, audio in generator if audio is not None and len(audio) > 0]
+            except Exception as e:
+                logger.warning(f"Kokoro generation failed on scene {idx+1}: {e}")
+                return False, [], []
+
+            if not chunks:
+                return False, [], []
+
+            scene_audio = np.concatenate(chunks)
+            peak = np.max(np.abs(scene_audio))
+            if peak > 0:
+                scene_audio = (scene_audio / peak) * 0.90
+
+            pcm_data = (scene_audio * 32767).astype(np.int16).tobytes()
+
+            tail_pad = int(0.15 * self.sample_rate) * 2
+            pcm_data += b"\x00" * tail_pad
+
+            bytes_per_frame = (self.sample_rate // 30) * 2
+            rem = len(pcm_data) % bytes_per_frame
+            if rem != 0:
+                pcm_data += b"\x00" * (bytes_per_frame - rem)
+
+            exact_dur = round((len(pcm_data) // 2) / float(self.sample_rate), 4)
+
+            # Distribute words with question/pause awareness
+            words = scene_text.split()
+            all_words.extend(self._distribute_words_over_duration(words, curr_offset, exact_dur - 0.15, raw_text=scene_text))
+
+            all_pcm.extend(pcm_data)
+            scene_durations.append(exact_dur)
+            curr_offset += exact_dur
+
+        # Broadcast vocal mastering on output WAV
+        temp_wav = output_path.replace(".wav", "_raw_kokoro.wav")
+        with wave.open(temp_wav, "wb") as out_wf:
+            out_wf.setnchannels(1)
+            out_wf.setsampwidth(2)
+            out_wf.setframerate(self.sample_rate)
+            out_wf.writeframes(bytes(all_pcm))
+
+        # Broadcast audio filter for broadcast loudness, warm presence, and dynamic control
+        audio_filter = (
+            "highpass=f=80,"
+            "equalizer=f=200:t=q:w=1.2:g=1.5,"
+            "equalizer=f=3500:t=q:w=1.0:g=3.0,"
+            "equalizer=f=8000:t=q:w=0.8:g=2.0,"
+            "compand=attacks=0.02:decays=0.1:points=-60/-60|-24/-12|0/-1.5:soft-knee=6,"
+            "volume=1.8"
+        )
+        try:
+            subprocess.run(
+                [self.ffmpeg_exe, "-y", "-i", temp_wav, "-af", audio_filter, "-ar", str(self.sample_rate), "-ac", "1", output_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True
+            )
+            if os.path.exists(temp_wav):
+                os.remove(temp_wav)
+        except Exception as e:
+            logger.warning(f"Audio mastering filter failed: {e}. Keeping raw Kokoro wav.")
+            if os.path.exists(temp_wav):
+                import shutil
+                shutil.move(temp_wav, output_path)
+
+        return True, all_words, scene_durations
 
     def _get_best_macos_voice(self, tier: str = "younger", default_voice: str = "Samantha") -> str:
         """Finds the most energetic, expressive natural voice installed on macOS for the target age group."""

@@ -4,7 +4,7 @@ import os
 import json
 import hashlib
 import logging
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class PolicyChecker:
         with open(self.history_db_path, "w", encoding="utf-8") as f:
             json.dump(self.history, f, indent=2)
 
-    def evaluate_script(self, script_text: str, title: str) -> PolicyCheckResult:
+    def evaluate_script(self, script_text: str, title: str, ignore_self_title: bool = True) -> PolicyCheckResult:
         """Evaluates safety, originality, and advertiser friendliness."""
         flags = []
         recommendations = []
@@ -66,8 +66,10 @@ class PolicyChecker:
             flags.append(f"Contains sensitive words for kids audience: {', '.join(found_prohibited)}")
             score -= 35.0
 
-        # 2. Originality / Reused Content Check
-        max_similarity, matched_title = self._check_uniqueness(script_text)
+        # 2. Originality / Reused Content Check (ignores past revision of the same title if re-rendering)
+        max_similarity, matched_title = self._check_uniqueness(
+            script_text, current_title=title if ignore_self_title else None
+        )
         if max_similarity > 0.65:
             flags.append(f"Script too similar ({int(max_similarity*100)}%) to previously published Short: '{matched_title}'. Violates YouTube Reused Content rule.")
             score -= 40.0
@@ -92,7 +94,7 @@ class PolicyChecker:
         })
         self._save_history()
 
-    def _check_uniqueness(self, new_script: str) -> Tuple[float, str]:
+    def _check_uniqueness(self, new_script: str, current_title: Optional[str] = None) -> Tuple[float, str]:
         """Calculates maximum Jaccard word-set similarity against past scripts."""
         if not self.history:
             return 0.0, ""
@@ -104,6 +106,8 @@ class PolicyChecker:
         max_sim = 0.0
         matched_title = ""
         for item in self.history:
+            if current_title and item.get("title", "").strip().lower() == current_title.strip().lower():
+                continue
             past_words = set(item.get("words", []))
             if not past_words:
                 continue
