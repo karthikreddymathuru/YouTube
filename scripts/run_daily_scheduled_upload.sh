@@ -7,6 +7,7 @@ cd "$SCRIPT_DIR"
 
 # Setup environment
 export PATH="$SCRIPT_DIR/.venv/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+export HF_HUB_OFFLINE=1
 
 echo "========================================================================"
 echo "🎬 [$(date '+%Y-%m-%d %H:%M:%S')] STARTING SCHEDULED DAILY KIDS SHORTS PIPELINE"
