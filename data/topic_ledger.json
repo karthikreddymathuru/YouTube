@@ -10,7 +10,8 @@
     "nitrogen",
     "octopus",
     "shrimp",
-    "unknown"
+    "unknown",
+    "frog"
   ],
   "history": [
     {
@@ -148,6 +149,14 @@
       "topic": "Why Does Soda Explode With Mentos? \ud83e\udd64\ud83d\udca5 #shorts",
       "title": "Why Does Soda Explode With Mentos? \ud83e\udd64\ud83d\udca5 #shorts",
       "key_facts": []
+    },
+    {
+      "episode_number": 15,
+      "tier": "preschool",
+      "core_entity": "frog",
+      "topic": "Five Little Frogs Hop & Splash! \ud83d\udc38\ud83d\udc9a #shorts",
+      "title": "Five Little Frogs Hop & Splash! \ud83d\udc38\ud83d\udc9a #shorts",
+      "key_facts": []
     }
   ],
   "used_entities_by_tier": {
@@ -161,7 +170,8 @@
       "unknown"
     ],
     "preschool": [
-      "duckling"
+      "duckling",
+      "frog"
     ],
     "older": [
       "nitrogen",

@@ -275,7 +275,27 @@
       "made_for_kids": true,
       "upload_status": "staged_local_package",
       "youtube_video_id": "staged_local"
+    },
+    {
+      "episode_number": 15,
+      "timestamp": "2026-10-27T18:21:03.788395",
+      "date": "2026-10-27",
+      "niche": "science_curiosities",
+      "tier": "preschool",
+      "title": "Five Little Frogs Hop & Splash! \ud83d\udc38\ud83d\udc9a #shorts",
+      "package_dir": "/Users/karthik/Projects/YouTube/data/ready_for_upload/package_20261027_182031",
+      "video_file": "/Users/karthik/Projects/YouTube/data/ready_for_upload/package_20261027_182031/short_20261027_170131.mp4",
+      "duration_sec": 61.03,
+      "av_drift_sec": 0.0,
+      "tournament_score": 100.0,
+      "winning_archetype": "curiosity_mystery",
+      "silent_comprehension_score": 98.0,
+      "character_face_consistency_score": 100.0,
+      "all_gates_passed": true,
+      "made_for_kids": true,
+      "upload_status": "staged_local_package",
+      "youtube_video_id": "staged_local"
     }
   ],
-  "last_updated": "2026-10-26T18:29:19.452472"
+  "last_updated": "2026-10-27T18:21:03.788680"
 }
