@@ -7,11 +7,11 @@
     "duckling",
     "eel",
     "flamingo",
+    "frog",
     "nitrogen",
     "octopus",
     "shrimp",
-    "unknown",
-    "frog"
+    "unknown"
   ],
   "history": [
     {
@@ -156,6 +156,14 @@
       "core_entity": "frog",
       "topic": "Five Little Frogs Hop & Splash! \ud83d\udc38\ud83d\udc9a #shorts",
       "title": "Five Little Frogs Hop & Splash! \ud83d\udc38\ud83d\udc9a #shorts",
+      "key_facts": []
+    },
+    {
+      "episode_number": 16,
+      "tier": "younger",
+      "core_entity": "unknown",
+      "topic": "Why Do Cats Always Land on Their Feet? \ud83d\udc31\ud83e\udd38 #shorts",
+      "title": "Why Do Cats Always Land on Their Feet? \ud83d\udc31\ud83e\udd38 #shorts",
       "key_facts": []
     }
   ],
