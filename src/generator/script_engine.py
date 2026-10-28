@@ -1314,13 +1314,13 @@ class ScriptEngine:
 
         # If static library for this tier is exhausted, dynamically generate a novel blueprint with AI Studio!
         logger.info(f"All static blueprints for tier [{tier}] exhausted. Dynamically generating novel blueprint via AI Studio...")
-        novel_ep = self._generate_novel_blueprint_with_ai(niche, used_entities_tier, tier=tier)
+        novel_ep = self._generate_novel_blueprint_with_ai(niche, used_entities_tier, tier=tier, topic=topic)
         if novel_ep:
             return novel_ep
 
         raise RuntimeError(f"FATAL ZERO-REPETITION LOCK: All {len(used_entities_tier)} topics in tier [{tier}] have been used. No fresh blueprint available.")
 
-    def _generate_novel_blueprint_with_ai(self, niche: str, used_entities: set, tier: str = "younger") -> Optional[Dict[str, Any]]:
+    def _generate_novel_blueprint_with_ai(self, niche: str, used_entities: set, tier: str = "younger", topic: str = "") -> Optional[Dict[str, Any]]:
         """Dynamically synthesizes a brand-new, never-before-covered 8-scene blueprint using Gemini tailored to age tier."""
         if not self.api_key:
             return None
@@ -1374,9 +1374,9 @@ class ScriptEngine:
                     return novel_data
         except Exception as e:
             logger.warning(f"Failed to generate dynamic blueprint via AI Studio: {e}")
-        return self._generate_procedural_novel_blueprint(niche, used_entities, tier)
+        return self._generate_procedural_novel_blueprint(niche, used_entities, tier, requested_topic=topic)
 
-    def _generate_procedural_novel_blueprint(self, niche: str, used_entities: set, tier: str = "younger") -> Optional[Dict[str, Any]]:
+    def _generate_procedural_novel_blueprint(self, niche: str, used_entities: set, tier: str = "younger", requested_topic: str = "") -> Optional[Dict[str, Any]]:
         """Procedural zero-crash engine generating fresh, compliant 8-scene blueprints for any tier."""
         tier = (tier or "younger").lower()
         topic_seeds = [
@@ -1389,7 +1389,27 @@ class ScriptEngine:
                 "desc": "Count 1 to 5 with five cheerful green tree frogs hopping across lily pads! Fun singalong for toddlers. #shorts #kids #preschool #counting",
                 "tags": ["shorts", "preschool", "toddlers", "counting", "frogs", "nurseryrhymes"],
                 "badge": "HOP HOP SPLASH!",
+                "badges": [
+                    "FROG ON LILY PAD",
+                    "BIG LEG STRETCH",
+                    "COOL POND DIVE",
+                    "RIBBIT SINGALONG",
+                    "WATER RIPPLES",
+                    "YUMMY BUG SNACK",
+                    "COZY LEAF BED",
+                    "HOPPING SHOWDOWN"
+                ],
                 "prop": "tree_frog_lily_pad",
+                "props": [
+                    "frog_on_lily_pad",
+                    "frog_legs_jumping",
+                    "frog_swimming_pond",
+                    "frog_croaking",
+                    "frog_watching_ripples",
+                    "frog_eating_insect",
+                    "frog_sleeping_under_leaf",
+                    "frogs_splashing"
+                ],
                 "narrations": [
                     "One little froggy... sitting in the sun!\nBouncing on a lily pad... having so much fun!",
                     "Two little frogs... stretch their legs so high!\nCatching yummy flies... as they flutter by!",
@@ -1409,7 +1429,27 @@ class ScriptEngine:
                 "desc": "Play with three cute fluffy puppies running in the park! Fun puppy song for toddlers. #shorts #kids #preschool #puppy #nurseryrhymes",
                 "tags": ["shorts", "preschool", "toddlers", "puppies", "dogs", "nurseryrhymes"],
                 "badge": "PUPPY PLAYTIME!",
+                "badges": [
+                    "SWEET PUPPY PAWS",
+                    "CHASING THE BALL",
+                    "WAGGING TAILS",
+                    "FETCH THE STICK",
+                    "PUPPY TREAT TIME",
+                    "SPINNING IN LEAVES",
+                    "PUPPY PILE SNOOZE",
+                    "SUNNY PUPPY FUN"
+                ],
                 "prop": "cute_playful_puppy",
+                "props": [
+                    "puppy_walking_street",
+                    "puppies_chasing_ball",
+                    "puppies_wagging_tails",
+                    "puppy_fetching_stick",
+                    "puppy_catching_treat",
+                    "puppy_tumbling_leaves",
+                    "puppies_sleeping_pile",
+                    "puppies_running_sun"
+                ],
                 "narrations": [
                     "One little puppy... fluffy and so sweet!\nPattering his paws... down the sunny street!",
                     "Two little puppies... chasing round a ball!\nRolling in the grass... having such a ball!",
@@ -1430,7 +1470,27 @@ class ScriptEngine:
                 "desc": "Discover the incredible gymnastic flip that helps cats land on their paws every time! #shorts #animals #cats #science #kids",
                 "tags": ["shorts", "kids", "animals", "cats", "science", "facts"],
                 "badge": "CAT NINJA FLIP!",
+                "badges": [
+                    "NINJA CAT REFLEX",
+                    "INNER EAR BALANCE",
+                    "180° FRONT TWIST",
+                    "FLEXIBLE SPINE",
+                    "SHOCK ABSORBING PAWS",
+                    "KITTEN ACROBATICS",
+                    "TAIL COUNTERBALANCE",
+                    "CAT SKILL SHOWDOWN"
+                ],
                 "prop": "cat_midair_twist",
+                "props": [
+                    "cat_midair_jump",
+                    "cat_ear_balance_system",
+                    "cat_front_legs_twist",
+                    "cat_arched_spine_rotation",
+                    "cat_paw_pads_cushion",
+                    "playful_kittens_jumping",
+                    "cat_tail_balance_pole",
+                    "cat_climbing_tree"
+                ],
                 "narrations": [
                     "Ever wonder how cats... always land on their feet?\nIt's a secret superpower... super cool and neat!",
                     "Inside their ears... there is a balance guide!\nIt tells their clever brain... which way is up and wide!",
@@ -1450,7 +1510,27 @@ class ScriptEngine:
                 "desc": "Find out the secret language of dog tail wags and what your furry best friend is saying! #shorts #animals #dogs #pets #facts",
                 "tags": ["shorts", "kids", "dogs", "pets", "animals", "facts"],
                 "badge": "TAIL WAG SECRETS!",
+                "badges": [
+                    "SECRET TAIL CODE",
+                    "DOORWAY EXCITEMENT",
+                    "RIGHT VS LEFT WAG",
+                    "HELICOPTER TAIL",
+                    "PUPPY FRIENDSHIP",
+                    "SCENT MESSAGING",
+                    "TAIL LANGUAGE",
+                    "DOG TAIL SHOWDOWN"
+                ],
                 "prop": "happy_wagging_dog",
+                "props": [
+                    "dog_wagging_tail_intro",
+                    "dog_happy_at_front_door",
+                    "dog_wagging_tail_direction",
+                    "dog_spinning_tail_circle",
+                    "puppies_wagging_together",
+                    "dog_tail_scent_communication",
+                    "dog_calm_tail_rest",
+                    "happy_dog_outdoor_run"
+                ],
                 "narrations": [
                     "Have you ever wondered... why dogs wag their tails?\nIt's a secret language... with cheerful happy tales!",
                     "When a dog is excited... and sees you at the door!\nTheir tail wags back and forth... sweeping on the floor!",
@@ -1471,7 +1551,27 @@ class ScriptEngine:
                 "desc": "The real science behind the famous Mentos and Diet Coke backyard fountain explosion! #shorts #science #experiment #diy #coolfacts",
                 "tags": ["shorts", "science", "experiment", "soda", "coolfacts", "diy"],
                 "badge": "10-FT SODA GEYSER!",
+                "badges": [
+                    "10-FT SODA GEYSER",
+                    "PHYSICAL REACTION",
+                    "MICROSCOPIC PITS",
+                    "NUCLEATION SITES",
+                    "BILLION BUBBLE BLAST",
+                    "FOAM SPOUT ERUPTION",
+                    "DIET SODA SECRET",
+                    "SCIENCE SHOWDOWN"
+                ],
                 "prop": "soda_geyser_explosion",
+                "props": [
+                    "soda_bottle_candies_drop",
+                    "soda_carbon_gas_bubbles",
+                    "microscopic_candy_pits",
+                    "nucleation_sites_bubbles",
+                    "candy_sinking_upward_blast",
+                    "foaming_geyser_blast",
+                    "diet_soda_fountain",
+                    "backyard_science_showdown"
+                ],
                 "narrations": [
                     "Drop a single candy into soda... and boom!\nA giant fizzy geyser... shoots straight across the room!",
                     "Is it a chemical explosion? ... Nope, it's physical science!\nSoda is packed with carbon gas... looking for defiance!",
@@ -1491,7 +1591,27 @@ class ScriptEngine:
                 "desc": "Why does eating ice cream too fast give you a crazy frozen headache? The secret science explained! #shorts #science #icecream #brainfreeze #facts",
                 "tags": ["shorts", "science", "icecream", "facts", "brainfreeze", "cool"],
                 "badge": "BRAIN FREEZE HACK!",
+                "badges": [
+                    "BRAIN FREEZE OUCH!",
+                    "ROOF OF MOUTH TRICK",
+                    "COLD SENSOR ALARM",
+                    "RAPID BLOOD SURGE",
+                    "TRIGEMINAL NERVE",
+                    "TONGUE PRESS HACK",
+                    "5-SECOND RECOVERY",
+                    "COLD RUSH SHOWDOWN"
+                ],
                 "prop": "ice_cream_brain_freeze",
+                "props": [
+                    "eating_ice_cream_cold_bite",
+                    "human_mouth_palate_diagram",
+                    "cold_temperature_nerve_signal",
+                    "expanding_blood_vessels_rush",
+                    "trigeminal_nerve_forehead",
+                    "warm_tongue_pressing_palate",
+                    "blood_vessels_calming_down",
+                    "frozen_slushy_dessert"
+                ],
                 "narrations": [
                     "Take a giant bite of ice cream... and suddenly ouch!\nA massive frozen headache... knocks you onto the couch!",
                     "Is your brain really freezing? ... No, it's an optical trick!\nYour mouth is playing games... super weird and quick!",
@@ -1505,27 +1625,44 @@ class ScriptEngine:
             }
         ]
 
-        candidates = [s for s in topic_seeds if s["tier"] == tier and s["core_entity"] not in used_entities]
-        if not candidates:
-            # Fallback to any unused entity regardless of tier tags
-            candidates = [s for s in topic_seeds if s["core_entity"] not in used_entities]
-        if not candidates:
-            candidates = topic_seeds
+        sel = None
+        if requested_topic:
+            req = requested_topic.lower()
+            matching = [s for s in topic_seeds if s["core_entity"] in req or s["topic"].lower() in req or any(w in req for w in s["core_entity"].split()) or any(w in req for w in s["topic"].lower().split() if len(w) > 3)]
+            if matching:
+                sel = matching[0]
 
-        sel = candidates[0]
+        if not sel:
+            candidates = [s for s in topic_seeds if s["tier"] == tier and s["core_entity"] not in used_entities]
+            if not candidates:
+                # Fallback to any unused entity regardless of tier tags
+                candidates = [s for s in topic_seeds if s["core_entity"] not in used_entities]
+            if not candidates:
+                candidates = topic_seeds
+            sel = candidates[0]
         logger.info(f"Procedural engine auto-crafted fresh novel blueprint for [{tier}]: {sel['topic']}")
 
-        # Build 8-scene canonical blueprint
+        # Build 8-scene canonical blueprint with unique, section-specific beats and props
         bp_scenes = []
+        badges = sel.get("badges") or [sel["badge"]] * 8
+        props = sel.get("props") or [sel["prop"]] * 8
+        narr_list = sel.get("narrations") or []
+
         for i in range(1, 9):
+            idx = i - 1
+            narr_chunk = narr_list[idx] if idx < len(narr_list) else sel["topic"]
+            # Extract first meaningful concept line from narration as the specific section beat
+            first_line = narr_chunk.split("\n")[0].replace("...", "").strip()
+            beat = first_line if len(first_line) > 5 else f"{sel['topic']} part {i}"
+
             bp_scenes.append({
                 "scene_id": i,
-                "topic_beat": f"Scene {i} covering {sel['topic']}",
+                "topic_beat": beat,
                 "required_keywords": [sel["core_entity"], "power", "science", "discovery"],
                 "character_expression": "happy_proud" if i % 2 == 0 else "shocked",
                 "character_color_state": "blue" if tier == "older" else "pink",
-                "visual_prop": sel["prop"],
-                "visual_badge_text": sel["badge"],
+                "visual_prop": props[idx % len(props)],
+                "visual_badge_text": badges[idx % len(badges)],
                 "sfx_cue": "whoosh" if i in (1, 8) else "pop"
             })
 
@@ -1734,7 +1871,7 @@ class ScriptEngine:
                     scene_id=bp["scene_id"],
                     duration_sec=3.2,
                     narration=narr,
-                    visual_prompt=f"Stunning photorealistic photograph of real {real_subject}, {bp['topic_beat']}. National Geographic wildlife photography, 8k resolution, authentic nature documentary shot, natural lighting, crystal clear pin-sharp focus, detailed skin texture, realistic natural habitat, zero cartoon, zero animation, zero CGI, zero 3D render.",
+                    visual_prompt=f"Stunning photorealistic photograph of real {real_subject}, {bp['topic_beat']}. National Geographic documentary photography, f/11 deep focus aperture, pin-sharp focus on entire subject, crisp textures, natural cinematic daylight, zero motion blur, no shallow depth of field, no blurry background, zero cartoon, zero animation, zero CGI, zero 3D render.",
                     character_expression=bp["character_expression"],
                     character_color_state=bp["character_color_state"],
                     visual_prop=bp["visual_prop"],

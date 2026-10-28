@@ -91,7 +91,7 @@ class VideoComposer:
             "-r", str(self.fps),
             "-i", "-",
             "-c:v", "libx264",
-            "-preset", "ultrafast",
+            "-preset", "fast",
             "-crf", "20",
             "-pix_fmt", "yuv420p",
             output_video
@@ -144,10 +144,10 @@ class VideoComposer:
                     x2 = min(float(self.width), cx + cw)
                     y2 = min(float(self.height), cy + ch)
 
-                    # Subpixel float resampling: zero integer truncation, zero shaking!
+                    # Subpixel float resampling with Bicubic: high fidelity, crisp edges, zero blurring!
                     frame_im = base_im.resize(
                         (self.width, self.height),
-                        resample=Image.Resampling.BILINEAR,
+                        resample=Image.Resampling.BICUBIC,
                         box=(cx, cy, x2, y2)
                     )
 
@@ -228,8 +228,9 @@ class VideoComposer:
                 "-vf", video_filter,
                 "-c:v", "libx264",
                 "-preset", "fast",
-                "-b:v", "2200k",
-                "-maxrate", "2800k",
+                "-crf", "21",
+                "-b:v", "2300k",
+                "-maxrate", "2600k",
                 "-bufsize", "4500k",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
@@ -246,8 +247,9 @@ class VideoComposer:
                 "-i", audio_input,
                 "-c:v", "libx264",
                 "-preset", "fast",
-                "-b:v", "2200k",
-                "-maxrate", "2800k",
+                "-crf", "21",
+                "-b:v", "2300k",
+                "-maxrate", "2600k",
                 "-bufsize", "4500k",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
